@@ -27,14 +27,19 @@
  * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
  * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
  * @license GNU Affero General Public License - {@link http://www.gnu.org/licenses/agpl.html}
- * @example Visit {@link http://www.balupton.com/projects/jquery-history} for more information.
+ * @example Visit {@link http://www.balupton.com/projects/jquery-ajaxy} for more information.
  */
 ---
 
 Installation & Usage:
-1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-history if the demo is not included.
+1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-ajaxy if the demo is not included.
 
 Todo:
+1. Finish text for demo
+2. Talk about the options in the demo
+
+Options:
+1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
 
 ----
 

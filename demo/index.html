@@ -170,20 +170,6 @@
 		});
 		</code>
 		
-		<h3 id="trigger">Logging the State Changes in Google Analytics</h3>
-		<p>Originally Google Analytics will only perform one single page log once the page has loaded through. As we are now modifying our page's state dynamically without refreshing the browser, we would naturally want to Google Analytics to log these changes too! We can inform GA by using the following code:</p>
-		<code class="code language-javascript">
-		$(function(){
-			$('#zucchini').click(function(){
-				// Make it so when the zucchini element is clicked
-				// We trigger the state: /zucchini
-				// However we do not change to the state. Perhaps this state should remain secret to the user?
-				//  Or by changing one state, we want to change another - for instance change the main page, and change the sidebar
-				$.Ajaxy.trigger('/zucchini');
-			});
-		});
-		</code>
-		
 	</div>
 	
 	<div class="section">
@@ -201,6 +187,11 @@
 	<script type="text/javascript">
 		// Create a local noconflict scope
 		(function($){
+			// Fetch Elements
+			var $body = $(document.body),
+				$menu = $('#menu'),
+				$content = $('#content');
+			
 			// Configure Ajaxy
 			$.Ajaxy.configure({
 				'controllers': {
@@ -214,20 +205,20 @@
 							// Log what is happening
 							window.console.debug('$.Ajaxy.configure.controllers._generic.request', [this,arguments]);
 							// Loading
-							$(document.body).addClass('loading');
+							$body.addClass('loading');
 							// Done
 							return true;
 						},
 						// Fired for every response
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.response_data;
+							var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.controllers._generic.response', [this,arguments], data);
+							window.console.debug('$.Ajaxy.configure.controllers._generic.response', [this,arguments], data, state);
 							// Title
-							document.title = 'jQuery Ajaxy | ' + (data.title||this.state);
+							document.title = 'jQuery Ajaxy - ' + (data.title||this.state);
 							// Loaded
-							$(document.body).removeClass('loading');
+							$body.removeClass('loading');
 							// Return true
 							return true;
 						},
@@ -241,7 +232,7 @@
 							// Log what is happening
 							window.console.error('$.Ajaxy.configure.controllers._generic.error', [this, arguments], error_message);
 							// Loaded
-							$(document.body).removeClass('loading');
+							$body.removeClass('loading');
 							// Done
 							return true;
 						}
@@ -253,19 +244,23 @@
 						request: function(){
 							// Log what is happening
 							window.console.debug('$.Ajaxy.configure.controllers.page.request', [this,arguments]);
+							// Adjust Menu
+							$menu.children('.active').removeClass('active');
 							// Hide Content
-							$('#content').stop(true,true).fadeOut(400);
+							$content.stop(true,true).fadeOut(400);
 							// Return true
 							return true;
 						},
 						// Handle our AJAX Response
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.response_data;
+							var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.controllers.page.response', [this,arguments], data);
+							window.console.debug('$.Ajaxy.configure.controllers.page.response', [this,arguments], data, state);
+							// Adjust Menu
+							$menu.children(':has(a[href="'+state+'"])').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
-							$('#content').stop(true,true).hide().html(data.content).fadeIn(400);
+							$content.stop(true,true).hide().html(data.content).fadeIn(400);
 							// Return true
 							return true;
 						}
