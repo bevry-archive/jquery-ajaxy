@@ -47,7 +47,6 @@ Changelog:
 v1.3.1-dev, July 22, 2010
 - Updated demo to go into great detail
 
-
 v1.3.0-dev, July 22, 2010
 - Added demo
 - Added [redirect, relative_as_base, no_history_class, no_history_class, support_text] options
