@@ -21,8 +21,8 @@
  * @name readme
  * @package jquery-ajaxy
  * @category jquery-plugin
- * @version 1.2.0-dev
- * @date July 21, 2010
+ * @version 1.3.1-dev
+ * @date July 22, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
  * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
@@ -35,8 +35,7 @@ Installation & Usage:
 1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-ajaxy if the demo is not included.
 
 Todo:
-1. Finish text for demo
-2. Talk about the options in the demo
+1. Add matches support
 
 Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
@@ -44,6 +43,10 @@ Options:
 ----
 
 Changelog:
+
+v1.3.1-dev, July 22, 2010
+- Updated demo to go into great detail
+
 
 v1.3.0-dev, July 22, 2010
 - Added demo
