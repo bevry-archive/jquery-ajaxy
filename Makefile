@@ -22,7 +22,7 @@ demo:
 	open ./demo/index.html
 
 add:
-	git add .gitignore CHECKLIST.txt COPYING.txt demo Makefile README.txt scripts
+	git add .gitignore CHECKLIST.* COPYING.* demo Makefile README.* scripts
 
 push:
 	git push --all ; git push --tags ;
@@ -36,6 +36,7 @@ refresh:
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/core.string.js -O scripts/resources/core.string.js ;
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.events.js -O scripts/resources/jquery.events.js ;
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.extra.js -O scripts/resources/jquery.extra.js ;
+	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.utilities.js -O scripts/resources/jquery.utilities.js ;
 	wget -q http://github.com/balupton/jquery-history/raw/master/scripts/jquery.history.js -O scripts/jquery.history.js ;
 	wget -q http://github.com/balupton/jquery-history/raw/master/scripts/jquery.history.min.js -O scripts/jquery.history.min.js ;
 
@@ -46,6 +47,7 @@ pack:
 		./scripts/resources/core.string.js \
 		./scripts/resources/jquery.events.js \
 		./scripts/resources/jquery.extra.js \
+		./scripts/resources/jquery.utilities.js \
 		./scripts/resources/jquery.ajaxy.js \
 		> ./scripts/jquery.ajaxy.js;
 

@@ -1,7 +1,7 @@
 /**
  * @depends jquery
  * @name jquery.extra
- * @package jquery-sparkle
+ * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
  */
 
 /**
@@ -15,8 +15,10 @@
 	 * The background-color value is the the same value as the first parent div which has a background-color.
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.opacityFix = $.fn.opacityFix || function(){
 		var $this = $(this);
@@ -46,8 +48,10 @@
 	 * Get all elements above ourself which match the selector, and include ourself in the search
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.parentsAndSelf = $.fn.parentsAndSelf || function(selector){
 		var $this = $(this);
@@ -58,8 +62,10 @@
 	 * Get all elements within ourself which match the selector, and include ourself in the search
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.findAndSelf = $.fn.findAndSelf || function(selector){
 		var $this = $(this);
@@ -70,8 +76,10 @@
 	 * Find the first input, and include ourself in the search
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.firstInput = $.fn.firstInput || function(){
 		var $this = $(this);
@@ -83,8 +91,10 @@
 	 * Rather than setting the actual value of a element which $el.val does.
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.choose = $.fn.choose||function(value){
 		var $this = $(this);
@@ -117,8 +127,10 @@
 	 * Deselect a option within options, checkboxes, radios and selects.
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.unchoose = $.fn.unchoose||function(){
 		var $this = $(this);
@@ -145,8 +157,10 @@
 	 * Checks if the element would be passed with the form if the form was submitted.
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.wouldSubmit = $.fn.wouldSubmit || function(){
 		var $input = $(this).findAndSelf(':input');
@@ -161,8 +175,10 @@
 	 * Grab all the values of a form in JSON format if the form would be submitted.
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.values = $.fn.values || function(){
 		var $inputs = $(this).findAndSelf(':input');
@@ -194,8 +210,10 @@
 	 * Submit the form which the element is associated with.
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.submitForm = $.fn.submitForm || function(){
 		// Submit the parent form or our form
@@ -210,10 +228,12 @@
 	 * Checks if the element is attached within the DOM
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
-	$.fn.inDOM = function(){
+	$.fn.inDOM = $.fn.inDOM || function(){
 		var $ancestor = $(this).parent().parent();
 		return $ancestor.size() && ($ancestor.height()||$ancestor.width());
 	};
@@ -222,10 +242,12 @@
 	 * Wrap the element's value with the passed start and end text
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
-	$.fn.valWrap = function(start,end){
+	$.fn.valWrap = $.fn.valWrap || function(start,end){
 		// Wrap a value
 		var $field = $(this);
 		return $field.val($field.val().wrap(start,end));
@@ -235,10 +257,12 @@
 	 * Wrap a selection of the element's value with the passed start and end text
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
-	$.fn.valWrapSelection = function(start,end,a,z){
+	$.fn.valWrapSelection = $.fn.valWrapSelection || function(start,end,a,z){
 		// Wrap the selected text
 		var $field = $(this);
 		var field = $field.get(0);
@@ -271,10 +295,12 @@
 	 * Find (with regards to the element) the first visible input element, and give focus to it
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
-	$.fn.giveFocus = function(){
+	$.fn.giveFocus = $.fn.giveFocus || function(){
 		// Give focus to the current element
 		var $this = $(this);
 		var selector = ':input:visible:first';
@@ -286,10 +312,12 @@
 	 * Perform the highlight effect
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
-	$.fn.highlight = function(duration){
+	$.fn.highlight = $.fn.highlight || function(duration){
 		// Perform the Highlight Effect
 		return $(this).effect('highlight', {}, duration||3000);
 	};

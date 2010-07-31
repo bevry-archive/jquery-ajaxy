@@ -1,7 +1,7 @@
 /**
  * @depends jquery
  * @name jquery.events
- * @package jquery-sparkle
+ * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
  */
 
 /**
@@ -14,8 +14,10 @@
 	 * Benefit over $.bind, is that $.binder(event, callback, false|{}|''|false) works.
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.binder = $.fn.binder || function(event, data, callback){
 		// Help us bind events properly
@@ -35,8 +37,10 @@
 	 * Bind a event only once
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.once = $.fn.once || function(event, data, callback){
 		// Only apply a event handler once
@@ -58,8 +62,10 @@
 	 * Event for pressing the enter key
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.enter = $.fn.enter || function(data,callback){
 		return $(this).binder('enter',data,callback);
@@ -91,8 +97,10 @@
 	 * Event for pressing the escape key
 	 * @version 1.0.0
 	 * @date June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.cancel = $.fn.cancel || function(data,callback){
 		return $(this).binder('cancel',data,callback);
@@ -125,8 +133,10 @@
 	 * Event for the last click for a series of one or more clicks
 	 * @version 1.0.0
 	 * @date July 16, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.lastclick = $.fn.lastclick || function(data,callback){
 		return $(this).binder('lastclick',data,callback);
@@ -185,8 +195,10 @@
 	 * Event for the first click for a series of one or more clicks
 	 * @version 1.0.0
 	 * @date July 16, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.firstclick = $.fn.firstclick || function(data,callback){
 		return $(this).binder('firstclick',data,callback);
@@ -247,8 +259,10 @@
 	 * @version 1.1.0
 	 * @date July 16, 2010
 	 * @since 1.0.0, June 30, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	$.fn.singleclick = $.fn.singleclick || function(data,callback){
 		return $(this).binder('singleclick',data,callback);

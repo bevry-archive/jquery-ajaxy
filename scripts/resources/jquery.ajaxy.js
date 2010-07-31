@@ -1,7 +1,7 @@
 /**
  * @depends jquery, core.console, core.string, jquery.extra
  * @name jquery.ajaxy
- * @package jquery-ajaxy
+ * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
  */
 
 /**
@@ -15,14 +15,16 @@
 	 * Prepare Body
 	 */
 	$(document.body).addClass('js');
-
+	
 	/**
-	 * jQuery Ajaxy - jQuery's DRY Effect Library
-	 * @version 1.2.0
-	 * @date July 11, 2010
-	 * @since 1.0.0, June 30, 2010
- 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- 	 * @license GNU Affero General Public License - {@link http://www.gnu.org/licenses/agpl.html}
+	 * jQuery Ajaxy
+	 * @version 1.4.0
+	 * @date August 01, 2010
+	 * @since 0.1.0-dev, July 24, 2008
+     * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
+	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
+	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
 	if ( !($.Ajaxy||false) ) {
 		/**
@@ -54,12 +56,7 @@
 				/**
 				 * The CSS class that can be attached to a Ajaxy link to indicate we should not log this page in history.
 				 */
-				no_history_class: 'ajaxy-no_history,ajaxy__no_history', // __ for b/c
-				/**
-				 * Whether or not we should default to use the request controller if not controller was returned in the response.
-				 * For production use, you want to ensure this has been set to false. As we should always send the controller to be used with the response.
-				 */
-				use_request_controller_as_default: true,
+				no_log_class: 'ajaxy-no_log',
 				/**
 				 * Whether or not we should perform the initial redirect if we have detected we are on a page.
 				 * For production use, you want to ensure this has been set to false. As we should always want to ensure we are in the correct location.
@@ -72,7 +69,7 @@
 				relative_as_base: true,
 				/**
 				 * Whether or not we should support plain text responses in our Ajax requests, as well as the standard JSON.
-				 * If this is set to true and text was sent back on a Ajax request, then response_data will have the following structure:
+				 * If this is set to true and text was sent back on a Ajax request, then responseData will have the following structure:
 				 * 		{
 				 * 			content: responseText
 				 * 		}
@@ -91,12 +88,104 @@
 				 * Whether or not we should output as much debugging information as possible.
 				 * For production use, you want to ensure this has been set to false. As we should always never want the client to see debug information.
 				 */
-				debug: true
+				debug: true,
+				/**
+				 * The Controllers to use
+				 */
+				Controllers: {}
 			},
 		
 			// -----------------
 			// Variables
-		
+			
+			/**
+			 * Default Structures
+			 */
+			defaults: {
+				/**
+				 * Default Controller Structure
+				 * All Controllers inherit and are bound to this
+				 */
+				Controller: {
+					// Options
+					selector: null,
+					matches: null,
+					
+					// System
+					controller: null,
+					
+					// Actions
+					response: null,
+					request: null,
+					error: null
+				},
+				
+				Action: {
+					// Options
+					propagate: true,
+					
+					// System
+					action: null,
+					state: null,
+					State: null,
+					controller: null,
+					Controller: null,
+					
+					// Ajaxy Helper Functions
+					forward: function(){
+						window.console.error('Ajaxy.Action.forward: Forward never defined.', [this, arguments]);
+						window.console.trace();
+					},
+					trigger: function(){
+						window.console.error('Ajaxy.Action.trigger: Trigger never defined.', [this, arguments]);
+						window.console.trace();
+					},
+					stopPropagation: function(){
+						this.propagate = false;
+					},
+					preventDefault: function(){
+						this.propagate = false;
+					}
+				},
+				
+				/**
+				 * Default State Structure
+				 * All Controllers inherit and are bound to this
+				 * State is associated with a particular state
+				 */
+				State: {
+					// Options
+					log: null,
+					form: false,
+					
+					// System
+					state: null,
+					controller: null,
+					
+					/** The Request Object that is used in the $.Ajax */
+					Request: {
+						data: {}
+					},
+					
+					/* The Response Object which is returned in our Ajax Request */
+					Response: {
+						callback: null,
+						data: {}
+					},
+					
+					/* The Response Object which is returned from an Error in our Ajax Request */
+					Error: {
+						callback: null,
+						data: {}
+					},
+					
+					/* Any user data specific to the state should go in here. This is not used by Ajaxy. */
+					User: {
+						data: {}
+					}
+				}
+			},
+			
 			/**
 			 * Have we been constructed
 			 */
@@ -105,18 +194,18 @@
 			/**
 			 * Collection of Controllers
 			 */
-			controllers: {},
+			Controllers: {},
 		
 			/**
-			 * Collection of hashes
+			 * Collection of states
 			 */
-			hashes: {},
-		
+			States: {},
+			
 			/**
 			 * Queue for our events
-			 * @param {Object} hash
+			 * @param {Object} state
 			 */
-			ajaxqueue: [],
+			ajaxQueue: [],
 		
 			/**
 			 * Our assigned data
@@ -134,67 +223,77 @@
 			// Functions
 		
 			/**
-			 * Format a hash accordingly
-			 * @param {String} hash
+			 * Format a state accordingly
+			 * @param {String} state
 			 */
-			format: function (hash){
+			format: function (state){
 				var Ajaxy = $.Ajaxy; var History = $.History;
+				
 				// Strip urls
-				hash = hash.replace(/^\//, '').strip(Ajaxy.options.root_url).strip(Ajaxy.options.base_url);
+				state = state.replace(/^\//, '').strip(Ajaxy.options.root_url).strip(Ajaxy.options.base_url);
+				
 				// History format
-				hash = History.format(hash);
+				state = History.format(state);
+				
 				// Slash
-				if ( hash ) hash = '/'+hash;
+				if ( state ) state = '/'+state;
+				
 				// All good
-				return hash;
+				return state;
 			},
 		
 			/**
 			 * Bind controllers
 			 * Either via Ajaxy.bind(controller, options), or Ajaxy.bind(controllers)
 			 * @param {String} controller
-			 * @param {Object} options
+			 * @param {Object} Controller
 			 */
-			bind: function ( controller, options ) {
+			bind: function ( controller, Controller ) {
 				var Ajaxy = $.Ajaxy;
+				
 				// Add a controller
-				if ( typeof options === 'undefined' && typeof controller === 'object' ) {
+				if ( typeof Controller === 'undefined' && typeof controller === 'object' ) {
 					// Array of controllers
-					for (index in controller) {
-						Ajaxy.bind(index, controller[index]);
-					}
+					$.each(controller,Ajaxy.bind);
 					return true;
-				} else if ( typeof options === 'function' ) {
+				}
+				else if ( typeof Controller === 'function' ) {
 					// We just have the response handler
-					options = {
-						'response': options
+					Controller = {
+						'response': Controller
 					}
-				} else if ( typeof options !== 'object' ) {
+				}
+				else if ( typeof Controller !== 'object' ) {
 					// Unknown handlers
-					window.console.error('AJAXY: Bind: Unknown option type', controller, options);
+					window.console.error('Ajaxy.bind: Unknown option type', [this, arguments]);
+					window.console.trace();
 					return false;
 				}
-			
-				// Create the controller
-				if ( typeof Ajaxy.controllers[controller] === 'undefined' ) {
-					Ajaxy.controllers[controller] = {
-						trigger:function(action){
-							return Ajaxy.trigger(controller, action);
-						},
-						ajaxy_data: {},
-						response_data: {},
-						request_data: {},
-						error_data: {}
-					};
+				
+				// Create the Controller
+				if ( typeof Ajaxy.getController(controller,false) === 'undefined' ) {
+					Ajaxy.storeController(
+						$.prepareObject(
+							Ajaxy.defaults.Controller,
+							{
+								'controller': controller
+							},
+							Controller
+						)
+					);
 				}
-			
-				// Bind the handlers to the controller
-				for ( option in options ) {
-					Ajaxy.controllers[controller][option] = options[option];
+				else {
+					// Already bound
+					window.console.error('Ajaxy.bind: Controller already bound.', [this, arguments]);
+					window.console.trace();
+					return false;
 				}
-			
-				// Ajaxify the controller
-				Ajaxy.ajaxifyController(controller);
+				
+				// Ajaxify the Controller
+				if ( Ajaxy.options.auto_ajaxify ) {
+					Ajaxy.ajaxifyController(controller);
+					return true; // prevent closure complaint
+				}
 			
 				// Done
 				return true;
@@ -202,99 +301,108 @@
 			
 			/**
 			 * Trigger the action for the particular controller
-			 * @param {Object} controller
-			 * @param {Object} action
-			 * @param {Object} args
-			 * @param {Object} params
+			 * @param {String} controller
+			 * @param {String} action
+			 * @param {Object} State
 			 */
-			trigger: function ( controller, action, args, params ) {
+			trigger: function ( controller, action, state ) {
 				var Ajaxy = $.Ajaxy;
-				// Trigger
-				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.trigger: ', [this, arguments, params]);
-			
-				// Fire the state handler
-				params = params || {};
-				args = args || [];
-				var i, n, list, call_generic;
-				call_generic = true;
-			
-				// Check Controller
-				if ( typeof controller === 'undefined' || controller === null ) {
-					window.console.info('Ajaxy.trigger: Controller Reset', [controller, action], [this, arguments]);
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.trigger: ', [this, arguments]);
+				
+				// Prepare
+				var i, n, list, call_generic = true;
+				
+				// Check Input
+				if ( !controller ) {
+					window.console.warn('Ajaxy.trigger: No controller was passed, reset to _generic.', [this, arguments]);
 					controller = '_generic';
 				}
-				if ( typeof Ajaxy.controllers[controller] === 'undefined' ) {
+				
+				// --------------------------
+				// Fetch
+				
+				// Fetch Controller
+				var Controller = Ajaxy.getController(controller);
+				
+				// Fetch Controller Action
+				var ControllerAction = Ajaxy.getControllerAction(controller,action,false);
+				
+				// Fetch the State
+				var State = Ajaxy.getState(state,true),
+					state = State.state||undefined;
+				
+				// --------------------------
+				// Checks
+				
+				// Check Controller
+				if ( typeof Controller === 'undefined' ) {
 					// No Controller
-					window.console.error('Ajaxy.trigger: No Controller', [controller, action], [this, arguments]);
+					window.console.error('Ajaxy.trigger: Controller does not exist', [this, arguments]);
 					window.console.trace();
 					if ( controller !== '_generic' ) {
-						Ajaxy.trigger('_generic', 'error', args, params);
+						Ajaxy.trigger('_generic', 'error', State);
 					}
 					return false;
 				}
-			
+				
 				// Check Controller Action
-				if ( typeof Ajaxy.controllers[controller][action] === 'undefined' ) {
+				if ( typeof ControllerAction === 'undefined' ) {
 					// No Action
-					window.console.error('Ajaxy.trigger: No Controller Action', [controller, action], [this, arguments]);
+					window.console.error('Ajaxy.trigger: No Controller Action', [this, arguments]);
 					window.console.trace();
 					if ( controller !== '_generic' ) {
-						Ajaxy.trigger('_generic', 'error', args, params);
+						Ajaxy.trigger('_generic', 'error', State);
 					}
 					return false;
 				}
-			
-				// Apply the Params to the Controller
-				params.propagate = (typeof params.propagate === 'undefined' || params.propagate) ? true : false;
-				params.state = params.hash = params.hash||null;
-				params.controller = params.controller||null;
-				params.form = params.form||null;
-				params.request_data = params.request_data||{};
-				params.request_data = params.request_data||{};
-				params.response_data = params.response_data||{};
-				params.error_data = params.error_data||{};
-				params.user_data = params.user_data||{};
-				params.ajaxy_data = $.extend({},{
-					controller: controller,
-					action: action
-				}, params.ajaxy_data||{});
-			
-				// Apply
-				Ajaxy.controllers[controller].state = params.hash;
-				Ajaxy.controllers[controller].hash = params.hash;
-				Ajaxy.controllers[controller].controller = params.controller;
-				Ajaxy.controllers[controller].form = params.form;
-				Ajaxy.controllers[controller].propagate = params.propagate;
-				Ajaxy.controllers[controller].request_data = params.request_data;
-				Ajaxy.controllers[controller].response_data = params.response_data;
-				Ajaxy.controllers[controller].error_data = params.error_data;
-				Ajaxy.controllers[controller].user_data = params.user_data;
-				Ajaxy.controllers[controller].ajaxy_data = params.ajaxy_data;
-			
-				// Forward
-				Ajaxy.controllers[controller].forward = function(_controller, _action, _args, _params){
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.triger.forward:', [controller, action, args, params], [this, arguments]);
+				
+				// --------------------------
+				// Prepare Action
+				
+				// Generate Action
+				var Action = $.extend({},Ajaxy.defaults.Action,{
+					'action':action,
+					'controller':controller,
+					'Controller':Controller,
+					'state':state,
+					'State':State
+				});
+				
+				// Setup up the Trigger + Forward Actions
+				Action.forward = Action.trigger = function(_controller, _action, _state){
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.Action.trigger:', [this, arguments]);
+					
+					// Prepare
+					_controller = _controller||controller;
 					_action = _action||action;
-					_args = _args||args;
-					_params = _params||this;
-					Ajaxy.trigger(_controller, _action, _args, _params);
+					_state = _state||state;
+					
+					// Trigger
+					Ajaxy.trigger(_controller, _action, _state);
+					
+					// Return true
 					return true;
-				}
-			
-				// Fire the specific handler
-				var handler = Ajaxy.controllers[controller][action];
-				var result = handler.apply(Ajaxy.controllers[controller], args);
-				//if ( result === false ) {
-				if ( Ajaxy.controllers[controller].propagate === false ) {
+				};
+				
+				// --------------------------
+				// Fire
+				
+				// Fire the ControllerAction Handler
+				var result = ControllerAction.apply(Action, []);
+				
+				// Should we continue to Propagate through
+				if ( Action.propagate === false ) {
 					// Break
 					call_generic = false;
 				}
-			
-				// Fire generic
+				
+				// Fire generic?
 				if ( call_generic && controller !== '_generic' ) {
 					// Fire generic
-					Ajaxy.controllers[controller].forward('_generic');
+					Action.forward('_generic');
 				}
+				
+				// --------------------------
 				
 				// Return true
 				return true;
@@ -306,8 +414,8 @@
 			 */
 			get: function ( name ) {
 				var Ajaxy = $.Ajaxy;
-			
-				//
+				
+				// Fetch data
 				if ( typeof Ajaxy.data[name] !== 'undefined' ) {
 					return Ajaxy.data[name];
 				} else {
@@ -333,7 +441,7 @@
 					Ajaxy.data[data] = value;
 				}
 			},
-		
+			
 			/**
 			 * Refresh
 			 */
@@ -345,114 +453,343 @@
 		
 			/**
 			 * Perform an Ajaxy Request
-			 * @param {Object} data
+			 * @param {String|Object} UserState
 			 */
-			go: function ( data ) {
+			go: function ( UserState ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
-				// Go
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go:', [this, arguments]);
 			
+				// --------------------------
+				
 				// Ensure format
-				if ( typeof data === 'string' ) {
-					// We have just a hash
-					data = {
-						hash: data
+				if ( typeof UserState === 'string' ) {
+					// We have just a state
+					UserState = {
+						state: UserState
 					};
 				}
-			
-				// Ensure callbacks
-			
-				// Prepare
-				var hashdata = {
-					url: 			data.url || null,
-					hash: 			data.hash || null,
-					controller: 	data.controller || null,
-					form: 			data.form || null,
-					data: 			data.data || {},
-					history:		typeof data.history === 'undefined' ? null : data.history,
-					response: 		data.response || data.success || null,
-					request:		data.request || null,
-					error: 			data.error || null
-				};
-			
-				// Ensure hash
-				if ( !hashdata.hash && hashdata.url ) {
-					hashdata.hash = Ajaxy.format(hashdata.url);
+				
+				// Prepare State
+				var State = $.extend(true,{},Ajaxy.defaults.State,UserState);
+				
+				// --------------------------
+				
+				// Ensure state and log
+				if ( !State.state && State.url ) {
+					State.state = Ajaxy.format(State.url);
 					// We have a URL
 					// Don't log by default
-					if ( hashdata.history === null ) {
-						hashdata.history = false;
+					if ( State.log === null || State.log === undefined ) {
+						State.log = false;
 					}
-				} else if ( hashdata.form ) {
+				} else if ( State.form ) {
 					// We have a form
 					// Don't log by default
-					if ( hashdata.history === null ) {
-						hashdata.history = false;
+					if ( State.log === null || State.log === undefined ) {
+						State.log = false;
 					}
 				} else {
 					// We are normal
 					// Do log by default
-					if ( hashdata.history === null ) {
-						hashdata.history = true;
+					if ( State.log === null || State.log === undefined ) {
+						State.log = true;
 					}
 				}
 			
-				// Ensure
-				hashdata.history = hashdata.history ? true : false
+				// Ensure log is a boolean (never null)
+				State.log = State.log ? true : false
 			
-				// Check hash
-				if ( !hashdata.hash ) {
-					window.console.error('Ajaxy.request: No hash');
+				// --------------------------
+				
+				// Check state
+				if ( !State.state ) {
+					window.console.error('Ajaxy.go: No state', [this, arguments]);
 					return false;
 				} else {
-					hashdata.hash = Ajaxy.format(hashdata.hash);
+					State.state = Ajaxy.format(State.state);
 				}
-			
+				
 				// Figure it out
-				if ( hashdata.hash !== History.getHash() && Ajaxy.options.debug ) {
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: Trigger but no change.', hashdata.hash);
+				if ( State.state === History.getHash() && Ajaxy.options.debug ) {
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go: Trigger but no change.', State.state);
 				}
+				
+				// Store it
+				Ajaxy.storeState(State);
 			
-				// Assign data for reuse
-				Ajaxy.hashes[hashdata.hash] = hashdata;
-			
-				// Trigger hash
-				if ( hashdata.history ) {
+				// --------------------------
+				
+				// Trigger state
+				if ( State.log ) {
 					// Log the history
 					// Trigger automaticly
-					History.go(hashdata.hash);
+					History.go(State.state);
 				} else {
 					// Don't log
 					// Trigger manually
-					Ajaxy.hashchange(hashdata.hash);
+					Ajaxy.stateChange(State.state);
 				}
-			
-				// Done
+				
+				// --------------------------
+				
+				// Return true
 				return true;
 			},
-		
+			
+			/**
+			 * Get the Controller Action
+			 * @param {String|Object} controller
+			 * @return {Object|undefined}
+			 */
+			getControllerAction: function ( controller, action, create ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var ControllerAction = undefined,
+					Controller = Ajaxy.getController(controller,false);
+				
+				// Fetch
+				if ( typeof Controller === 'undefined' ) {
+					if ( create === false ) {
+						// Don't report couldn't find
+					}
+					else {
+						window.console.error('Ajaxy.getControllerAction: Controller does not exist', [this, arguments]);
+						window.console.trace();
+					}
+				}
+				else {
+					var controllerActionType = typeof (Controller[action]||undefined);
+					if ( controllerActionType === 'function' || controllerActionType === 'object' ) {
+						ControllerAction = Controller[action];
+					}
+					else if ( create === false ) {
+						// Don't report couldn't find
+					}
+					else {
+						window.console.error('Ajaxy.getControllerAction: Controller Action does not exist', [this, arguments]);
+						window.console.trace();
+					}
+				}
+				
+				// Return ControllerAction
+				return ControllerAction;
+			},
+			
+			/**
+			 * Store a Controller Object
+			 * @param {Object} Controller
+			 */
+			storeController: function ( Controller ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var result = true,
+					controllerType = typeof (Controller||undefined);
+					
+				// Fetch
+				if ( controllerType === 'object' && typeof Controller.controller === 'string' ) {
+					result = Ajaxy.Controllers[Controller.controller] = Controller;
+				}
+				else {
+					window.console.error('Ajaxy.getController: Unkown Controller Format', [this, arguments]);
+					window.console.trace();
+					result = false;
+				}
+			
+				// Return result
+				return result;
+			},
+			
+			/**
+			 * Get the controller's Controller Object
+			 * @param {String|Object} controller
+			 * @return {Object|undefined}
+			 */
+			getController: function ( controller, create ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var Controller = undefined,
+					controllerType = typeof (controller||undefined);
+				
+				// Fetch
+				if ( (controllerType === 'number' || controllerType === 'string') && typeof Ajaxy.Controllers[controller] !== 'undefined' ) {
+					Controller = Ajaxy.Controllers[controller];
+				}
+				else if ( controllerType === 'object' && typeof controller.controller === 'string' ) {
+					Controller = Ajaxy.getController(controller.controller,create);
+				}
+				else if ( create ) {
+					Controller = $.extend({},Ajaxy.defaults.Controller);
+				}
+				else if ( create === false ) {
+					// Don't report couldn't find
+				}
+				else {
+					// Report couldn't find
+					window.console.error('Ajaxy.getController: Controller does not exist', [this, arguments]);
+					window.console.trace();
+				}
+			
+				// Return Controller
+				return Controller;
+			},
+			
+			/**
+			 * Store a State Object
+			 * @param {Object} state
+			 */
+			storeState: function ( State ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var result = true,
+					stateType = typeof (State||undefined);
+				
+				// Fetch
+				if ( stateType === 'object' && typeof State.state === 'string' ) {
+					result = Ajaxy.States[State.state] = State;
+				}
+				else {
+					window.console.error('Ajaxy.getState: Unkown State Format', [this, arguments]);
+					window.console.trace();
+					result = false;
+				}
+			
+				// Return result
+				return result;
+			},
+			
+			/**
+			 * Get the state's State Object
+			 * @param {String|Object} state
+			 * @return {Object|undefined}
+			 */
+			getState: function ( state, create ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var State = undefined,
+					stateType = typeof (state||undefined);
+				
+				// Fetch
+				if ( (stateType === 'number' || stateType === 'string') && typeof Ajaxy.States[state] !== 'undefined' ) {
+					State = Ajaxy.States[state];
+				}
+				else if ( stateType === 'object' && typeof state.state === 'string' ) {
+					State = Ajaxy.getState(state.state,create);
+				}
+				else if ( create ) {
+					State = $.extend({},Ajaxy.defaults.State);
+				}
+				else if ( create === false ) {
+					// Don't report couldn't find
+				}
+				else {
+					// Report couldn't find
+					window.console.error('Ajaxy.getState: State does not exist', [this, arguments]);
+					window.console.trace();
+				}
+			
+				// Return State
+				return State;
+			},
+			
 			/**
 			 * Track a state change in Google Analytics
 			 * @param {String} state
 			 */
 			track: function ( state ) {
-				var History = $.History;
+				var Ajaxy = $.Ajaxy;
 			
 				// Inform Google Analytics of a state change
 				if ( typeof pageTracker !== 'undefined' ) {
-					pageTracker._trackPageview('/'+state);
+					pageTracker._trackPageview(Ajaxy.options.base_url+'/'+state);
+					// ^ we do not use root url here as google doesn't want that
+					//   but it does want the base url here
+					//   http://www.google.com/support/googleanalytics/bin/answer.py?answer=55521
 				}
+				
+				// Done
+				return true;
 			},
-		
+			
+			/**
+			 * Determines the result of a matches against a state
+			 * @param {Regex|Array|String} matches
+			 * @param {String} state
+			 */
+			matches: function ( matches, state ) {
+				var Ajaxy = $.Ajaxy;
+				var isAMatch = false;
+				
+				// Handle matches
+				switch ( typeof matches ) {
+					// Objects
+					case 'function':
+					case 'object':
+						if ( matches.test||false && matches.exec||false ) {
+							// Regular Expression
+							isAMatch = matches.test(state);
+							break;
+						}
+					case 'array':
+						$.each(matches, function(i,match){
+							isAMatch = Ajaxy.matches(match,state);
+							if ( isAMatch ) return false; // break out of $.each
+						});
+						break;
+					
+					// Exact
+					case 'number':
+					case 'string':
+						isAMatch = (String(matches) === state);
+						break;
+				}
+				
+				// Return isAMatch
+				return isAMatch;
+			},
+			
+			/**
+			 * Match the state against the controllers
+			 * @param {String} state
+			 */
+			match: function ( state ) {
+				var Ajaxy = $.Ajaxy;
+				var matchedController = false;
+				
+				// Cycle through
+				$.each(Ajaxy.Controllers, function(controller,Controller){
+					// Check for matches
+					var matches = Ajaxy.matches(Controller.matches||false, state);
+					// Did we find a match?
+					if ( matches ) {
+						matchedController = controller;
+						return false; // break out of $.each
+					}
+				});
+				
+				// Return matchedController
+				return matchedController;
+			},
+			
 			/**
 			 * Send an Ajaxy Request
-			 * @param {Object} hash
+			 * @param {Object} state
 			 */
-			request: function (hash) {
+			request: function (state) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
-			
-				// Format the hash
-				hash = Ajaxy.format(hash);
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request:', [this, arguments]);
+				
+				// Prepare variables
+				var skip_ajax = false;
+				
+				// --------------------------
+				
+				// Format the state
+				state = Ajaxy.format(state);
 			
 				// Check if we were a redirect
 				if ( Ajaxy.redirected !== false ) {
@@ -462,175 +799,197 @@
 				}
 			
 				// Add to AJAX queue
-				Ajaxy.ajaxqueue.push(hash);
-				if ( Ajaxy.ajaxqueue.length !== 1 ) {
+				Ajaxy.ajaxQueue.push(state);
+				if ( Ajaxy.ajaxQueue.length !== 1 ) {
 					// Already processing an event
 					return false;
 				}
 			
 				// Fire the analytics
-				if ( this.options.analytics ) {
-					Ajaxy.track(hash);
+				if ( Ajaxy.options.analytics ) {
+					Ajaxy.track(state);
 				}
-			
-				// Ensure the hashdata
-				var hashdata;
-				hashdata = Ajaxy.hashes[hash] = Ajaxy.hashes[hash] || {};
-				hashdata.url = (hashdata.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(hash.replace(/^\//, '') || '?'));
-				hashdata.hash = hash;
-				hashdata.controller = hashdata.controller || null;
-				hashdata.form = hashdata.form || null;
-				hashdata.data = hashdata.data || {};
-				hashdata.data.Ajaxy = true;
-				hashdata.response = hashdata.response || null;
-				hashdata.request = hashdata.request || null;
-				hashdata.error = hashdata.error || null;
-				hashdata.request_data = hashdata.request_data||{};
-				hashdata.response_data = hashdata.response_data||{};
-				hashdata.error_data = hashdata.error_data||{};
-			
+				
+				// --------------------------
+				
+				// Determine State
+				var State = Ajaxy.getState(state,true);
+				
+				// Determine controller
+				var controller = State.controller || Ajaxy.match(state) || undefined;
+				
+				// --------------------------
+				
+				// Prepare the State
+				State.state = state;
+				State.controller = controller;
+				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state.replace(/^\//, '') || '?'));
+				
+				// Store the State
+				Ajaxy.storeState(State);
+				
+				// --------------------------
+				
 				// Trigger Request
-				Ajaxy.trigger('_generic', 'request');
-			
+				Ajaxy.trigger(controller, 'request');
+				
+				// --------------------------
+				
 				// Define handlers
-				var request;
-				request = {
-					data: hashdata.data,
-					url: hashdata.url,
+				var Request = {
+					data: State.Request.data,
+					url: State.Request.url,
 					type: 'post',
-					success: function(response_data, status){
+					success: function(responseData, status){
 						// Success
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.success:', [this, arguments]);
 					
 						// Prepare
-						response_data = response_data || {};
-						response_data.Ajaxy = response_data.Ajaxy || {};
-					
+						responseData = $.extend(true,{},Ajaxy.defaults.State.Response.data,responseData);
+						responseData.Ajaxy = responseData.Ajaxy || {};
+						
 						// Check for redirect
-						if ( response_data.Ajaxy.redirected ) {
+						if ( responseData.Ajaxy.redirected ) {
 							// A redirect was performed, set a option so we know what to do
-							var newhash = Ajaxy.format(response_data.Ajaxy.redirected.to);
+							var newState = Ajaxy.format(responseData.Ajaxy.redirected.to);
 							Ajaxy.redirected = {
 								status: true,
-								from: hash,
-								to: newhash
+								from: state,
+								to: newState
 							};
 							// Update the history, not ajaxy
-							History.go(newhash);
+							History.go(newState);
 							// We do the redirect check up the top, so no worries here, this one flows through like normal
 						};
-					
+						
 						// Success function
-						Ajaxy.ajaxqueue.shift()
-						var queue_hash = Ajaxy.ajaxqueue.pop();
-						if (queue_hash && queue_hash !== hash) {
-							Ajaxy.ajaxqueue = []; // abandon others
-							Ajaxy.hashchange(queue_hash);
+						Ajaxy.ajaxQueue.shift()
+						var queueState = Ajaxy.ajaxQueue.pop();
+						if (queueState && queueState !== state) {
+							Ajaxy.ajaxQueue = []; // abandon others
+							Ajaxy.stateChange(queueState);
 							return false; // don't care for this
 						}
-					
+						
 						// Prepare
-						hashdata.response_data = response_data;
-						hashdata.error_data = {};
-					
+						State.Response.data = responseData;
+						State.Error.data = {};
+						
+						// Fetch controller
+						var controller = responseData.controller || State.controller || null;
+						
 						// Check controller
-						var controller = response_data.controller || null;
-					
-						// Default Controller?
-						if ( !controller && Ajaxy.options.use_request_controller_as_default ) {
-							controller = hashdata.controller;
+						if ( controller === null ) {
+							// Default
+							controller = '_generic';
+							// Issue warning
+							window.console.warn(
+								'Ajaxy.request.success.controller: The controller was unable to be determined, defaulted to _generic.',
+								[this, arguments],
+								[responseData.controller, State.controller]
+							);
 						}
 						
-						// Fire callback
-						if ( hashdata.response ) {
-							if ( hashdata.response.apply(hashdata, arguments) || controller === 'callback' ) {
-								// Ignore the rest
+						// Fire User Specified Callback (specified with Ajaxy.go)
+						// Halts if callback returns true, or if controller is set to 'callback'
+						if ( State.Response.callback ) {
+							if ( State.Response.callback.apply(State, arguments) || controller === 'callback' ) {
+								// We are done
 								return true;
 							}
-							if ( !controller ) {
-								// If we are continueing on, ignore missing controller
-								controller = '_generic';
-							}
+							// We fired the callback and we want to continue on
 						}
-					
+						
 						// Trigger handler
-						return Ajaxy.trigger(controller, 'response', [], hashdata);
+						return Ajaxy.trigger(controller, 'response', State);
 					},
-					error: function(XMLHttpRequest, textStatus, errorThrown, response_data){
+					error: function(XMLHttpRequest, textStatus, errorThrown, responseData){
 						// Error
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.error:', [this, arguments]);
 					
 						// Prepare
-						if ( !response_data ) {
+						if ( !responseData ) {
 							// Should already be handled, but in the rare case it isn't
-							response_data = {
+							responseData = {
 								responseText: XMLHttpRequest.responseText.trim()||false
 							}
 						}
 					
 						// Handler queue
-						Ajaxy.ajaxqueue.shift()
-						var queue_hash = Ajaxy.ajaxqueue.pop();
-						if (queue_hash && queue_hash !== hash) {
-							Ajaxy.ajaxqueue = []; // abandon others
-							Ajaxy.hashchange(queue_hash);
+						Ajaxy.ajaxQueue.shift()
+						var queueState = Ajaxy.ajaxQueue.pop();
+						if (queueState && queueState !== state) {
+							Ajaxy.ajaxQueue = []; // abandon others
+							Ajaxy.stateChange(queueState);
 							return false; // don't care for this
 						}
 					
 						// Prepare
-						var error_data = {
+						var errorData = {
 							XMLHttpRequest: XMLHttpRequest,
 							textStatus: textStatus,
 							errorThrown: errorThrown
 						};
 					
 						// Prepare
-						hashdata.request_data.XMLHttpRequest = XMLHttpRequest;
-						hashdata.response_data = response_data;
-						hashdata.error_data = {};
+						State.Request.XMLHttpRequest = XMLHttpRequest;
+						State.Response.data = responseData;
+						State.Error.data = {};
 					
+						// Fetch controller
+						var controller = responseData.controller || State.controller || null;
+						
 						// Check controller
-						var controller = response_data.controller || null;
-					
-						// Fire callback
-						if ( hashdata.response ) {
-							if ( hashdata.response.apply(hashdata, arguments) || controller === 'callback' ) {
-								// Ignore the rest
+						if ( controller === null ) {
+							// Default
+							controller = '_generic';
+							// Issue warning
+							window.console.warn(
+								'Ajaxy.request.error.controller: The controller was unable to be determined, defaulted to _generic.',
+								[this, arguments],
+								[responseData.controller, State.controller]
+							);
+						}
+						
+						// Fire User Specified Callback (specified with Ajaxy.go)
+						// Halts if callback returns true, or if controller is set to 'callback'
+						if ( State.Error.callback ) {
+							if ( State.Error.callback.apply(State, arguments) || controller === 'callback' ) {
+								// We are done
 								return true;
 							}
-							if ( !controller ) {
-								// If we are continueing on, ignore missing controller
-								controller = '_generic';
-							}
+							// We fired the callback and we want to continue on
 						}
-					
+						
 						// Trigger handler
-						return Ajaxy.trigger(controller, 'error', [], hashdata);
+						return Ajaxy.trigger(controller, 'error', State);
 					},
 				
 					complete:	function ( XMLHttpRequest, textStatus ) {
 						// Request completed
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.complete:', [this, arguments]);
 						// Set XMLHttpRequest
-						hashdata.request_data.XMLHttpRequest = XMLHttpRequest;
+						State.Request.XMLHttpRequest = XMLHttpRequest;
 						// Ignore for some reason
 						if ( false && this.url !== XMLHttpRequest.channel.name ) {
 							// A redirect was performed, set a option so we know what to do
-							var newhash = Ajaxy.format(XMLHttpRequest.channel.name);
+							var newState = Ajaxy.format(XMLHttpRequest.channel.name);
 							Ajaxy.redirected = {
 								status: true,
-								from: hash,
-								to: newhash
+								from: state,
+								to: newState
 							};
 							// Update the history, not ajaxy
-							History.go(newhash);
+							History.go(newState);
 						};
 					}
 				};
 			
+				// --------------------------
+				
 				// Handle form if need be
-				if ( hashdata.form ) {
-					var $form = $(hashdata.form);
+				if ( State.form ) {
+					var $form = $(State.form);
 					
 					// Determine form type
 					var enctype = $form.attr('enctype');
@@ -659,7 +1018,7 @@
 							try {
 								json = JSON.parse(text);
 							} catch ( e ) {
-								window.console.error('Invalid response: ', text, [this, arguments]);
+								window.console.error('Ajaxy.request.form: Invalid Response.', [this, arguments], [text]);
 							}
 							if ( json ) {
 								request.success(json);
@@ -682,24 +1041,33 @@
 
 						// Update
 						var values = $form.values();
-						request.data = hashdata.data = $.extend(request.data, values);
-						hashdata.request_data = request;
-					
-						// Done with this
-						return true;
+						Request.data = $.extend(Request.data, values||{});
+						
+						// Inform to skip ajax
+						skip_ajax = true;
 					}
 					else {
 						// Normal form
 						var values = $form.values();
-						request.data = hashdata.data = $.extend(request.data, values);
+						Request.data = $.extend(Request.data, values||{});
 					}
 				}
-			
+				
+				// --------------------------
+				
+				// Prepare Result
+				var result = true;
+				
 				// Update
-				hashdata.request_data = request;
-			
+				State.Request = Request;
+				
 				// Perform AJAX request
-				return Ajaxy.ajax(request);
+				if ( !skip_ajax ) {
+					result = Ajaxy.ajax(Request);
+				}
+				
+				// Return result
+				return result;
 			},
 		
 		
@@ -709,15 +1077,20 @@
 			 */
 			ajax: function(options){
 				var Ajaxy = $.Ajaxy; var History = $.History;
-				// Defaults
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax:', [this, arguments]);
+				
+				// --------------------------
+				
+				// Move handlers into callbacks
+				// Use defaults if they do not exist
 				var callbacks = {};
-				callbacks.success = options.success || function (response_data, status) {
+				callbacks.success = options.success || function (data, status) {
 					// Success
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.callbacks.success:', [this, arguments]);
 					// Handle
 					$('.error').empty();
 				};
-				callbacks.error = options.error || function (XMLHttpRequest, textStatus, errorThrown, response_data) {
+				callbacks.error = options.error || function (XMLHttpRequest, textStatus, errorThrown, data) {
 					// Error
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.callbacks.error:', [this, arguments]);
 					// Handle
@@ -727,57 +1100,65 @@
 					// Request completed
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.callbacks.complete:', [this, arguments]);
 				};
+				
+				// Delete from options
 				delete options.success;
 				delete options.error;
 				delete options.complete;
 			
-				// Prepare
-				var request = $.extend({
+				// --------------------------
+				
+				// Prepare Ajax Request
+				var request = {
 					type:		'post',
 					dataType:	(Ajaxy.options.support_text ? 'text' : 'json')
-				}, options || {});
+				};
+				$.extend(request,options);
 				
-				// Handlers
+				// Apply Handlers to Request
 				request.success = function(responseText, status){
 					// Success
-					var response_data = {};
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.request.success:', [this, arguments]);
+					var Response = {},
+						responseData = {};
 					
 					// Parse
-					if ( Ajaxy.options.support_text ) {
-						if ( responseText ) {
-							try {
-								// Try JSON
-								response_data = JSON.parse(responseText);
-							} catch (e) {
-								// Not Valid JSON
-								response_data = {
-									content: responseText
-								};
-							} finally {
-								// Is Valid, so already assigned
-							}
+					if ( typeof responseText !== 'object' && Ajaxy.options.support_text && responseText ) {
+						try {
+							// Try JSON
+							responseData = JSON.parse(responseText);
+						} catch (e) {
+							// Not Valid JSON
+							responseData = {
+								content: responseText
+							};
+						} finally {
+							// Is Valid, so already assigned
 						}
 					}
 					else {
 						// Using JSON
-						response_data = responseText;
+						responseData = responseText;
 					}
 					
+					// Apply
+					Response.data = responseData;
+					
 					// Debug
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.success:', [this, arguments], [Ajaxy, response_data, responseText]);
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.success:', [this, arguments]);
 					
 					// Check
-					if ( typeof response_data.controller === 'undefined' && ((typeof response_data.success !== 'undefined' && !response_data.success) || (typeof response_data.error !== 'undefined' && response_data.error)) ) {
+					if ( typeof responseData.controller === 'undefined' && ((typeof responseData.success !== 'undefined' && !responseData.success) || (typeof responseData.error !== 'undefined' && responseData.error)) ) {
 						// Error on simple Ajax request, not Ajaxy
-						return callbacks.error.apply(this, [null, status, response_data.error||true, response_data]);
+						return callbacks.error.apply(this, [null, status, responseData.error||true, responseData]);
 					}
 					
 					// Fire
-					return callbacks.success.apply(this, [response_data, status]);
+					return callbacks.success.apply(this, [responseData, status]);
 				};
 				request.error = function(XMLHttpRequest, textStatus, errorThrown) {
 					// Error
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.error:', [this, arguments]);
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.request.error:', [this, arguments]);
 				
 					// Prepare Response
 					var responseText = XMLHttpRequest.responseText||false;
@@ -785,7 +1166,7 @@
 					if ( !responseText ) responseText = false;
 				
 					// Prepare Data
-					var response_data = {
+					var responseData = {
 						error: errorThrown||true,
 						responseText: responseText
 					};
@@ -794,17 +1175,17 @@
 					if ( responseText ) {
 						try {
 							// Try JSON
-							response_data = JSON.parse(responseText);
+							responseData = JSON.parse(responseText);
 						} catch (e) {
 							// Not Valid JSON
 						} finally {
 							// Is Valid, so Move
-							return this.success.apply(this, [response_data, textStatus]);
+							return this.success.apply(this, [responseData, textStatus]);
 						}
 					}
 					
 					// Apply
-					return callbacks.error.apply(this, [XMLHttpRequest, textStatus, errorThrown, response_data]);
+					return callbacks.error.apply(this, [XMLHttpRequest, textStatus, errorThrown, responseData]);
 				};
 			
 				// Send the Request
@@ -813,14 +1194,14 @@
 		
 		
 			/**
-			 * Handler for a hashchange
-			 * @param {Object} hash
+			 * Handler for a stateChange
+			 * @param {Object} state
 			 */
-			hashchange: function ( hash ) {
+			stateChange: function ( state ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
 			
 				// Perform the Request
-				Ajaxy.request(hash);
+				Ajaxy.request(state);
 			},
 		
 			// --------------------------------------------------
@@ -832,27 +1213,24 @@
 			 */
 			configure: function ( options ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
-			
-				// Extract
-				var controllers, routes;
-				if ( typeof options.controllers !== 'undefined' ) {
-					controllers = options.controllers; delete options.controllers;
-				}
-				if ( typeof options.routes !== 'undefined' ) {
-					routes = options.routes; delete options.routes;
-				}
-			
+				options = options||{};
+				
+				// --------------------------
+				
+				// Prepare
+				var Controllers = options.Controllers||options.controllers||options;
+				
 				// Set options
-				Ajaxy.options = $.extend(Ajaxy.options, options);
+				Ajaxy.options = $.extend(Ajaxy.options, options.options||options||{});
 			
 				// Set params
-				Ajaxy.bind(controllers);
-			
-			
+				Ajaxy.bind(Controllers);
+				
+				// --------------------------
+				
 				// URLs
 				Ajaxy.options.root_url = (Ajaxy.options.root_url || document.location.protocol.toString()+'//'+document.location.hostname.toString()).replace(/\/$/, '')+'/';
-				Ajaxy.options.base_url = (Ajaxy.options.base_url || '').replace(/^\/|\/$/g, '');
-				if ( Ajaxy.options.base_url ) Ajaxy.options.base_url += '/';
+				Ajaxy.options.base_url = (Ajaxy.options.base_url || '');
 				Ajaxy.options.relative_url = Ajaxy.format(Ajaxy.options.relative_url || document.location.pathname.toString().replace(/^\//, ''));
 				
 				// Relative as Base
@@ -863,6 +1241,13 @@
 					}
 				}
 				
+				// Adjust finals urls
+				if ( Ajaxy.options.base_url ) {
+					Ajaxy.options.base_url = Ajaxy.options.base_url.replace(/^\/|\/$/g, '')+'/';
+				}
+				
+				// --------------------------
+				
 				// Debug
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.configure:', [this, arguments]);
 				
@@ -871,8 +1256,10 @@
 					var location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+Ajaxy.options.relative_url;
 					document.location = location;
 				}
-			
-				// Done
+				
+				// --------------------------
+				
+				// Return true
 				return true;
 			},
 		
@@ -883,18 +1270,22 @@
 			construct: function ( ) {
 				// Construct our Plugin
 				var Ajaxy = $.Ajaxy; var History = $.History;
-			
+				
+				// --------------------------
+				
 				// Check if we've been constructed
 				if ( Ajaxy.constructed ) {
 					return;
 				} else {
 					Ajaxy.constructed = true;
 				}
-			
+				
+				// --------------------------
+				
 				// Set AJAX History Handler
-				History.bind(function(hash){
+				History.bind(function(state){
 					// History Handler
-					return Ajaxy.hashchange(hash);
+					return Ajaxy.stateChange(state);
 				});
 			
 				// Bind fn functions
@@ -907,7 +1298,9 @@
 					Ajaxy.domReady();
 					History.domReady();
 				});
-			
+				
+				// --------------------------
+				
 				// All done
 				return true;
 			},
@@ -918,13 +1311,10 @@
 			domReady: function ( ) {
 				// We are good
 				var Ajaxy = $.Ajaxy;
-			
-				// Auto ajaxify?
-				if ( Ajaxy.options.auto_ajaxify ) {
-					$('body').ajaxify();
-				}
-			
-				// All done
+				
+				// --------------------------
+				
+				// Return true
 				return true;
 			},
 		
@@ -935,17 +1325,27 @@
 			 */
 			ajaxify: function ( options ) {
 				var Ajaxy = $.Ajaxy;
-				var $this = $(this);
+				
+				// --------------------------
+				
+				// Prepare
+				var $el = $(this);
+				
 				// Ajaxify the controllers
-				for ( var controller in $.Ajaxy.controllers ) {
-					$.Ajaxy.ajaxifyController(controller);
-				}
+				$.each(Ajaxy.Controllers, function(controller,Controller){
+					Ajaxy.ajaxifyController(controller);
+				});
+				
 				// Add the onclick handler for ajax compatiable links
-				$this.findAndSelf('a.ajaxy').once('click',Ajaxy.ajaxify_helpers.a);
+				$el.findAndSelf('a.ajaxy').once('click',Ajaxy.ajaxify_helpers.a);
+				
 				// Add the onclick handler for ajax compatiable forms
-				$this.findAndSelf('form.ajaxy').once('submit',Ajaxy.ajaxify_helpers.form);
-				// And chain
-				return this;
+				$el.findAndSelf('form.ajaxy').once('submit',Ajaxy.ajaxify_helpers.form);
+				
+				// --------------------------
+				
+				// Chain
+				return $el;
 			},
 		
 			/**
@@ -953,16 +1353,27 @@
 			 * @param {String} controller
 			 */
 			ajaxifyController: function(controller) {
-				var Ajaxy = $.Ajaxy; var History = $.History;
+				var Ajaxy = $.Ajaxy;
+				
+				// --------------------------
+				
+				// Fetch Controller
+				var Controller = Ajaxy.getController(controller);
+				
 				// Do selector
-				if ( typeof this.controllers[controller]['selector'] !== 'undefined' ) {
+				if ( Controller && typeof Controller['selector'] !== 'undefined' ) {
 					// We have a selector
 					$(function(){
 						// Onload
-						var $els = $(Ajaxy.controllers[controller]['selector']);
+						var $els = $(Controller['selector']);
 						$els.data('ajaxy-controller',controller).once('click',Ajaxy.ajaxify_helpers.a);
 					});
 				}
+				
+				// --------------------------
+				
+				// Return true
+				return true;
 			},
 			
 			/**
@@ -971,16 +1382,26 @@
 			ajaxify_helpers: {
 				a: function(event){
 					var Ajaxy = $.Ajaxy;
-					// We have a ajax link
-					var $this = $(this);
-					var hash = Ajaxy.format($this.attr('href'));
-					var history = !$this.hasClass(Ajaxy.options.no_history_class);
-					var controller = $this.data('ajaxy-controller')||null;
-					var result = Ajaxy.go({
-						'hash': hash,
+					
+					// --------------------------
+					
+					// Fetch
+					var $a = $(this);
+					
+					// Prepare
+					var state = Ajaxy.format($a.attr('href').replace(/^\/?\.\//,'/'));
+					var log = !$a.hasClass(Ajaxy.options.no_log_class);
+					var controller = $a.data('ajaxy-controller')||null;
+					
+					// Perform the request
+					Ajaxy.go({
+						'state': state,
 						'controller': controller,
-						'history': history
+						'log': log
 					});
+					
+					// --------------------------
+					
 					// Prevent
 					event.stopPropagation();
 					event.preventDefault();
@@ -988,25 +1409,35 @@
 				},
 				form: function(event){
 					var Ajaxy = $.Ajaxy;
-					// Get the form
+					
+					// --------------------------
+					
+					// Fetch
 					var $form = $(this);
+					
 					// Check
 					var disabled = $form.attr('disabled'); disabled = disabled || disabled === 'false';
 					if ( disabled ) {
 						return false;
 					}
+					
 					// See if we are in the middle of a request
 					if ( $form.attr('target') ) {
 						// We are, so proceed with the request
 						return true;
 					}
-					// Generate the hash
-					var hash = $.Ajaxy.format($form.attr('action'));//.replace(/[?\.]?\/?/, '#/');
-					// Perform request
+					
+					// Generate the state
+					var state = Ajaxy.format($form.attr('action'));//.replace(/[?\.]?\/?/, '#/');
+					
+					// Perform the request
 					Ajaxy.go({
-						'hash':	hash,
+						'state': state,
 						'form':	this
 					});
+					
+					// --------------------------
+					
 					// Prevent
 					event.stopPropagation();
 					event.preventDefault();

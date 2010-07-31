@@ -33,3 +33,15 @@
 	padding-left:1em;
 	border-top: 5px solid #DDD;
 }
+
+
+body .syntaxhighlighter {
+	font-size: 14px !important;
+	padding:5px 0 !important;
+}
+body .syntaxhighlighter .line {
+	white-space: pre-wrap !important; /* make code wrap */
+}
+body .syntaxhighlighter .line.alt2 {
+	background-color: white !important;
+}

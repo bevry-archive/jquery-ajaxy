@@ -18,20 +18,23 @@
 	<link type="text/css" rel="stylesheet" media="screen" href="./styles/style.css" />
 </head>
 <body>
+	<!-- Include this demo's requirements -->
 	<!-- JSON -->
 	<script type="text/javascript"> 
 	if ( typeof JSON === "undefined" ) $.appendScript("./scripts/json2.min.js");
 	</script>
 	
-	<!-- Include this demo's requirements -->
-	<!-- beautyOfCode -->
-	<script type="text/javascript" src="./scripts/jquery.beautyOfCode.min.js"></script>
+	<!-- Include jQuery Syntax Highlighter -->
+	<script type="text/javascript" src="http://github.com/balupton/jQuery-SyntaxHighlighter/raw/master/scripts/jquery.syntaxhighlighter.min.js"></script>
+	<!-- Initialise jQuery Syntax Highlighter -->
 	<script type="text/javascript">/*<![CDATA[*/
-		$.beautyOfCode.init({
-			defaults: { gutter: true },
-			brushes: ["Xml", "JScript", "Css"]
-		}); 
+		$.SyntaxHighlighter.init({
+			'defaults': {
+				'toolbar':false
+			}
+		});
 	/*]]>*/</script>
+	
 	<!-- GetSatisfaction -->
 	<script type="text/javascript" src="http://s3.amazonaws.com/getsatisfaction.com/javascripts/feedback-v2.js"></script> 
 	<script type="text/javascript">/*<![CDATA[*/
@@ -75,9 +78,9 @@
 		
 		<div id="demo">
 			<ul id="menu">
-				<li><a href="/pages/apricots.html" class="ajaxy ajaxy-page">Learn about Apricots</a></li>
-				<li><a href="/pages/bananas.html" class="ajaxy ajaxy-page">Lean about Bananas</a></li>
-				<li><a href="/pages/coconuts.html" class="ajaxy ajaxy-page">Learn about Coconuts</a></li>
+				<li><a href="./pages/apricots.html" class="ajaxy ajaxy-page">Learn about Apricots</a></li>
+				<li><a href="./pages/bananas.html" class="ajaxy ajaxy-page">Lean about Bananas</a></li>
+				<li><a href="./pages/coconuts.html" class="ajaxy ajaxy-page">Learn about Coconuts</a></li>
 			</ul>
 			<div id="result">
 				<div id="content"></div>
@@ -135,195 +138,200 @@
 		<p>So now we got that out the way, let's get into the javascript. We've documented the code inline as detailed as we can, rather than splitting the code up into segments. As at least for me, reading comments inline is a lot better than detached segments of code as you can't see the big picture. So here you are the big picture with lots of comments.
 		
 		<code class="code language-javascript">	
+		/**
+		 * Create a local noconflict scope.
+		 * This is important as perhaps we are running in an noConflict environment so $ is not defined, but jQuery is.
+		 * What this will do is alias $ to jQuery, such that we can still write our code exactly the same as if we weren't in a noConflict environment.
+		 * Another important thing is that this allows us to create a local scope.
+		 * Local scopes are important they avoid variable overwrites and keeps our code nice and tidy.
+		 */
+		(function($){
 			/**
-			 * Create a local noconflict scope.
-			 * This is important as perhaps we are running in an noConflict environment so $ is not defined, but jQuery is.
-			 * What this will do is alias $ to jQuery, such that we can still write our code exactly the same as if we weren't in a noConflict environment.
-			 * Another important thing is that this allows us to create a local scope.
-			 * Local scopes are important they avoid variable overwrites and keeps our code nice and tidy.
+			 * Fetch the element we will be using.
+			 * We assign them to variables as that way they are cached in our local scope.
+			 * This is good as say if we do $('#menu') three times, that is 3 times that jQuery has to find the #menu element. Causing unecessary load.
 			 */
-			(function($){
-				/**
-				 * Fetch the element we will be using.
-				 * We assign them to variables as that way they are cached in our local scope.
-				 * This is good as say if we do $('#menu') three times, that is 3 times that jQuery has to find the #menu element. Causing unecessary load.
-				 */
-				var $body = $(document.body),
-					$menu = $('#menu'),
-					$content = $('#content');
+			var $body = $(document.body),
+				$menu = $('#menu'),
+				$content = $('#content'),
+				$current = $('#current');
 			
+			/**
+			 * Configure Ajaxy
+			 * We now proceed to configure Ajaxy.
+			 * We have to do this as otherwise, Ajaxy wouldn't know what to do with our Ajax data!
+			 * It would just perform a request, receive a response, and then go... well what do I do now?
+			 * So here we tell Ajaxy how to handle the different types of states we will have in our application.
+			 */
+			$.Ajaxy.configure({
 				/**
-				 * Configure Ajaxy
-				 * We now proceed to configure Ajaxy.
-				 * We have to do this as otherwise, Ajaxy wouldn't know what to do with our Ajax data!
-				 * It would just perform a request, receive a response, and then go... well what do I do now?
-				 * So here we tell Ajaxy how to handle the different types of states we will have in our application.
+				 * Ajaxy supports a whole bunch of different configuration options.
+				 * By default we have some enabled such as debugging etc, which should be turned off on production servers.
+				 * We don't cover any of the options in this demo as they are not outside of this demo's scope.
+				 * You can however learn about the options by reading the README.txt attached with the Ajaxy project.
 				 */
-				$.Ajaxy.configure({
-					/**
-					 * Ajaxy supports a whole bunch of different configuration options.
-					 * By default we have some enabled such as debugging etc, which should be turned off on production servers.
-					 * We don't cover any of the options in this demo as they are not outside of this demo's scope.
-					 * You can however learn about the options by reading the README.txt attached with the Ajaxy project.
-					 */
 				
+				/**
+				 * Define our Ajaxy Controllers.
+				 * If you have ever done some work with the Model View Controller architecture for applications, then this should be quite familiar to you.
+				 * If not I'll explain it anyway :-)
+				 * Controllers are what handles our application states, so if a state has changed we will rely on the appropriate controller to tell us what to do.
+				 * We'll explain this more as we go along. But this is the core of building an Ajaxy application.
+				 */
+				'Controllers': {
 					/**
-					 * Define our Ajaxy Controllers.
-					 * If you have ever done some work with the Model View Controller architecture for applications, then this should be quite familiar to you.
-					 * If not I'll explain it anyway :-)
-					 * Controllers are what handles our application states, so if a state has changed we will rely on the appropriate controller to tell us what to do.
-					 * We'll explain this more as we go along. But this is the core of building an Ajaxy application.
-					 */
-					'controllers': {
+					 * The Essential Generic Controller
+				 	 * In jQuery Ajaxy, we will always have a "_generic" controller, hence why it is deemed essential.
+				 	 * This controller is called for every single request and response Ajaxy recieves.
+				 	 * You can use it to (and probably should) use it to display loading animations so our user knows something is happening when a Ajax request is performing, as well as using it to update the document.title with the current states title, and displaying error information.
+				 	 */
+					'_generic': {
 						/**
-						 * The Essential Generic Controller
-					 	 * In jQuery Ajaxy, we will always have a "_generic" controller, hence why it is deemed essential.
-					 	 * This controller is called for every single request and response Ajaxy recieves.
-					 	 * You can use it to (and probably should) use it to display loading animations so our user knows something is happening when a Ajax request is performing, as well as using it to update the document.title with the current states title, and displaying error information.
-					 	 */
-						'_generic': {
-							/**
-							 * The Request Action
-							 * As this is part of our Generic Controller, this will be called for every Ajax request that is performed.
-							 * It allows us to do such things as display the loading animation, and debug requests.
-							 */
-							request: function(){
-								// Log what is happening
-								window.console.debug('$.Ajaxy.configure.controllers._generic.request', &#91;this,arguments&#93;);
-								// Loading
-								$body.addClass('loading');
-								// Done
-								return true;
-							},
-						
-							/**
-							 * The Response Action
-							 * This one will fire when a Ajax request receives a successful response, and as it is part of the Generic Controller it'll fire for every response.
-							 * It allows us to do such things as hide the loading animation, update the document.title with the current state, and debug responses.
-							 */
-							response: function(){
-								// Prepare
-								var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
-								// Log what is happening
-								window.console.debug('$.Ajaxy.configure.controllers._generic.response', &#91;this,arguments&#93;, data, state);
-								// Title
-								var title = data.title||false; // if we have a title in the response JSON
-								if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
-								if ( title ) document.title = title; // if we have a new title use it
-								// Loaded
-								$body.removeClass('loading');
-								// Return true
-								return true;
-							},
-						
-							/**
-							 * The Error Action
-							 * This one will fire when a Ajax request fails (be it we got a 404, invalid data, or whatever).
-							 * It's important as it allows us to display a error message to the user.
-							 * If an error occurs, only the Error action will be called and not the Response action, as such we should still do generic things like remove the loading animation.
-							 */
-							error: function(){
-								// Prepare
-								var Ajaxy = $.Ajaxy; var data = this.response_data;
-								// Error
-								var error = this.user_data.error||data.error||data.responseText||false;
-								var error_message = this.user_data.error_message||data.view||error;
-								// Log what is happening
-								window.console.error('$.Ajaxy.configure.controllers._generic.error', &#91;this, arguments&#93;, error_message);
-								// Loaded
-								$body.removeClass('loading');
-								// Done
-								return true;
-							}
-						},
-					
-						/**
-						 * Our Page Controller
-						 * This is what makes the example in this demo come alive.
-						 * It handles our page requests to do with the three fruits (apricots,bananas and coconuts).
-						 * We can call this whatever we like.
+						 * The Request Action
+						 * As this is part of our Generic Controller, this will be called for every Ajax request that is performed.
+						 * It allows us to do such things as display the loading animation, and debug requests.
 						 */
-						'page': {
-							/**
-							 * Our Page Controller's Selector &#91;optional&#93;
-							 * This associates our controller with the particular elements which match this selector.
-							 * It allows for when one of our Ajax links to be clicked, Ajaxy will know to fire the Page Controller's Request action.
-							 * This is important as without this there would be no possible way for us to know that the Ajax Request is for our Controller.
-							 */
-							selector: '.ajaxy-page',
+						request: function(){
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers._generic.request', &#91;this,arguments&#93;);
+							// Loading
+							$body.addClass('loading');
+							// Done
+							return true;
+						},
 						
-							/**
-							 * Our Page Controller's Matches &#91;optional&#93;
-							 * This can be a string, an array of strings, or a regular expression which is used to match the applications state.
-							 * For this demo, we have chosen to use a regular expression that will match against anything which starts with "/pages"
-							 * This variable follows the same reasoning as providing a selector, as it covers some more uses cases which the selector does not and vice versa.
-							 * To provide ane example of such a use case. Consider our page was bookmarked with the following state active: "/pages/apricots.html"
-							 * This would cause Ajaxy to perform the Ajax request necessary to recreate that state when the page has loaded.
-							 * However, as this request has not come from a link, we cannot use the Controller's selector to associate the request with a particular controller.
-							 * Instead we use this to match against the proposed state, and if it does then we know that this is the controller that should be used.
-							 */
-							matches: /^\/pages\/?/,
+						/**
+						 * The Response Action
+						 * This one will fire when a Ajax request receives a successful response, and as it is part of the Generic Controller it'll fire for every response.
+						 * It allows us to do such things as hide the loading animation, update the document.title with the current state, and debug responses.
+						 */
+						response: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers._generic.response', &#91;this,arguments&#93;, data, state);
+							// Title
+							var title = data.title||false; // if we have a title in the response JSON
+							if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
+							if ( title ) document.title = title; // if we have a new title use it
+							// Loaded
+							$body.removeClass('loading');
+							// Display State
+							$('#current').text('Our current state is: &#91;'+state+'&#93;');
+							// Return true
+							return true;
+						},
 						
-							/**
-							 * Our Page Controller's Request Action
-							 * This just like our Request Action in the Generic Controller will be fired for all Ajaxy requests.
-							 * However this will only be fired for those Ajaxy requests which are known to be for the Page controller.
-							 * For instance, we could have another Controller called "Subpage", if a request is determined to be for that controller, their request action will fire and not this one.
-							 * We use this to prepare our tab area for incoming content, so we deselect all items in the tab menu, and fade out the content.
-							 */
-							request: function(){
-								// Log what is happening
-								window.console.debug('$.Ajaxy.configure.controllers.page.request', &#91;this,arguments&#93;);
-								// Adjust Menu
-								$menu.children('.active').removeClass('active');
-								// Hide Content
-								$content.stop(true,true).fadeOut(400);
-								// Return true
-								return true;
-							},
+						/**
+						 * The Error Action
+						 * This one will fire when a Ajax request fails (be it we got a 404, invalid data, or whatever).
+						 * It's important as it allows us to display a error message to the user.
+						 * If an error occurs, only the Error action will be called and not the Response action, as such we should still do generic things like remove the loading animation.
+						 */
+						error: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
+							// Error
+							var error = data.error||data.responseText||false;
+							var error_message = data.content||error;
+							// Log what is happening
+							window.console.error('$.Ajaxy.configure.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
+							// Loaded
+							$body.removeClass('loading');
+							// Display State
+							$('#current').text('Our current state is: &#91;'+state+'&#93;');
+							// Done
+							return true;
+						}
+					},
+					
+					/**
+					 * Our Page Controller
+					 * This is what makes the example in this demo come alive.
+					 * It handles our page requests to do with the three fruits (apricots,bananas and coconuts).
+					 * We can call this whatever we like.
+					 */
+					'page': {
+						/**
+						 * Our Page Controller's Selector &#91;optional&#93;
+						 * This associates our controller with the particular elements which match this selector.
+						 * It allows for when one of our Ajax links to be clicked, Ajaxy will know to fire the Page Controller's Request action.
+						 * This is important as without this there would be no possible way for us to know that the Ajax Request is for our Controller.
+						 */
+						selector: '.ajaxy-page',
 						
-							/**
-							 * Our Page Controller's Response Action
-							 * This is just like our Page Controller's Request Action, however for responses instead.
-							 * We will use this to mark the appropriate item in the tab menu as active, to load the content into the tab area, and fade it in.
-							 * This is all we have to do :-)
-							 */
-							response: function(){
-								// Prepare
-								var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
-								// Log what is happening
-								window.console.debug('$.Ajaxy.configure.controllers.page.response', &#91;this,arguments&#93;, data, state);
-								// Adjust Menu
-								$menu.children(':has(a&#91;href="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
-								// Show Content
-								$content.stop(true,true).hide().html(data.content).fadeIn(400);
-								// Return true
-								return true;
-							}
+						/**
+						 * Our Page Controller's Matches &#91;optional&#93;
+						 * This can be a string, an array of strings, or a regular expression which is used to match the applications state.
+						 * For this demo, we have chosen to use a regular expression that will match against anything which starts with "/pages"
+						 * This variable follows the same reasoning as providing a selector, as it covers some more uses cases which the selector does not and vice versa.
+						 * To provide ane example of such a use case. Consider our page was bookmarked with the following state active: "/pages/apricots.html"
+						 * This would cause Ajaxy to perform the Ajax request necessary to recreate that state when the page has loaded.
+						 * However, as this request has not come from a link, we cannot use the Controller's selector to associate the request with a particular controller.
+						 * Instead we use this to match against the proposed state, and if it does then we know that this is the controller that should be used.
+						 */
+						matches: /^\/pages\/?/,
+						
+						/**
+						 * Our Page Controller's Request Action
+						 * This just like our Request Action in the Generic Controller will be fired for all Ajaxy requests.
+						 * However this will only be fired for those Ajaxy requests which are known to be for the Page controller.
+						 * For instance, we could have another Controller called "Subpage", if a request is determined to be for that controller, their request action will fire and not this one.
+						 * We use this to prepare our tab area for incoming content, so we deselect all items in the tab menu, and fade out the content.
+						 */
+						request: function(){
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers.page.request', &#91;this,arguments&#93;);
+							// Adjust Menu
+							$menu.children('.active').removeClass('active');
+							// Hide Content
+							$content.stop(true,true).fadeOut(400);
+							// Return true
+							return true;
+						},
+						
+						/**
+						 * Our Page Controller's Response Action
+						 * This is just like our Page Controller's Request Action, however for responses instead.
+						 * We will use this to mark the appropriate item in the tab menu as active, to load the content into the tab area, and fade it in.
+						 * This is all we have to do :-)
+						 */
+						response: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state;
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers.page.response', &#91;this,arguments&#93;, data, state);
+							// Adjust Menu
+							$menu.children(':has(a&#91;href$="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
+							// Show Content
+							$content.html(data.content).fadeIn(400);
+							// Return true
+							return true;
 						}
 					}
-				});
+				}
+			});
 			
-				/**
-				 * It is important to note that for our demo we have chosen to make it as simple as possible.
-				 * 
-				 * For instance in the demo our responses to the AJAX requests are HTML templates so always returned as text instead of JSON.
-				 * This is due to this solution not requiring and server side code and as such the demo can be understood by all developers, be it PHP, ASP, RoR whatever.
-				 * While it works great, google will index this demo's Ajaxy links and instead of discovering proper pages it will just see the linked templates instead.
-				 * In a proper production environment you would implement such tools as Clean URLs etc, such that those links will still display a full page even without Ajaxy. And when Ajaxy performs a Ajax request to the same URL, you will instead of returning a full HTML page you would probably want to return a small JSON object which contains only the HTML needed. You could also return the entire HTML page, then in your Response Controller find just the parts you need but that performs a lot of extra work on the Server (the server has to render the header, footer, everything else etc) and is a larger fetch for the user as more data is being returned. Ultimately, you would want to reach a point where on an Ajaxy request you return a JSON object which contains:
-				 * - The content we would like to display
-				 * - The document title we would like to use
-				 * - The Ajaxy controller that should be used.
-				 * An example of this could be: {content:"&lt;div&gt;my page&lt;/div&gt;",title:"My Page",controller:"page"}
-				 * 
-				 * While none of these recomendations are required and you could even have a fully working Ajax application just based off this demo. These recommendations should still be considered for the long run. We are currently working on a demo which uses PHP, and another demo which uses PHP and Zend Framework to demonstrate these points.
-				 * 
-				 * However don't let us stop you from using it however you want. As you have seen in this demo, you can create a ajax application in barely any lines of code, all keeping it very simple and understandable. Good luck and you can always provide feedback or ask questions by using the support link right up the top of the page, or by using the feedback link to the right of the page.
-				 */
+			/**
+			 * It is important to note that for our demo we have chosen to make it as simple as possible.
+			 * 
+			 * For instance in the demo our responses to the AJAX requests are HTML templates so always returned as text instead of JSON.
+			 * This is due to this solution not requiring and server side code and as such the demo can be understood by all developers, be it PHP, ASP, RoR whatever.
+			 * While it works great, google will index this demo's Ajaxy links and instead of discovering proper pages it will just see the linked templates instead.
+			 * In a proper production environment you would implement such tools as Clean URLs etc, such that those links will still display a full page even without Ajaxy. And when Ajaxy performs a Ajax request to the same URL, you will instead of returning a full HTML page you would probably want to return a small JSON object which contains only the HTML needed. You could also return the entire HTML page, then in your Response Controller find just the parts you need but that performs a lot of extra work on the Server (the server has to render the header, footer, everything else etc) and is a larger fetch for the user as more data is being returned. Ultimately, you would want to reach a point where on an Ajaxy request you return a JSON object which contains:
+			 * - The content we would like to display
+			 * - The document title we would like to use
+			 * - The Ajaxy controller that should be used.
+			 * An example of this could be: {content:"&lt;div&gt;my page&lt;/div&gt;",title:"My Page",controller:"page"}
+			 * 
+			 * While none of these recomendations are required and you could even have a fully working Ajax application just based off this demo. These recommendations should still be considered for the long run. We are currently working on a demo which uses PHP, and another demo which uses PHP and Zend Framework to demonstrate these points.
+			 * 
+			 * However don't let us stop you from using it however you want. As you have seen in this demo, you can create a ajax application in barely any lines of code, all keeping it very simple and understandable. Good luck and you can always provide feedback or ask questions by using the support link right up the top of the page, or by using the feedback link to the right of the page.
+			 */
 			
-				// All done
-			})(jQuery);
-			// Back to global scope
+			// All done
+		})(jQuery);
+		// Back to global scope
 		</code>
 		
 		<p>
@@ -345,75 +353,83 @@
 			&lt;/div&gt;
 		</code>
 		<code class="code language-javascript">
-			(function($){
-				// Fetch Elements
-				var $body = $(document.body),
-					$menu = $('#menu'),
-					$content = $('#content');
-				
-				// Configure Ajaxy
-				$.Ajaxy.configure({
-					'controllers': {
-						'_generic': {
-							request: function(){
-								// Log what is happening
-								window.console.debug('$.Ajaxy.configure.controllers._generic.request', &#91;this,arguments&#93;);
-								// Loading
-								$body.addClass('loading');
-								// Done
-								return true;
-							},
-							response: function(){
-								// Prepare
-								var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
-								// Title
-								var title = data.title||false; // if we have a title in the response JSON
-								if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
-								if ( title ) document.title = title; // if we have a new title use it
-								// Loaded
-								$body.removeClass('loading');
-								// Return true
-								return true;
-							},
-							error: function(){
-								// Prepare
-								var Ajaxy = $.Ajaxy; var data = this.response_data;
-								// Error
-								var error = this.user_data.error||data.error||data.responseText||false;
-								var error_message = this.user_data.error_message||data.view||error;
-								// Log what is happening
-								window.console.error('$.Ajaxy.configure.controllers._generic.error', &#91;this, arguments&#93;, error_message);
-								// Loaded
-								$body.removeClass('loading');
-								// Done
-								return true;
-							}
+		(function($){
+			var $body = $(document.body),
+				$menu = $('#menu'),
+				$content = $('#content'),
+				$current = $('#current');
+			$.Ajaxy.configure({
+				'Controllers': {
+					'_generic': {
+						request: function(){
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers._generic.request', &#91;this,arguments&#93;);
+							// Loading
+							$body.addClass('loading');
+							// Done
+							return true;
 						},
-						'page': {
-							selector: '.ajaxy-page',
-							matches: /^\/pages\/?/,
-							request: function(){
-								// Adjust Menu
-								$menu.children('.active').removeClass('active');
-								// Hide Content
-								$content.stop(true,true).fadeOut(400);
-								// Return true
-								return true;
-							},
-							response: function(){
-								// Prepare
-								var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
-								// Adjust Menu
-								$menu.children(':has(a&#91;href="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
-								// Show Content
-								$content.stop(true,true).hide().html(data.content).fadeIn(400);
-								// Return true
-								return true;
-							}
+						response: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers._generic.response', &#91;this,arguments&#93;, data, state);
+							// Title
+							var title = data.title||false; // if we have a title in the response JSON
+							if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
+							if ( title ) document.title = title; // if we have a new title use it
+							// Loaded
+							$body.removeClass('loading');
+							// Display State
+							$('#current').text('Our current state is: &#91;'+state+'&#93;');
+							// Return true
+							return true;
+						},
+						error: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
+							// Error
+							var error = data.error||data.responseText||false;
+							var error_message = data.content||error;
+							// Log what is happening
+							window.console.error('$.Ajaxy.configure.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
+							// Loaded
+							$body.removeClass('loading');
+							// Display State
+							$('#current').text('Our current state is: &#91;'+state+'&#93;');
+							// Done
+							return true;
+						}
+					},
+					'page': {
+						selector: '.ajaxy-page',
+						matches: /^\/pages\/?/,
+						request: function(){
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers.page.request', &#91;this,arguments&#93;);
+							// Adjust Menu
+							$menu.children('.active').removeClass('active');
+							// Hide Content
+							$content.stop(true,true).fadeOut(400);
+							// Return true
+							return true;
+						},
+						response: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state;
+							// Log what is happening
+							window.console.debug('$.Ajaxy.configure.Controllers.page.response', &#91;this,arguments&#93;, data, state);
+							// Adjust Menu
+							$menu.children(':has(a&#91;href$="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
+							// Show Content
+							$content.html(data.content).fadeIn(400);
+							// Return true
+							return true;
 						}
 					}
-				});
-			})(jQuery);
+				}
+			});
+		})(jQuery);
 		</code>
 		
 		
@@ -511,7 +527,8 @@
 			 */
 			var $body = $(document.body),
 				$menu = $('#menu'),
-				$content = $('#content');
+				$content = $('#content'),
+				$current = $('#current');
 			
 			/**
 			 * Configure Ajaxy
@@ -535,7 +552,7 @@
 				 * Controllers are what handles our application states, so if a state has changed we will rely on the appropriate controller to tell us what to do.
 				 * We'll explain this more as we go along. But this is the core of building an Ajaxy application.
 				 */
-				'controllers': {
+				'Controllers': {
 					/**
 					 * The Essential Generic Controller
 				 	 * In jQuery Ajaxy, we will always have a "_generic" controller, hence why it is deemed essential.
@@ -550,7 +567,7 @@
 						 */
 						request: function(){
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.controllers._generic.request', [this,arguments]);
+							window.console.debug('$.Ajaxy.configure.Controllers._generic.request', [this,arguments]);
 							// Loading
 							$body.addClass('loading');
 							// Done
@@ -564,15 +581,17 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.controllers._generic.response', [this,arguments], data, state);
+							window.console.debug('$.Ajaxy.configure.Controllers._generic.response', [this,arguments], data, state);
 							// Title
 							var title = data.title||false; // if we have a title in the response JSON
 							if ( !title && this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
 							if ( title ) document.title = title; // if we have a new title use it
 							// Loaded
 							$body.removeClass('loading');
+							// Display State
+							$('#current').text('Our current state is: ['+state+']');
 							// Return true
 							return true;
 						},
@@ -585,14 +604,16 @@
 						 */
 						error: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.response_data;
+							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
 							// Error
-							var error = this.user_data.error||data.error||data.responseText||false;
-							var error_message = this.user_data.error_message||data.view||error;
+							var error = data.error||data.responseText||false;
+							var error_message = data.content||error;
 							// Log what is happening
-							window.console.error('$.Ajaxy.configure.controllers._generic.error', [this, arguments], error_message);
+							window.console.error('$.Ajaxy.configure.Controllers._generic.error', [this, arguments], error_message);
 							// Loaded
 							$body.removeClass('loading');
+							// Display State
+							$('#current').text('Our current state is: ['+state+']');
 							// Done
 							return true;
 						}
@@ -634,7 +655,7 @@
 						 */
 						request: function(){
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.controllers.page.request', [this,arguments]);
+							window.console.debug('$.Ajaxy.configure.Controllers.page.request', [this,arguments]);
 							// Adjust Menu
 							$menu.children('.active').removeClass('active');
 							// Hide Content
@@ -651,13 +672,13 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.response_data; var state = this.state;
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.controllers.page.response', [this,arguments], data, state);
+							window.console.debug('$.Ajaxy.configure.Controllers.page.response', [this,arguments], data, state);
 							// Adjust Menu
-							$menu.children(':has(a[href="'+state+'"])').addClass('active').siblings('.active').removeClass('active');
+							$menu.children(':has(a[href$="'+state+'"])').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
-							$content.stop(true,true).hide().html(data.content).fadeIn(400);
+							$content.html(data.content).fadeIn(400);
 							// Return true
 							return true;
 						}
