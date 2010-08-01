@@ -19,7 +19,7 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.4.0-dev
+ * @version 1.4.0-beta
  * @date August 01, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
@@ -35,7 +35,6 @@ Installation & Usage:
 1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-ajaxy if the demo is not included.
 
 Todo:
-1. Fix State Issue
 
 Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
@@ -44,7 +43,8 @@ Options:
 
 Changelog:
 
-v1.4.0-dev, August 1, 2010
+v1.4.0-beta, August 1, 2010
+- Updated licensing information. Still using the same license, as it is the best there is, but just provided some more information on it to make life simpler.
 - A very large redo and IS NOT backwards compatible
 - Added Controller.matches feature
 - Changed naming convention to Google's Javascript Standards for everything but options
@@ -53,7 +53,9 @@ v1.4.0-dev, August 1, 2010
 - Added support for relative Ajaxy links
 - The Controller, State and Action are now separate entities. Instead of doing [this.response_data] or [this.data.response] you now do [this.State.Response.data]
 - All references to Hash have been renamed to State appropriately
+- We now support loading in complete HTML documents. Will find content and title automatically.
 - Updated jQuery Sparkle dependencies to [v1.4.8-beta, August 01, 2010]
+- Updated jQuery History dependencies to [v1.3.0-beta, August 01, 2010]
 - Quite close to a final release
 
 v1.3.2-dev, July 28, 2010

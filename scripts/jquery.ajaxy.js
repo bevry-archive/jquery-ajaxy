@@ -1262,6 +1262,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					
 					/** The Request Object that is used in the $.Ajax */
 					Request: {
+						url: null,
 						data: {}
 					},
 					
@@ -1458,7 +1459,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Prepare Action
 				
 				// Generate Action
-				var Action = $.extend({},Ajaxy.defaults.Action,{
+				var Action = $.extend(true,{},Ajaxy.defaults.Action,{
 					'action':action,
 					'controller':controller,
 					'Controller':Controller,
@@ -1568,26 +1569,30 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				}
 				
 				// Prepare State
-				var State = $.extend(true,{},Ajaxy.defaults.State,UserState);
+				var State = Ajaxy.getState(false,true);
+				$.extend(true,State,UserState);
 				
 				// --------------------------
-				
 				// Ensure state and log
-				if ( !State.state && State.url ) {
+				
+				// We have a URL and no state
+				if ( !State.state||false && State.url||false ) {
 					State.state = Ajaxy.format(State.url);
-					// We have a URL
+					delete State.url;
 					// Don't log by default
 					if ( State.log === null || State.log === undefined ) {
 						State.log = false;
 					}
-				} else if ( State.form ) {
-					// We have a form
+				}
+				// We have a form
+				else if ( State.form ) {
 					// Don't log by default
 					if ( State.log === null || State.log === undefined ) {
 						State.log = false;
 					}
-				} else {
-					// We are normal
+				}
+				// We are normal
+				else {
 					// Do log by default
 					if ( State.log === null || State.log === undefined ) {
 						State.log = true;
@@ -1719,7 +1724,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					Controller = Ajaxy.getController(controller.controller,create);
 				}
 				else if ( create ) {
-					Controller = $.extend({},Ajaxy.defaults.Controller);
+					Controller = $.extend(true,{},Ajaxy.defaults.Controller);
 				}
 				else if ( create === false ) {
 					// Don't report couldn't find
@@ -1779,7 +1784,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					State = Ajaxy.getState(state.state,create);
 				}
 				else if ( create ) {
-					State = $.extend({},Ajaxy.defaults.State);
+					State = $.extend(true,{},Ajaxy.defaults.State);
 				}
 				else if ( create === false ) {
 					// Don't report couldn't find
@@ -2139,7 +2144,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 
 						// Update
 						var values = $form.values();
-						Request.data = $.extend(Request.data, values||{});
+						Request.data = $.extend(true, Request.data, values||{});
 						
 						// Inform to skip ajax
 						skip_ajax = true;
@@ -2147,7 +2152,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					else {
 						// Normal form
 						var values = $form.values();
-						Request.data = $.extend(Request.data, values||{});
+						Request.data = $.extend(true, Request.data, values||{});
 					}
 				}
 				
@@ -2211,7 +2216,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					type:		'post',
 					dataType:	(Ajaxy.options.support_text ? 'text' : 'json')
 				};
-				$.extend(request,options);
+				$.extend(true,request,options);
 				
 				// Apply Handlers to Request
 				request.success = function(responseText, status){
@@ -2222,16 +2227,34 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					
 					// Parse
 					if ( typeof responseText !== 'object' && Ajaxy.options.support_text && responseText ) {
+						// Attempt JSON
 						try {
-							// Try JSON
+							// Attempt
 							responseData = JSON.parse(responseText);
-						} catch (e) {
-							// Not Valid JSON
+						}
+						// Invalid JSON
+						catch (e) {
+							// Extract details
+							var html = responseText,
+								$html = $(html
+											.replace(/<(html|head|body|title)>/g,'<div id="ajaxy-$1">')
+											.replace(/<\/(html|head|body|title)/g,'</div>')
+										),
+								$body = $html.find('#ajaxy-body'),
+								$title = $html.find('#ajaxy-title'),
+								$controller = $html.find('#ajaxy-controller'),
+								title = ($title.length ? $title.text() : null),
+								content = ($body.length ? $body.html() : html),
+								controller = ($controller.length ? $controller.text() : null),
+							// ^ We do the above workaround with element types as jQuery does not support loadin in documents
+							
+							// Create
 							responseData = {
-								content: responseText
+								"title": title,
+								"content": content,
+								"controller": controller,
+								"html": html
 							};
-						} finally {
-							// Is Valid, so already assigned
 						}
 					}
 					else {
@@ -2319,7 +2342,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				var Controllers = options.Controllers||options.controllers||options;
 				
 				// Set options
-				Ajaxy.options = $.extend(Ajaxy.options, options.options||options||{});
+				Ajaxy.options = $.extend(true, Ajaxy.options, options.options||options||{});
 			
 				// Set params
 				Ajaxy.bind(Controllers);
