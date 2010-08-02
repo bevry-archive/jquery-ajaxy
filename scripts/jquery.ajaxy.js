@@ -1846,6 +1846,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				 */
 				auto_sparkle_documentReady: true,
 				/**
+				 * Whether or not we should add a ajaxy sparkle extension such that we can perform an ajaxify on sparkled content.
+				 * This only applies if jQuery Sparkle has been detected.
+				 */
+				add_sparkle_extension: true,
+				/**
 				 * Whether or not we should output as much debugging information as possible.
 				 * For production use, you want to ensure this has been set to false. As we should always never want the client to see debug information.
 				 */
@@ -1910,9 +1915,23 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					documentReady: function($el){
 						var Ajaxy = $.Ajaxy; var Action = this; var State = Action.State||{};
 						
+						// Prepare
+						var ajaxify = Ajaxy.options.auto_ajaxify_documentReady;
+						
 						// Prepare el
 						if ( ($el||{}).length||false ) {
 							$el = $('body');
+						}
+						
+						// Auto Sparkle
+						if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
+							if ( Ajaxy.options.add_sparkle_extension ) ajaxify = false; // as the sparkle extension will handle this
+							$el.sparkle();
+						}
+						
+						// Auto Ajaxify
+						if ( ajaxify ) {
+							$el.ajaxify();
 						}
 						
 						// Check for Anchor
@@ -1923,16 +1942,6 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							$('.target').removeClass('target');
 							// Fire the anchor
 							$('#'+anchor).addClass('target').ScrollTo();
-						}
-						
-						// Auto Ajaxify
-						if ( Ajaxy.options.auto_ajaxify_documentReady ) {
-							$el.ajaxify();
-						}
-						
-						// Auto Ajaxify
-						if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
-							$el.sparkle();
 						}
 						
 						// Return true
@@ -2015,39 +2024,70 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			
 			// --------------------------------------------------
 			// Functions
-		
+			
 			/**
-			 * Format a state accordingly
-			 * @param {String} state
+			 * Extract a Relative URL from a URL
+			 * @param {String} url
+			 */
+			extractRelativeUrl: function (url){
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				
+				// Strip urls
+				var relative_url = url.stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
+				
+				// Return relative_url
+				return relative_url;
+			},
+			
+			/**
+			 * Extract a Anchor from a URL
+			 * @param {String} url
 			 */
 			extractAnchor: function (url){
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				
 				// Strip urls
-				var anchor = url.replace(/^\//g, '').stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
+				var anchor = Ajaxy.extractRelativeUrl(url);
 				
 				// History format
-				anchor = History.extractAnchor(anchor);
+				anchor = History.extractAnchor(anchor) || Ajaxy.extractAnchorFromQueryString(url);
 				
 				// Return anchor
 				return anchor;
 			},
 			
 			/**
-			 * Format a state accordingly
-			 * @param {String} state
+			 * Extract a Anchor from a QueryString
+			 * @param {String} url
+			 */
+			extractAnchorFromQueryString: function (state){
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				
+				// Extract anchor
+				var anchor = state.match(/anchor=([a-zA-Z0-9-_]+)/)||'';
+				if ( anchor && anchor.length||false === 2 ) {
+					anchor = anchor[1]||'';
+				}
+				
+				// Return anchor
+				return anchor;
+			},
+			
+			/**
+			 * Extract a State from a URL
+			 * @param {String} url
 			 */
 			extractState: function (url){
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				
 				// Strip urls
-				var state = url.replace(/^\//g, '').stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
+				var state = Ajaxy.extractRelativeUrl(url);
 				
 				// History format
 				state = History.extractState(state);
 				
 				// Slash
-				if ( state ) state = '/'+state.replace(/^\//g, '');
+				if ( state ) state = '/'+state.replace(/^\/+/, '');
 				
 				// Return state
 				return state;
@@ -2324,6 +2364,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					State.state = Ajaxy.extractState(State.state);
 				}
 				
+				// Place anchor in QueryString
+				if ( State.anchor ) {
+					var hashdata = State.state.queryStringToJSON();
+					hashdata.anchor = State.anchor;
+					var querystring = $.param(hashdata);
+					State.state = State.state.replace(/\?.*/, '')+'?'+querystring;
+				}
+				
 				// Figure it out
 				if ( State.state === History.getHash() && Ajaxy.options.debug ) {
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go: Trigger but no change.', State.state);
@@ -2520,7 +2568,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			
 				// Inform Google Analytics of a state change
 				if ( typeof pageTracker !== 'undefined' ) {
-					var url = Ajaxy.options.base_url+(state.replace(/^\/+/, '') || '?');
+					var url = Ajaxy.options.base_url+(state || '?');
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.track', [this,arguments], [url]);
 					pageTracker._trackPageview(url);
 					// ^ we do not use root url here as google doesn't want that
 					//   but it does want the base url here
@@ -2606,7 +2655,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// Format the state
 				state = Ajaxy.extractState(state);
-			
+				
 				// Check if we were a redirect
 				if ( Ajaxy.redirected !== false ) {
 					// We were, ignore as we have already been fired
@@ -2634,12 +2683,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Determine controller
 				var controller = State.controller || Ajaxy.match(state) || undefined;
 				
+				// Determine anchor
+				var anchor = State.anchor || Ajaxy.extractAnchorFromQueryString(state);
+				
 				// --------------------------
 				
 				// Prepare the State
 				State.state = state;
 				State.controller = controller;
-				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state.replace(/^\/+/, '') || '?'));
+				State.anchor = anchor;
+				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state || '?'));
 				
 				// Store the State
 				Ajaxy.storeState(State);
@@ -2832,7 +2885,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							var text = $iframe.contents().find('.response').val();
 							var json = false;
 							try {
-								json = JSON.parse(text);
+								json = $.parseJSON(text);
 							} catch ( e ) {
 								window.console.error('Ajaxy.request.form: Invalid Response.', [this, arguments], [text]);
 							}
@@ -2943,7 +2996,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Attempt JSON
 						try {
 							// Attempt
-							responseData = JSON.parse(responseText);
+							responseData = $.parseJSON(responseText);
 						}
 						// Invalid JSON
 						catch (e) {
@@ -3009,7 +3062,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					if ( responseText ) {
 						try {
 							// Try JSON
-							responseData = JSON.parse(responseText);
+							responseData = $.parseJSON(responseText);
 						} catch (e) {
 							// Not Valid JSON
 						} finally {
@@ -3063,22 +3116,22 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// --------------------------
 				
 				// URLs
-				Ajaxy.options.root_url = (Ajaxy.options.root_url || document.location.protocol.toString()+'//'+document.location.hostname.toString()).replace(/\/$/, '')+'/';
+				Ajaxy.options.root_url = (Ajaxy.options.root_url || document.location.protocol.toString()+'//'+document.location.hostname.toString()).replace(/\/+$/, '')+'/';
 				Ajaxy.options.base_url = (Ajaxy.options.base_url || '');
-				Ajaxy.options.relative_url = Ajaxy.extractState(Ajaxy.options.relative_url || document.location.pathname.toString().replace(/^\//, ''));
+				Ajaxy.options.relative_url = Ajaxy.extractState(Ajaxy.options.relative_url ||  document.location.pathname.toString());
 				
 				// Relative as Base
 				if ( Ajaxy.options.relative_as_base ) {
 					if ( Ajaxy.options.base_url.length === 0 ) {
 						Ajaxy.options.base_url = Ajaxy.options.relative_url;
-						Ajaxy.options.relative_url = "";
+						Ajaxy.options.relative_url = '';
 					}
 				}
 				
 				// Adjust finals urls
-				if ( Ajaxy.options.base_url ) {
-					Ajaxy.options.base_url = Ajaxy.options.base_url.replace(/^\/|\/$/g, '')+'/';
-				}
+				Ajaxy.options.root_url = Ajaxy.options.root_url.replace(/\/+$/, '');
+				Ajaxy.options.base_url = Ajaxy.options.base_url.replace(/\/+$/, '');
+				Ajaxy.options.relative_url = Ajaxy.extractRelativeUrl(Ajaxy.options.relative_url);
 				
 				// --------------------------
 				
@@ -3087,7 +3140,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// Initial redirect
 				if ( Ajaxy.options.redirect && Ajaxy.options.relative_url && Ajaxy.options.relative_url !== null  ) {
-					var location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+Ajaxy.options.relative_url;
+					var location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+Ajaxy.options.relative_url,
+						hash = History.getHash();
+					if ( hash ) {
+						location += '?anchor='+hash;
+					}
 					document.location = location;
 				}
 				
@@ -3145,6 +3202,17 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			domReady: function ( ) {
 				// We are good
 				var Ajaxy = $.Ajaxy;
+				
+				// --------------------------
+				
+				// Check for Sparkle
+				if ( $.Sparkle||false && Ajaxy.options.add_sparkle_extension ) {
+					// Add Ajaxify to Sparkle
+					$.Sparkle.addExtension('ajaxy', function(){
+						// Find all internal links, mark them as Ajaxy links
+						$(this).ajaxify();
+					});
+				}
 				
 				// --------------------------
 				
@@ -3223,10 +3291,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					var $a = $(this);
 					
 					// Prepare
-					var href = $a.attr('href').replace(/^\/?\.\//,'/');
+					var href = Ajaxy.extractRelativeUrl($a.attr('href')).replace(/^\/?\.\//,'/');
 					var anchor = Ajaxy.extractAnchor(href);
 					var state = Ajaxy.extractState(href);
-					if ( '/'+anchor === state ) anchor = '';
+					if ( '/'+anchor === state || anchor === state ) anchor = '';
 					var log = !$a.hasClass(Ajaxy.options.no_log_class);
 					var controller = $a.data('ajaxy-controller')||null;
 					

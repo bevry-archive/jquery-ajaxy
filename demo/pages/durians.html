@@ -12,7 +12,8 @@
 		<p id="yummy">They are soo yummy.</p>
 		<p><em>As you just saw when you clicked the durians link; the browser would have automatically just scrolled to the sentence "They are soo yummy" and highlighted it yellow. This is because on the durians link we clicked, there is an anchor which points to that sentence. This is done with:<br/>
 		<code>&lt;a href="./pages/durians.html#yummy" class="ajaxy ajaxy-page"&gt;Learn about Durians&lt;/a&gt;</code><br/>
-		The background color is specified using the CSS3 <code>:target,.target</code> selector.</em></p>
+		Ajaxy will automatically convert the <code>#yummy</code> anchor into part of our querystring and use that. This is pretty awesome as it allows us to still have full support for anchor functionality despite us hijacking the hash to use for ajax states!<br/>
+		The yellow background color is specified using the CSS3 <code>:target,.target</code> selector.</em></p>
 	</div>
 </body>
 </html>

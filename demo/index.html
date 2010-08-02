@@ -10,18 +10,12 @@
 	<!-- Include jQuery (Ajaxy Requirement) -->
 	<script type="text/javascript" src="../scripts/jquery-1.4.2.min.js"></script>
 	<!-- Include jQuery Ajaxy -->
-	<script type="text/javascript" src="../scripts/jquery.ajaxy.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.ajaxy.min.js"></script>
 	
 	<!-- Include The Demo's Requirements -->
 	<link type="text/css" rel="stylesheet" media="screen" href="./styles/style.css" />
 </head>
 <body>
-	<!-- Include this demo's requirements -->
-	<!-- JSON -->
-	<script type="text/javascript"> 
-	if ( typeof JSON === "undefined" ) $.appendScript("./scripts/json2.min.js");
-	</script>
-	
 	<!-- Include jQuery Syntax Highlighter -->
 	<script type="text/javascript" src="http://github.com/balupton/jQuery-SyntaxHighlighter/raw/master/scripts/jquery.syntaxhighlighter.min.js"></script>
 	<!-- Initialise jQuery Syntax Highlighter -->
@@ -104,16 +98,15 @@
 		
 		<p>The HTML:</p>
 		<code class="code language-html">
-			&lt;div id="demo"&gt;
-				&lt;ul id="menu"&gt;
-					&lt;li&gt;&lt;a href="./pages/apricots.html" class="ajaxy ajaxy-page"&gt;Learn about Apricots&lt;/a&gt;&lt;/li&gt;
-					&lt;li&gt;&lt;a href="./pages/bananas.html" class="ajaxy ajaxy-page"&gt;Lean about Bananas&lt;/a&gt;&lt;/li&gt;
-					&lt;li&gt;&lt;a href="./pages/coconuts.html" class="ajaxy ajaxy-page"&gt;Learn about Coconuts&lt;/a&gt;&lt;/li&gt;
-				&lt;/ul&gt;
-				&lt;div id="result"&gt;
-					&lt;div id="content"&gt;&lt;/div&gt;
-					&lt;div id="current"&gt;&lt;/div&gt;
-				&lt;/div&gt;
+			&lt;ul id="menu"&gt;
+				&lt;li&gt;&lt;a href="./pages/apricots.html" class="ajaxy ajaxy-page"&gt;Learn about Apricots&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="./pages/bananas.html" class="ajaxy ajaxy-page"&gt;Lean about Bananas&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="./pages/coconuts.html" class="ajaxy ajaxy-page"&gt;Learn about Coconuts&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="./pages/durians.html#yummy" class="ajaxy ajaxy-page"&gt;Learn about Durians&lt;/a&gt;&lt;/li&gt;
+			&lt;/ul&gt;
+			&lt;div id="result"&gt;
+				&lt;div id="content" style="max-height:100px;overflow:auto;"&gt;&lt;/div&gt;
+				&lt;div id="current"&gt;&lt;/div&gt;
 			&lt;/div&gt;
 		</code>
 		
@@ -139,7 +132,7 @@
 		<p>So now we got that out the way, let's get into the javascript. We've documented the code inline as detailed as we can, rather than splitting the code up into segments. As at least for me, reading comments inline is a lot better than detached segments of code as you can't see the big picture. So here you are the big picture with lots of comments.
 		
 		<p>The JavaScript:</p>
-		<code class="code language-javascript">	
+		<code class="code language-javascript">
 		/**
 		 * Create a local noconflict scope.
 		 * This is important as perhaps we are running in an noConflict environment so $ is not defined, but jQuery is.
@@ -304,9 +297,23 @@
 							// Log what is happening
 							window.console.debug('$.Ajaxy.configure.Controllers.page.response', &#91;this,arguments&#93;, data, state);
 							// Adjust Menu
-							$menu.children(':has(a&#91;href$="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
+							$menu.children(':has(a&#91;href*="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
-							$content.html(data.content).fadeIn(400);
+							var Action = this;
+							$content.html(data.content).fadeIn(400,function(){
+								Action.documentReady($content);
+								/**
+								 * The above line calls our Action's documentReady function.
+								 * This is a special function which is always there as it is automaticly provided by Ajaxy.
+								 * We assign this to the variable Action, as inside the callback function for our jQuery effect the variable this will be point to somewhere else then!
+								 * 
+								 * So what does this function do?
+								 * 1. It tells Ajaxy that the document is now ready for post processing.
+								 * 2. Ajaxy will then determine if the state included a anchor that we want to scroll to and initiate, and do that.
+								 * 3. Ajaxy will ajaxify the new content (provided the option &#91;auto_ajaxify_documentReady&#93; is true).
+								 * 4. Ajaxy will sparkle the new contnet (provided the option &#91;auto_sparkle_documentReady&#93; is true, and jQuery Sparkle exists). This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look: http://www.balupton.com/projects/jquery-sparkle/
+								 */
+							});
 							// Return true
 							return true;
 						}
@@ -326,16 +333,15 @@
 		
 		<p>The HTML:</p>
 		<code class="code language-html">
-			&lt;div id="demo"&gt;
-				&lt;ul id="menu"&gt;
-					&lt;li&gt;&lt;a href="./pages/apricots.html" class="ajaxy ajaxy-page"&gt;Learn about Apricots&lt;/a&gt;&lt;/li&gt;
-					&lt;li&gt;&lt;a href="./pages/bananas.html" class="ajaxy ajaxy-page"&gt;Lean about Bananas&lt;/a&gt;&lt;/li&gt;
-					&lt;li&gt;&lt;a href="./pages/coconuts.html" class="ajaxy ajaxy-page"&gt;Learn about Coconuts&lt;/a&gt;&lt;/li&gt;
-				&lt;/ul&gt;
-				&lt;div id="result"&gt;
-					&lt;div id="content"&gt;&lt;/div&gt;
-					&lt;div id="current"&gt;&lt;/div&gt;
-				&lt;/div&gt;
+			&lt;ul id="menu"&gt;
+				&lt;li&gt;&lt;a href="./pages/apricots.html" class="ajaxy ajaxy-page"&gt;Learn about Apricots&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="./pages/bananas.html" class="ajaxy ajaxy-page"&gt;Lean about Bananas&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="./pages/coconuts.html" class="ajaxy ajaxy-page"&gt;Learn about Coconuts&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="./pages/durians.html#yummy" class="ajaxy ajaxy-page"&gt;Learn about Durians&lt;/a&gt;&lt;/li&gt;
+			&lt;/ul&gt;
+			&lt;div id="result"&gt;
+				&lt;div id="content" style="max-height:100px;overflow:auto;"&gt;&lt;/div&gt;
+				&lt;div id="current"&gt;&lt;/div&gt;
 			&lt;/div&gt;
 		</code>
 		
@@ -408,9 +414,12 @@
 							// Log what is happening
 							window.console.debug('$.Ajaxy.configure.Controllers.page.response', &#91;this,arguments&#93;, data, state);
 							// Adjust Menu
-							$menu.children(':has(a&#91;href$="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
+							$menu.children(':has(a&#91;href*="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
-							$content.html(data.content).fadeIn(400);
+							var Action = this;
+							$content.html(data.content).fadeIn(400,function(){
+								Action.documentReady($content);
+							});
 							// Return true
 							return true;
 						}
@@ -444,14 +453,14 @@
 		<h3>Step 3. Include jQuery (insert into your page's head tag)</h3>
 		<p>If your page already has jQuery included then you can skip this step.</p>
 		<code class="code language-html">
-			&lt;!-- Include jQuery (Sparkle Requirement) --&gt;
+			&lt;!-- Include jQuery (Ajaxy Requirement) --&gt;
 			&lt;script type="text/javascript" src="http://www.yoursite.com/somewhere/on/your/webserver/jquery-ajaxy/scripts/jquery-1.4.2.min.js"&gt;&lt;/script&gt;
 		</code>
 		
 		<h3>Step 4. Include jQuery Ajaxy (insert into your page's head tag)</h3>
 		<code class="code language-html">
 			&lt;!-- Include jQuery Ajaxy --&gt;
-			&lt;script type="text/javascript" src="http://www.yoursite.com/somewhere/on/your/webserver/jquery-ajaxy/scripts/jquery.ajaxy.js"&gt;&lt;/script&gt;
+			&lt;script type="text/javascript" src="http://www.yoursite.com/somewhere/on/your/webserver/jquery-ajaxy/scripts/jquery.ajaxy.min.js"&gt;&lt;/script&gt;
 		</code>
 	</div>
 	
@@ -639,13 +648,14 @@
 								Action.documentReady($content);
 								/**
 								 * The above line calls our Action's documentReady function.
-								 * This is a function automaticly provided by Ajaxy for our action, so is included without our Action's this scope.
-								 * We assign this to the variable Action, as inside the callback function for our jQuery effect this will no longer be the action.
+								 * This is a special function which is always there as it is automaticly provided by Ajaxy.
+								 * We assign this to the variable Action, as inside the callback function for our jQuery effect the variable this will be point to somewhere else then!
+								 * 
 								 * So what does this function do?
 								 * 1. It tells Ajaxy that the document is now ready for post processing.
 								 * 2. Ajaxy will then determine if the state included a anchor that we want to scroll to and initiate, and do that.
 								 * 3. Ajaxy will ajaxify the new content (provided the option [auto_ajaxify_documentReady] is true).
-								 * 4. Ajaxy will sparkle the new contnet (provided the option [auto_sparkle_documentReady] is true, and jQuery Sparkle exists). This is optional, there is no dependency on jQuery Sparkle, but it is a nifty project worth a look: http://www.balupton.com/projects/jquery-sparkle/
+								 * 4. Ajaxy will sparkle the new contnet (provided the option [auto_sparkle_documentReady] is true, and jQuery Sparkle exists). This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look: http://www.balupton.com/projects/jquery-sparkle/
 								 */
 							});
 							// Return true
