@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.4.0-beta
- * @date August 01, 2010
+ * @version 1.5.0-dev
+ * @date August 03, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -35,6 +35,7 @@ Installation & Usage:
 1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-ajaxy if the demo is not included.
 
 Todo:
+- Fixed redirect issue
 
 Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
@@ -43,7 +44,16 @@ Options:
 
 Changelog:
 
-v1.4.0-beta, August 1, 2010
+v1.5.0-dev, August 03, 2010
+- Renamed format to extractHash. This change may break backwards compatibility in advanced cases.
+- Added support for anchors. This now requires a call to [var Action = this; this.documentReady()] once the content has updated to inform Ajaxy that it can take care of anchors now. See the updated JavaScript in the demo for more information. To do this we have included Ariel Flesler's $.fn.scrollTo with Balupton's $.fn.ScrollTo extension.
+- Added auto_ajaxify_documentReady option
+- Added auto_sparkle_documentReady option
+- Fixed track providing 3 slashes issue
+- History requirement is now bundled into built jQuery Ajaxy script, so no need to include both anymore. This saves space as History and Ajax share some dependencies.
+- Updated jQuery History dependencies to [v1.4.0-beta, August 03, 2010]
+
+v1.4.0-beta, August 01, 2010
 - Updated licensing information. Still using the same license, as it is the best there is, but just provided some more information on it to make life simpler.
 - A very large redo and IS NOT backwards compatible
 - Added Controller.matches feature

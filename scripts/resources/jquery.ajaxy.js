@@ -18,8 +18,8 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.4.0
-	 * @date August 01, 2010
+	 * @version 1.5.0
+	 * @date August 03, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -59,7 +59,7 @@
 				no_log_class: 'ajaxy-no_log',
 				/**
 				 * Whether or not we should perform the initial redirect if we have detected we are on a page.
-				 * For production use, you want to ensure this has been set to false. As we should always want to ensure we are in the correct location.
+				 * For production use, you want to ensure this has been set to true. As we should always want to ensure we are in the correct location.
 				 */
 				redirect: false,
 				/**
@@ -84,6 +84,15 @@
 				 * Whether or not we should automatically find all ajaxy links and ajaxify them on DOM ready.
 				 */
 				auto_ajaxify: true,
+				/**
+				 * Whether or not we should automatically find all ajaxy links and ajaxify them on the document ready calls.
+				 */
+				auto_ajaxify_documentReady: true,
+				/**
+				 * Whether or not we should automatically sparkle the loaded in content (or page) on the document ready calls.
+				 * This only applies if jQuery Sparkle has been detected.
+				 */
+				auto_sparkle_documentReady: true,
 				/**
 				 * Whether or not we should output as much debugging information as possible.
 				 * For production use, you want to ensure this has been set to false. As we should always never want the client to see debug information.
@@ -145,6 +154,37 @@
 					},
 					preventDefault: function(){
 						this.propagate = false;
+					},
+					documentReady: function($el){
+						var Ajaxy = $.Ajaxy; var Action = this; var State = Action.State||{};
+						
+						// Prepare el
+						if ( ($el||{}).length||false ) {
+							$el = $('body');
+						}
+						
+						// Check for Anchor
+						var anchor = State.anchor||false;
+						if ( anchor ) {
+							// Reset the anchor
+							State.anchor = false;
+							$('.target').removeClass('target');
+							// Fire the anchor
+							$('#'+anchor).addClass('target').ScrollTo();
+						}
+						
+						// Auto Ajaxify
+						if ( Ajaxy.options.auto_ajaxify_documentReady ) {
+							$el.ajaxify();
+						}
+						
+						// Auto Ajaxify
+						if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
+							$el.sparkle();
+						}
+						
+						// Return true
+						return true;
 					}
 				},
 				
@@ -157,6 +197,7 @@
 					// Options
 					log: null,
 					form: false,
+					anchor: null,
 					
 					// System
 					state: null,
@@ -227,22 +268,39 @@
 			 * Format a state accordingly
 			 * @param {String} state
 			 */
-			format: function (state){
+			extractAnchor: function (url){
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				
 				// Strip urls
-				state = state.replace(/^\//, '').strip(Ajaxy.options.root_url).strip(Ajaxy.options.base_url);
+				var anchor = url.replace(/^\//g, '').stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
 				
 				// History format
-				state = History.format(state);
+				anchor = History.extractAnchor(anchor);
+				
+				// Return anchor
+				return anchor;
+			},
+			
+			/**
+			 * Format a state accordingly
+			 * @param {String} state
+			 */
+			extractState: function (url){
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				
+				// Strip urls
+				var state = url.replace(/^\//g, '').stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
+				
+				// History format
+				state = History.extractState(state);
 				
 				// Slash
-				if ( state ) state = '/'+state;
+				if ( state ) state = '/'+state.replace(/^\//g, '');
 				
-				// All good
+				// Return state
 				return state;
 			},
-		
+			
 			/**
 			 * Bind controllers
 			 * Either via Ajaxy.bind(controller, options), or Ajaxy.bind(controllers)
@@ -479,7 +537,7 @@
 				
 				// We have a URL and no state
 				if ( !State.state||false && State.url||false ) {
-					State.state = Ajaxy.format(State.url);
+					State.state = Ajaxy.extractState(State.url);
 					delete State.url;
 					// Don't log by default
 					if ( State.log === null || State.log === undefined ) {
@@ -511,7 +569,7 @@
 					window.console.error('Ajaxy.go: No state', [this, arguments]);
 					return false;
 				} else {
-					State.state = Ajaxy.format(State.state);
+					State.state = Ajaxy.extractState(State.state);
 				}
 				
 				// Figure it out
@@ -710,7 +768,8 @@
 			
 				// Inform Google Analytics of a state change
 				if ( typeof pageTracker !== 'undefined' ) {
-					pageTracker._trackPageview(Ajaxy.options.base_url+'/'+state);
+					var url = Ajaxy.options.base_url+(state.replace(/^\/+/, '') || '?');
+					pageTracker._trackPageview(url);
 					// ^ we do not use root url here as google doesn't want that
 					//   but it does want the base url here
 					//   http://www.google.com/support/googleanalytics/bin/answer.py?answer=55521
@@ -794,7 +853,7 @@
 				// --------------------------
 				
 				// Format the state
-				state = Ajaxy.format(state);
+				state = Ajaxy.extractState(state);
 			
 				// Check if we were a redirect
 				if ( Ajaxy.redirected !== false ) {
@@ -828,7 +887,7 @@
 				// Prepare the State
 				State.state = state;
 				State.controller = controller;
-				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state.replace(/^\//, '') || '?'));
+				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state.replace(/^\/+/, '') || '?'));
 				
 				// Store the State
 				Ajaxy.storeState(State);
@@ -856,7 +915,7 @@
 						// Check for redirect
 						if ( responseData.Ajaxy.redirected ) {
 							// A redirect was performed, set a option so we know what to do
-							var newState = Ajaxy.format(responseData.Ajaxy.redirected.to);
+							var newState = Ajaxy.extractState(responseData.Ajaxy.redirected.to);
 							Ajaxy.redirected = {
 								status: true,
 								from: state,
@@ -978,7 +1037,7 @@
 						// Ignore for some reason
 						if ( false && this.url !== XMLHttpRequest.channel.name ) {
 							// A redirect was performed, set a option so we know what to do
-							var newState = Ajaxy.format(XMLHttpRequest.channel.name);
+							var newState = Ajaxy.extractState(XMLHttpRequest.channel.name);
 							Ajaxy.redirected = {
 								status: true,
 								from: state,
@@ -1254,7 +1313,7 @@
 				// URLs
 				Ajaxy.options.root_url = (Ajaxy.options.root_url || document.location.protocol.toString()+'//'+document.location.hostname.toString()).replace(/\/$/, '')+'/';
 				Ajaxy.options.base_url = (Ajaxy.options.base_url || '');
-				Ajaxy.options.relative_url = Ajaxy.format(Ajaxy.options.relative_url || document.location.pathname.toString().replace(/^\//, ''));
+				Ajaxy.options.relative_url = Ajaxy.extractState(Ajaxy.options.relative_url || document.location.pathname.toString().replace(/^\//, ''));
 				
 				// Relative as Base
 				if ( Ajaxy.options.relative_as_base ) {
@@ -1412,7 +1471,10 @@
 					var $a = $(this);
 					
 					// Prepare
-					var state = Ajaxy.format($a.attr('href').replace(/^\/?\.\//,'/'));
+					var href = $a.attr('href').replace(/^\/?\.\//,'/');
+					var anchor = Ajaxy.extractAnchor(href);
+					var state = Ajaxy.extractState(href);
+					if ( '/'+anchor === state ) anchor = '';
 					var log = !$a.hasClass(Ajaxy.options.no_log_class);
 					var controller = $a.data('ajaxy-controller')||null;
 					
@@ -1420,7 +1482,8 @@
 					Ajaxy.go({
 						'state': state,
 						'controller': controller,
-						'log': log
+						'log': log,
+						'anchor': anchor
 					});
 					
 					// --------------------------
@@ -1451,7 +1514,7 @@
 					}
 					
 					// Generate the state
-					var state = Ajaxy.format($form.attr('action'));//.replace(/[?\.]?\/?/, '#/');
+					var state = Ajaxy.extractState($form.attr('action'));//.replace(/[?\.]?\/?/, '#/');
 					
 					// Perform the request
 					Ajaxy.go({

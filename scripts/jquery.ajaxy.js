@@ -1096,7 +1096,661 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	};
 	
 
-})(jQuery);/**
+})(jQuery);
+(function($){
+	/**
+	 * jQuery.ScrollTo
+	 * Copyright (c) 2007-2009 Ariel Flesler - aflesler(at)gmail(dot)com | http://flesler.blogspot.com
+	 * Dual licensed under MIT and GPL.
+	 * Date: 5/25/2009
+	 */
+	var $scrollTo = $.scrollTo = function( target, duration, settings ){
+		$(window).scrollTo( target, duration, settings );
+	};
+
+	$scrollTo.defaults = {
+		axis:'xy',
+		duration: parseFloat($.fn.jquery) >= 1.3 ? 0 : 1
+	};
+
+	// Returns the element that needs to be animated to scroll the window.
+	// Kept for backwards compatibility (specially for localScroll & serialScroll)
+	$scrollTo.window = function( scope ){
+		return $(window)._scrollable();
+	};
+
+	// Hack, hack, hack :)
+	// Returns the real elements to scroll (supports window/iframes, documents and regular nodes)
+	$.fn._scrollable = function(){
+		return this.map(function(){
+			var elem = this,
+				isWin = !elem.nodeName || $.inArray( elem.nodeName.toLowerCase(), ['iframe','#document','html','body'] ) != -1;
+
+				if( !isWin )
+					return elem;
+
+			var doc = (elem.contentWindow || elem).document || elem.ownerDocument || elem;
+			
+			return $.browser.safari || doc.compatMode == 'BackCompat' ?
+				doc.body : 
+				doc.documentElement;
+		});
+	};
+
+	$.fn.scrollTo = function( target, duration, settings ){
+		if( typeof duration == 'object' ){
+			settings = duration;
+			duration = 0;
+		}
+		if( typeof settings == 'function' )
+			settings = { onAfter:settings };
+			
+		if( target == 'max' )
+			target = 9e9;
+			
+		settings = $.extend( {}, $scrollTo.defaults, settings );
+		// Speed is still recognized for backwards compatibility
+		duration = duration || settings.speed || settings.duration;
+		// Make sure the settings are given right
+		settings.queue = settings.queue && settings.axis.length > 1;
+		
+		if( settings.queue )
+			// Let's keep the overall duration
+			duration /= 2;
+		settings.offset = both( settings.offset );
+		settings.over = both( settings.over );
+
+		return this._scrollable().each(function(){
+			var elem = this,
+				$elem = $(elem),
+				targ = target, toff, attr = {},
+				win = $elem.is('html,body');
+
+			switch( typeof targ ){
+				// A number will pass the regex
+				case 'number':
+				case 'string':
+					if( /^([+-]=)?\d+(\.\d+)?(px|%)?$/.test(targ) ){
+						targ = both( targ );
+						// We are done
+						break;
+					}
+					// Relative selector, no break!
+					targ = $(targ,this);
+				case 'object':
+					// DOMElement / jQuery
+					if( targ.is || targ.style )
+						// Get the real position of the target 
+						toff = (targ = $(targ)).offset();
+			}
+			$.each( settings.axis.split(''), function( i, axis ){
+				var Pos	= axis == 'x' ? 'Left' : 'Top',
+					pos = Pos.toLowerCase(),
+					key = 'scroll' + Pos,
+					old = elem[key],
+					max = $scrollTo.max(elem, axis);
+
+				if( toff ){// jQuery / DOMElement
+					attr[key] = toff[pos] + ( win ? 0 : old - $elem.offset()[pos] );
+
+					// If it's a dom element, reduce the margin
+					if( settings.margin ){
+						attr[key] -= parseInt(targ.css('margin'+Pos)) || 0;
+						attr[key] -= parseInt(targ.css('border'+Pos+'Width')) || 0;
+					}
+					
+					attr[key] += settings.offset[pos] || 0;
+					
+					if( settings.over[pos] )
+						// Scroll to a fraction of its width/height
+						attr[key] += targ[axis=='x'?'width':'height']() * settings.over[pos];
+				}else{ 
+					var val = targ[pos];
+					// Handle percentage values
+					attr[key] = val.slice && val.slice(-1) == '%' ? 
+						parseFloat(val) / 100 * max
+						: val;
+				}
+
+				// Number or 'number'
+				if( /^\d+$/.test(attr[key]) )
+					// Check the limits
+					attr[key] = attr[key] <= 0 ? 0 : Math.min( attr[key], max );
+
+				// Queueing axes
+				if( !i && settings.queue ){
+					// Don't waste time animating, if there's no need.
+					if( old != attr[key] )
+						// Intermediate animation
+						animate( settings.onAfterFirst );
+					// Don't animate this axis again in the next iteration.
+					delete attr[key];
+				}
+			});
+
+			animate( settings.onAfter );			
+
+			function animate( callback ){
+				$elem.animate( attr, duration, settings.easing, callback && function(){
+					callback.call(this, target, settings);
+				});
+			};
+
+		}).end();
+	};
+	
+	// Max scrolling position, works on quirks mode
+	// It only fails (not too badly) on IE, quirks mode.
+	$scrollTo.max = function( elem, axis ){
+		var Dim = axis == 'x' ? 'Width' : 'Height',
+			scroll = 'scroll'+Dim;
+		
+		if( !$(elem).is('html,body') )
+			return elem[scroll] - $(elem)[Dim.toLowerCase()]();
+		
+		var size = 'client' + Dim,
+			html = elem.ownerDocument.documentElement,
+			body = elem.ownerDocument.body;
+
+		return Math.max( html[scroll], body[scroll] ) 
+			 - Math.min( html[size]  , body[size]   );
+			
+	};
+
+	function both( val ){
+		return typeof val == 'object' ? val : { top:val, left:val };
+	};
+	
+	
+	
+	/**
+	 * $.fn.ScrollTo
+	 * Improves on $.fn.scrollTo by ensuring content even within scrollable areas is scrolled to
+	 * @version 1.0.0
+	 * @date August 01, 2010
+	 * @since 0.1.0-dev, July 24, 2008
+     * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
+	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
+	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+	 */
+	$.fn.ScrollTo = function(){
+		var $el = $(this);
+		var $parent = $el.parent();
+		var foundParent = false;
+		while ( $parent.length === 1 && !$parent.is('body') ) {
+			var parent = $parent.get(0);
+			if ( $parent.css('overflow') !== 'visible' && parent.scrollHeight !== parent.clientHeight ) {
+				foundParent = true;
+				break;
+			}
+			$parent = $parent.parent();
+		}
+		if ( foundParent ) {
+			$parent.scrollTo($el);
+			$parent.ScrollTo();
+		} else
+			$.scrollTo($el);
+		return $el;
+	}
+		
+	
+})(jQuery);
+/**
+ * @depends jquery, core.console
+ * @name jquery.history
+ * @package jquery-history {@link http://www.balupton/projects/jquery-history}
+ */
+
+// Start of our jQuery Plugin
+(function($)
+{	// Create our Plugin function, with $ as the argument (we pass the jQuery object over later)
+	// More info: http://docs.jquery.com/Plugins/Authoring#Custom_Alias
+	
+	/**
+	 * jQuery History
+	 * @version 1.4.0
+	 * @date August 03, 2010
+	 * @since 0.1.0-dev, July 24, 2008
+     * @package jquery-history {@link http://www.balupton/projects/jquery-history}
+	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
+	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+	 */
+	// Check our class exists
+	if ( !($.History||false) ) {
+		// Declare our class
+		$.History = {
+			// Our Plugin definition
+		
+			// -----------------
+			// Options
+		
+			options: {
+				debug: false
+			},
+		
+			// -----------------
+			// Variables
+		
+			state:		'',
+			$window:	null,
+			$iframe:	null,
+			handlers:	{
+				generic:	[],
+				specific:	{}
+			},
+		
+			// --------------------------------------------------
+			// Functions
+			
+			/**
+			 * Extract the Hash from a URL
+			 * @param {String} hash
+			 */
+			extractHash: function ( url ) {
+				// Extract the hash
+				var hash = url
+					.replace(/^[^#]*#/, '')	/* strip anything before the first anchor */
+					.replace(/^#+|#+$/, '')
+					;
+				
+				// Return hash
+				return hash;
+			},
+			
+			/**
+			 * Extract the State from a URL
+			 * @param {String} hash
+			 */
+			extractState: function ( hash ) {
+				// Extract the state
+				var state = hash
+					.replace(/#.*$/, '')	/* strip anything after the first anchor */
+					.replace(/^#+|#+$/, '')
+					;
+				
+				// Return state
+				return state;
+			},
+			
+			/**
+			 * Fetch the Anchor from a State
+			 * @param {String} hash
+			 */
+			extractAnchor: function ( hash ) {
+				var History = $.History;
+				
+				// Extract the anchor
+				var anchor = hash
+					.replace(/^.*#/, '')	/* strip anything before the last anchor */
+					.replace(/^#+|#+$/, '')
+					;
+				
+				// Return anchor
+				return anchor;
+			},
+			
+			/**
+			 * Get the current state of the application
+			 */
+	        getState: function ( ) {
+				var History = $.History;
+			
+				// Get the current state
+				return History.state;
+	        },
+			/**
+			 * Set the current state of the application
+			 * @param {String} hash
+			 */
+			setState: function ( state ) {
+				var History = $.History;
+				// Format the state
+				state = History.extractHash(state)
+			
+				// Apply the state
+				History.state = state;
+			
+				// Return the state
+				return History.state;
+			},
+		
+			/**
+			 * Get the current hash of the browser
+			 */
+			getHash: function ( ) {
+				var History = $.History;
+			
+				// Get the hash
+				var hash = History.extractHash(window.location.hash || location.hash);
+			
+				// Return the hash
+				return hash;
+			},
+		
+			/**
+			 * Set the current hash of the browser and iframe if present
+			 * @param {String} hash
+			 */
+			setHash: function ( hash ) {
+				var History = $.History;
+			
+				// Prepare hash
+				hash = History.extractHash(hash);
+			
+				// Write hash
+				if ( typeof window.location.hash !== 'undefined' ) {
+					if ( window.location.hash !== hash ) {
+						window.location.hash = hash;
+					}
+				} else if ( location.hash !== hash ) {
+					location.hash = hash;
+				}
+			
+				// Done
+				return hash;
+			},
+		
+			/**
+			 * Go to the specific state - does not force a history entry like setHash
+			 * @param {String} to
+			 */
+			go: function ( to ) {
+				var History = $.History;
+			
+				// Format
+				to = History.extractHash(to);
+			
+				// Get current
+				var hash = History.getHash();
+				var state = History.getState();
+			
+				// Has the hash changed
+				if ( to !== hash ) {
+					// Yes, update the hash
+					// And wait for the next automatic fire
+					History.setHash(to);
+				} else {
+					// Hash the state changed?
+					if ( to !== state ) {
+						// Yes, Update the state
+						History.setState(to);
+					}
+				
+					// Trigger our change
+					History.trigger();
+				}
+			
+				// Done
+				return true;
+			},
+		
+			/**
+			 * Handle when the hash has changed
+			 * @param {Event} e
+			 */
+			hashchange: function ( e ) {
+				var History = $.History;
+			
+				// Get Hash
+				var hash = History.getHash();
+			
+				// Handle the new hash
+				History.go(hash);
+			
+				// All done
+				return true;
+			},
+		
+			/**
+			 * Bind a handler to a hash
+			 * @param {Object} state
+			 * @param {Object} handler
+			 */
+			bind: function ( state, handler ) {
+				var History = $.History;
+			
+				// 
+				if ( handler ) {
+					// We have a state specific handler
+					// Prepare
+					if ( typeof History.handlers.specific[state] === 'undefined' ) {
+						// Make it an array
+						History.handlers.specific[state] = [];
+					}
+					// Push new handler
+					History.handlers.specific[state].push(handler);
+				}
+				else {
+					// We have a generic handler
+					handler = state;
+					History.handlers.generic.push(handler);
+				}
+			
+				// Done
+				return true;
+			},
+		
+			/**
+			 * Trigger a handler for a state
+			 * @param {String} state
+			 */
+			trigger: function ( state ) {
+				var History = $.History;
+			
+				// Prepare
+				if ( typeof state === 'undefined' ) {
+					// Use current
+					state = History.getState();
+				}
+				var i, n, handler, list;
+			
+				// Fire specific
+				if ( typeof History.handlers.specific[state] !== 'undefined' ) {
+					// We have specific handlers
+					list = History.handlers.specific[state];
+					for ( i = 0, n = list.length; i < n; ++i ) {
+						// Fire the specific handler
+						handler = list[i];
+						handler(state);
+					}
+				}
+			
+				// Fire generics
+				list = History.handlers.generic;
+				for ( i = 0, n = list.length; i < n; ++i ) {
+					// Fire the specific handler
+					handler = list[i];
+					handler(state);
+				}
+			
+				// Done
+				return true;
+			},
+		
+			// --------------------------------------------------
+			// Constructors
+		
+			/**
+			 * Construct our application
+			 */
+			construct: function ( ) {
+				var History = $.History;
+			
+				// Modify the document
+				$(document).ready(function() {
+					// Prepare the document
+					History.domReady();
+				});
+			
+				// Done
+				return true;
+			},
+		
+			/**
+			 * Configure our application
+			 * @param {Object} options
+			 */
+			configure: function ( options ) {
+				var History = $.History;
+			
+				// Set options
+				History.options = $.extend(History.options, options);
+			
+				// Done
+				return true;
+			},
+		
+			domReadied: false,
+			domReady: function ( ) {
+				var History = $.History;
+			
+				// Runonce
+				if ( History.domRedied ) {
+					return;
+				}
+				History.domRedied = true;
+			
+				// Define window
+				History.$window = $(window);
+			
+				// Apply the hashchange function
+				History.$window.bind('hashchange', this.hashchange);
+			
+				// Force hashchange support for all browsers
+				setTimeout(History.hashchangeLoader, 200);
+			
+				// All done
+				return true;
+			},
+		
+			/**
+			 * Enable hashchange for all browsers
+			 */
+			hashchangeLoader: function () {
+				var History = $.History;
+			
+				// More is needed for non IE8 browsers
+				if ( !($.browser.msie && parseInt($.browser.version) >= 8) ) {	
+					// We are not IE8
+			
+					// State our checker function, it is used to constantly check the location to detect a change
+					var checker;
+				
+					// Handle depending on the browser
+					if ( $.browser.msie ) {
+						// We are still IE
+						// IE6, IE7, etc
+				
+						// Append and $iframe to the document, as $iframes are required for back and forward
+						// Create a hidden $iframe for hash change tracking
+						History.$iframe = $('<iframe id="jquery-history-iframe" style="display: none;"></$iframe>').prependTo(document.body)[0];
+					
+						// Create initial history entry
+						History.$iframe.contentWindow.document.open();
+						History.$iframe.contentWindow.document.close();
+					
+						// Define the checker function (for bookmarks)
+						var iframeHit = false;
+						checker = function ( ) {
+						
+							// Fetch
+							var hash = History.getHash();
+							var state = History.getState();
+							var iframeHash = History.extractHash(History.$iframe.contentWindow.document.location.hash);
+						
+							// Check if the browser hash is different
+							if ( state !== hash ) {
+								// Browser hash is different
+							
+								// Check if we need to update the iframe
+								if ( !iframeHit ) {
+									// Write a iframe/history entry in the browsers back and forward
+									// alert('update iframe entry');
+									History.$iframe.contentWindow.document.open();
+									History.$iframe.contentWindow.document.close();
+									// alert('update iframe entry.');
+								
+									// Update the iframe hash
+									// alert('update iframe hash');
+									History.$iframe.contentWindow.document.location.hash = hash;
+									// alert('update iframe hash.');
+								}
+							
+								// Reset
+								iframeHit = false;
+							
+								// Fire
+								// alert('hashchange');
+								History.$window.trigger('hashchange');
+								// alert('hashchange.');
+							}
+							else {
+								// Browser hash is not different
+							
+								// Check if the iframe hash is different from the iframe state
+								if ( state !== iframeHash ) {
+									// Specify we were hit from the iframe
+									iframeHit = true;
+								
+									// Update the browser hash
+									// alert('set hash from iframe');
+									History.setHash(iframeHash);
+									// alert('set hash from iframe.');
+								}
+							}
+						
+						};
+					}
+					else {
+						// We are not IE
+						// Firefox, Opera, Etc
+				
+						// Define the checker function (for bookmarks, back, forward)
+						checker = function ( ) {
+							var hash = History.getHash();
+							var state = History.getState();
+							// Check
+							if ( state !== hash ) {
+								// State change
+								History.$window.trigger('hashchange');
+							}
+						};
+					}
+				
+					// Apply the checker function
+					setInterval(checker, 200);
+				}
+				else {
+					// We are IE8
+				
+					// Fire the initial
+					var hash = History.getHash();
+					if ( hash ) {
+						History.$window.trigger('hashchange');
+					}
+				}
+			
+				// Done
+				return true;
+			}
+	
+		}; // We have finished extending/defining our Plugin
+	
+		// --------------------------------------------------
+		// Finish up
+	
+		// Instantiate
+		$.History.construct();
+	}
+	else {
+		window.console.warn('$.History has already been defined...');
+	}
+	
+	// Finished definition
+})(jQuery); // We are done with our plugin, so lets call it with jQuery as the argument
+/**
  * @depends jquery, core.console, core.string, jquery.extra
  * @name jquery.ajaxy
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -1116,8 +1770,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.4.0
-	 * @date August 01, 2010
+	 * @version 1.5.0
+	 * @date August 03, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -1157,7 +1811,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				no_log_class: 'ajaxy-no_log',
 				/**
 				 * Whether or not we should perform the initial redirect if we have detected we are on a page.
-				 * For production use, you want to ensure this has been set to false. As we should always want to ensure we are in the correct location.
+				 * For production use, you want to ensure this has been set to true. As we should always want to ensure we are in the correct location.
 				 */
 				redirect: false,
 				/**
@@ -1182,6 +1836,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				 * Whether or not we should automatically find all ajaxy links and ajaxify them on DOM ready.
 				 */
 				auto_ajaxify: true,
+				/**
+				 * Whether or not we should automatically find all ajaxy links and ajaxify them on the document ready calls.
+				 */
+				auto_ajaxify_documentReady: true,
+				/**
+				 * Whether or not we should automatically sparkle the loaded in content (or page) on the document ready calls.
+				 * This only applies if jQuery Sparkle has been detected.
+				 */
+				auto_sparkle_documentReady: true,
 				/**
 				 * Whether or not we should output as much debugging information as possible.
 				 * For production use, you want to ensure this has been set to false. As we should always never want the client to see debug information.
@@ -1243,6 +1906,37 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					},
 					preventDefault: function(){
 						this.propagate = false;
+					},
+					documentReady: function($el){
+						var Ajaxy = $.Ajaxy; var Action = this; var State = Action.State||{};
+						
+						// Prepare el
+						if ( ($el||{}).length||false ) {
+							$el = $('body');
+						}
+						
+						// Check for Anchor
+						var anchor = State.anchor||false;
+						if ( anchor ) {
+							// Reset the anchor
+							State.anchor = false;
+							$('.target').removeClass('target');
+							// Fire the anchor
+							$('#'+anchor).addClass('target').ScrollTo();
+						}
+						
+						// Auto Ajaxify
+						if ( Ajaxy.options.auto_ajaxify_documentReady ) {
+							$el.ajaxify();
+						}
+						
+						// Auto Ajaxify
+						if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
+							$el.sparkle();
+						}
+						
+						// Return true
+						return true;
 					}
 				},
 				
@@ -1255,6 +1949,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// Options
 					log: null,
 					form: false,
+					anchor: null,
 					
 					// System
 					state: null,
@@ -1325,22 +2020,39 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 * Format a state accordingly
 			 * @param {String} state
 			 */
-			format: function (state){
+			extractAnchor: function (url){
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				
 				// Strip urls
-				state = state.replace(/^\//, '').strip(Ajaxy.options.root_url).strip(Ajaxy.options.base_url);
+				var anchor = url.replace(/^\//g, '').stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
 				
 				// History format
-				state = History.format(state);
+				anchor = History.extractAnchor(anchor);
+				
+				// Return anchor
+				return anchor;
+			},
+			
+			/**
+			 * Format a state accordingly
+			 * @param {String} state
+			 */
+			extractState: function (url){
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				
+				// Strip urls
+				var state = url.replace(/^\//g, '').stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
+				
+				// History format
+				state = History.extractState(state);
 				
 				// Slash
-				if ( state ) state = '/'+state;
+				if ( state ) state = '/'+state.replace(/^\//g, '');
 				
-				// All good
+				// Return state
 				return state;
 			},
-		
+			
 			/**
 			 * Bind controllers
 			 * Either via Ajaxy.bind(controller, options), or Ajaxy.bind(controllers)
@@ -1577,7 +2289,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// We have a URL and no state
 				if ( !State.state||false && State.url||false ) {
-					State.state = Ajaxy.format(State.url);
+					State.state = Ajaxy.extractState(State.url);
 					delete State.url;
 					// Don't log by default
 					if ( State.log === null || State.log === undefined ) {
@@ -1609,7 +2321,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					window.console.error('Ajaxy.go: No state', [this, arguments]);
 					return false;
 				} else {
-					State.state = Ajaxy.format(State.state);
+					State.state = Ajaxy.extractState(State.state);
 				}
 				
 				// Figure it out
@@ -1808,7 +2520,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			
 				// Inform Google Analytics of a state change
 				if ( typeof pageTracker !== 'undefined' ) {
-					pageTracker._trackPageview(Ajaxy.options.base_url+'/'+state);
+					var url = Ajaxy.options.base_url+(state.replace(/^\/+/, '') || '?');
+					pageTracker._trackPageview(url);
 					// ^ we do not use root url here as google doesn't want that
 					//   but it does want the base url here
 					//   http://www.google.com/support/googleanalytics/bin/answer.py?answer=55521
@@ -1892,7 +2605,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// --------------------------
 				
 				// Format the state
-				state = Ajaxy.format(state);
+				state = Ajaxy.extractState(state);
 			
 				// Check if we were a redirect
 				if ( Ajaxy.redirected !== false ) {
@@ -1926,7 +2639,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Prepare the State
 				State.state = state;
 				State.controller = controller;
-				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state.replace(/^\//, '') || '?'));
+				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state.replace(/^\/+/, '') || '?'));
 				
 				// Store the State
 				Ajaxy.storeState(State);
@@ -1954,7 +2667,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Check for redirect
 						if ( responseData.Ajaxy.redirected ) {
 							// A redirect was performed, set a option so we know what to do
-							var newState = Ajaxy.format(responseData.Ajaxy.redirected.to);
+							var newState = Ajaxy.extractState(responseData.Ajaxy.redirected.to);
 							Ajaxy.redirected = {
 								status: true,
 								from: state,
@@ -2076,7 +2789,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Ignore for some reason
 						if ( false && this.url !== XMLHttpRequest.channel.name ) {
 							// A redirect was performed, set a option so we know what to do
-							var newState = Ajaxy.format(XMLHttpRequest.channel.name);
+							var newState = Ajaxy.extractState(XMLHttpRequest.channel.name);
 							Ajaxy.redirected = {
 								status: true,
 								from: state,
@@ -2352,7 +3065,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// URLs
 				Ajaxy.options.root_url = (Ajaxy.options.root_url || document.location.protocol.toString()+'//'+document.location.hostname.toString()).replace(/\/$/, '')+'/';
 				Ajaxy.options.base_url = (Ajaxy.options.base_url || '');
-				Ajaxy.options.relative_url = Ajaxy.format(Ajaxy.options.relative_url || document.location.pathname.toString().replace(/^\//, ''));
+				Ajaxy.options.relative_url = Ajaxy.extractState(Ajaxy.options.relative_url || document.location.pathname.toString().replace(/^\//, ''));
 				
 				// Relative as Base
 				if ( Ajaxy.options.relative_as_base ) {
@@ -2510,7 +3223,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					var $a = $(this);
 					
 					// Prepare
-					var state = Ajaxy.format($a.attr('href').replace(/^\/?\.\//,'/'));
+					var href = $a.attr('href').replace(/^\/?\.\//,'/');
+					var anchor = Ajaxy.extractAnchor(href);
+					var state = Ajaxy.extractState(href);
+					if ( '/'+anchor === state ) anchor = '';
 					var log = !$a.hasClass(Ajaxy.options.no_log_class);
 					var controller = $a.data('ajaxy-controller')||null;
 					
@@ -2518,7 +3234,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					Ajaxy.go({
 						'state': state,
 						'controller': controller,
-						'log': log
+						'log': log,
+						'anchor': anchor
 					});
 					
 					// --------------------------
@@ -2549,7 +3266,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					}
 					
 					// Generate the state
-					var state = Ajaxy.format($form.attr('action'));//.replace(/[?\.]?\/?/, '#/');
+					var state = Ajaxy.extractState($form.attr('action'));//.replace(/[?\.]?\/?/, '#/');
 					
 					// Perform the request
 					Ajaxy.go({

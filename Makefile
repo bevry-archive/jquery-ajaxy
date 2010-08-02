@@ -37,8 +37,7 @@ refresh:
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.events.js -O scripts/resources/jquery.events.js ;
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.extra.js -O scripts/resources/jquery.extra.js ;
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.utilities.js -O scripts/resources/jquery.utilities.js ;
-	wget -q http://github.com/balupton/jquery-history/raw/master/scripts/jquery.history.js -O scripts/jquery.history.js ;
-	wget -q http://github.com/balupton/jquery-history/raw/master/scripts/jquery.history.min.js -O scripts/jquery.history.min.js ;
+	wget -q http://github.com/balupton/jquery-history/raw/master/scripts/resources/jquery.history.js -O scripts/resources/jquery.history.js ;
 
 
 pack:
@@ -48,6 +47,8 @@ pack:
 		./scripts/resources/jquery.events.js \
 		./scripts/resources/jquery.extra.js \
 		./scripts/resources/jquery.utilities.js \
+		./scripts/resources/jquery.scrollto.js \
+		./scripts/resources/jquery.history.js \
 		./scripts/resources/jquery.ajaxy.js \
 		> ./scripts/jquery.ajaxy.js;
 

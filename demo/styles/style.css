@@ -45,3 +45,8 @@ body .syntaxhighlighter .line {
 body .syntaxhighlighter .line.alt2 {
 	background-color: white !important;
 }
+
+
+:target,.target {
+	background:yellow;
+}

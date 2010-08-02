@@ -9,8 +9,6 @@
 	
 	<!-- Include jQuery (Ajaxy Requirement) -->
 	<script type="text/javascript" src="../scripts/jquery-1.4.2.min.js"></script>
-	<!-- Include jQuery History (Ajaxy Requirement)  -->
-	<script type="text/javascript" src="../scripts/jquery.history.js"></script>
 	<!-- Include jQuery Ajaxy -->
 	<script type="text/javascript" src="../scripts/jquery.ajaxy.js"></script>
 	
@@ -64,6 +62,7 @@
 			<li>You already have automatic support for tracking state changes in your now web application so you don't have to worry about this at all - we do it for you. This allows it so the user can still use those back and forward buttons, or even send the page URL to a friend and see the same thing!</li>
 			<li>You can even submit forms via Ajax with confidence, without having to do any extra server side code.</li>
 			<li>You will also have the ability to control your web applications state manually through your code for advanced circumstances.</li>
+			<li>You will still have support for classical anchors despite us using hashes for our web application states! This means you can still direct your users to particular content on a webpage using a link like: <code>my/web/page.html#the-content-to-scroll-to</code></li>
 		</ul>
 		
 		<p>We've included a nice demo below so you can see all of this in action.</p>
@@ -81,9 +80,10 @@
 				<li><a href="./pages/apricots.html" class="ajaxy ajaxy-page">Learn about Apricots</a></li>
 				<li><a href="./pages/bananas.html" class="ajaxy ajaxy-page">Lean about Bananas</a></li>
 				<li><a href="./pages/coconuts.html" class="ajaxy ajaxy-page">Learn about Coconuts</a></li>
+				<li><a href="./pages/durians.html#yummy" class="ajaxy ajaxy-page">Learn about Durians</a></li>
 			</ul>
 			<div id="result">
-				<div id="content"></div>
+				<div id="content" style="max-height:100px;overflow:auto;"></div>
 				<div id="current"></div>
 			</div>
 		</div>
@@ -450,10 +450,8 @@
 		
 		<h3>Step 4. Include jQuery Ajaxy (insert into your page's head tag)</h3>
 		<code class="code language-html">
-			&lt;!-- Include jQuery History (Ajaxy Requirement)  --&gt;
-			&lt;script type="text/javascript" src="../scripts/jquery.history.js"&gt;&lt;/script&gt;
 			&lt;!-- Include jQuery Ajaxy --&gt;
-			&lt;script type="text/javascript" src="../scripts/jquery.ajaxy.js"&gt;&lt;/script&gt;
+			&lt;script type="text/javascript" src="http://www.yoursite.com/somewhere/on/your/webserver/jquery-ajaxy/scripts/jquery.ajaxy.js"&gt;&lt;/script&gt;
 		</code>
 	</div>
 	
@@ -634,9 +632,22 @@
 							// Log what is happening
 							window.console.debug('$.Ajaxy.configure.Controllers.page.response', [this,arguments], data, state);
 							// Adjust Menu
-							$menu.children(':has(a[href$="'+state+'"])').addClass('active').siblings('.active').removeClass('active');
+							$menu.children(':has(a[href*="'+state+'"])').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
-							$content.html(data.content).fadeIn(400);
+							var Action = this;
+							$content.html(data.content).fadeIn(400,function(){
+								Action.documentReady($content);
+								/**
+								 * The above line calls our Action's documentReady function.
+								 * This is a function automaticly provided by Ajaxy for our action, so is included without our Action's this scope.
+								 * We assign this to the variable Action, as inside the callback function for our jQuery effect this will no longer be the action.
+								 * So what does this function do?
+								 * 1. It tells Ajaxy that the document is now ready for post processing.
+								 * 2. Ajaxy will then determine if the state included a anchor that we want to scroll to and initiate, and do that.
+								 * 3. Ajaxy will ajaxify the new content (provided the option [auto_ajaxify_documentReady] is true).
+								 * 4. Ajaxy will sparkle the new contnet (provided the option [auto_sparkle_documentReady] is true, and jQuery Sparkle exists). This is optional, there is no dependency on jQuery Sparkle, but it is a nifty project worth a look: http://www.balupton.com/projects/jquery-sparkle/
+								 */
+							});
 							// Return true
 							return true;
 						}
