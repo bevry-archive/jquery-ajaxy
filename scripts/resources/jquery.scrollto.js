@@ -168,15 +168,15 @@
 	/**
 	 * $.fn.ScrollTo
 	 * Improves on $.fn.scrollTo by ensuring content even within scrollable areas is scrolled to
-	 * @version 1.0.0
-	 * @date August 01, 2010
+	 * @version 1.1.0
+	 * @date August 05, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
 	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
-	$.fn.ScrollTo = function(){
+	$.fn.ScrollTo = function(options){
 		var $el = $(this);
 		var $parent = $el.parent();
 		var foundParent = false;
@@ -189,12 +189,11 @@
 			$parent = $parent.parent();
 		}
 		if ( foundParent ) {
-			$parent.scrollTo($el);
-			$parent.ScrollTo();
+			$parent.scrollTo($el,options);
+			$parent.ScrollTo(options);
 		} else
 			$.scrollTo($el);
 		return $el;
 	}
-		
 	
 })(jQuery);

@@ -18,8 +18,8 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.0
-	 * @date August 03, 2010
+	 * @version 1.5.1
+	 * @date August 05, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -86,6 +86,7 @@
 				auto_ajaxify: true,
 				/**
 				 * Whether or not we should automatically find all ajaxy links and ajaxify them on the document ready calls.
+				 * This should be left to true generally, as it keeps the links working for ajaxed'in content.
 				 */
 				auto_ajaxify_documentReady: true,
 				/**
@@ -98,6 +99,23 @@
 				 * This only applies if jQuery Sparkle has been detected.
 				 */
 				add_sparkle_extension: true,
+				/**
+				 * The options to pass to $.fn.ScrollTo when we have detected an anchor.
+				 */
+				scrollto_options: {
+					duration:400, /* Set to 0 to have no scroll animation effect */
+					easing:'swing' /* unless you are using the jQuery Easing plugin, only [swing] and [linear] are available. */
+				},
+				/**
+				 * Whether or not we should track all the anchors with Ajaxyy (even if they don't have the ajaxy class).
+				 * If you are using jQuery Ajaxy to power your entire site, then this should be enabled.
+				 */
+				track_all_anchors: false,
+				/**
+				 * Whether or not we should track all the anchors with Ajaxy (even if they don't have the ajaxy class).
+				 * If you are using jQuery Ajaxy to power your entire site, then this should be enabled.
+				 */
+				track_all_internal_links: false,
 				/**
 				 * Whether or not we should output as much debugging information as possible.
 				 * For production use, you want to ensure this has been set to false. As we should always never want the client to see debug information.
@@ -161,39 +179,10 @@
 						this.propagate = false;
 					},
 					documentReady: function($el){
-						var Ajaxy = $.Ajaxy; var Action = this; var State = Action.State||{};
+						var Ajaxy = $.Ajaxy; var Action = this;
 						
-						// Prepare
-						var ajaxify = Ajaxy.options.auto_ajaxify_documentReady;
-						
-						// Prepare el
-						if ( ($el||{}).length||false ) {
-							$el = $('body');
-						}
-						
-						// Auto Sparkle
-						if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
-							if ( Ajaxy.options.add_sparkle_extension ) ajaxify = false; // as the sparkle extension will handle this
-							$el.sparkle();
-						}
-						
-						// Auto Ajaxify
-						if ( ajaxify ) {
-							$el.ajaxify();
-						}
-						
-						// Check for Anchor
-						var anchor = State.anchor||false;
-						if ( anchor ) {
-							// Reset the anchor
-							State.anchor = false;
-							$('.target').removeClass('target');
-							// Fire the anchor
-							$('#'+anchor).addClass('target').ScrollTo();
-						}
-						
-						// Return true
-						return true;
+						// Fire Ajaxy's stateCompleted
+						return Ajaxy.stateCompleted(Action.State,$el);
 					}
 				},
 				
@@ -204,12 +193,16 @@
 				 */
 				State: {
 					// Options
-					log: null,
+					mode: null,
 					form: false,
-					anchor: null,
+					
+					// Parts
+					state: '',
+					hash: '',
+					anchor: '',
+					querystring: '',
 					
 					// System
-					state: null,
 					controller: null,
 					
 					/** The Request Object that is used in the $.Ajax */
@@ -253,6 +246,11 @@
 			States: {},
 			
 			/**
+			 * Our Current State
+			 */
+			currentState: {},
+			
+			/**
 			 * Queue for our events
 			 * @param {Object} state
 			 */
@@ -274,47 +272,111 @@
 			// Functions
 			
 			/**
+			 * Ensure we return a valid String value
+			 * @param {*} str
+			 * @return {String}
+			 */
+			ensureString: function(str){
+				var result = '';
+				
+				switch ( typeof str ) {
+					case 'number':
+					case 'string':
+						result = String(str);
+						break;
+					
+					default:
+						result = '';
+				}
+				
+				return result;
+			},
+			
+			/**
 			 * Extract a Relative URL from a URL
 			 * @param {String} url
 			 */
 			extractRelativeUrl: function (url){
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				
+				// Prepare
+				url = Ajaxy.ensureString(url);
+				
 				// Strip urls
 				var relative_url = url.stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
+				
+				// Check
+				if ( relative_url === '/' ) relative_url = ''; 
 				
 				// Return relative_url
 				return relative_url;
 			},
 			
 			/**
-			 * Extract a Anchor from a URL
-			 * @param {String} url
+			 * Extract the State from a URL
+			 * Alias for extractRelativeUrl
+			 * @param {String} state
 			 */
-			extractAnchor: function (url){
-				var Ajaxy = $.Ajaxy; var History = $.History;
+			extractState: function (url) {
+				var Ajaxy = $.Ajaxy;
 				
 				// Strip urls
-				var anchor = Ajaxy.extractRelativeUrl(url);
+				var state = Ajaxy.extractRelativeUrl(url);
 				
-				// History format
-				anchor = History.extractAnchor(anchor) || Ajaxy.extractAnchorFromQueryString(url);
-				
-				// Return anchor
-				return anchor;
+				// Return state
+				return state;
 			},
 			
 			/**
-			 * Extract a Anchor from a QueryString
-			 * @param {String} url
+			 * Extract the Hash from a State
+			 * @param {String} state
+			 * @return {String}
 			 */
-			extractAnchorFromQueryString: function (state){
-				var Ajaxy = $.Ajaxy; var History = $.History;
+			extractHash: function (state) {
+				var Ajaxy = $.Ajaxy;
 				
-				// Extract anchor
-				var anchor = state.match(/anchor=([a-zA-Z0-9-_]+)/)||'';
+				// Strip urls
+				var state = Ajaxy.extractState(state);
+				
+				// Extract the anchor
+				var hash = state.match(/^([^#?]*)/)||'';
+				if ( hash && hash.length||false === 2 ) {
+					hash = hash[1]||'';
+				}
+				
+				// Return hash
+				return hash;
+			},
+			
+			/**
+			 * Extract a Anchor from a State
+			 * @param {String} state
+			 * @return {String}
+			 */
+			extractAnchor: function (state) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Strip urls
+				var state = Ajaxy.extractState(state);
+				
+				// Extract the anchor
+				var anchor = state.replace(/[^#]+#/g,'#').match(/#+([^#\?]*)/)||'';
 				if ( anchor && anchor.length||false === 2 ) {
 					anchor = anchor[1]||'';
+				}
+				
+				// Check
+				if ( anchor === state ) {
+					anchor = '';
+				}
+				
+				// Check
+				if ( !anchor ) {
+					// Extract anchor from QueryString
+					var anchor = state.match(/anchor=([a-zA-Z0-9-_]+)/)||'';
+					if ( anchor && anchor.length||false === 2 ) {
+						anchor = anchor[1]||'';
+					}
 				}
 				
 				// Return anchor
@@ -322,23 +384,24 @@
 			},
 			
 			/**
-			 * Extract a State from a URL
-			 * @param {String} url
+			 * Extract a Querystring from a State
+			 * @param {String} state
+			 * @return {String}
 			 */
-			extractState: function (url){
-				var Ajaxy = $.Ajaxy; var History = $.History;
+			extractQuerystring: function (state) {
+				var Ajaxy = $.Ajaxy;
 				
 				// Strip urls
-				var state = Ajaxy.extractRelativeUrl(url);
+				var state = Ajaxy.extractState(state);
 				
-				// History format
-				state = History.extractState(state);
+				// Extract the querystring
+				var querystring = state.match(/\?(.*)$/)||'';
+				if ( querystring && querystring.length||false === 2 ) {
+					querystring = querystring[1]||'';
+				}
 				
-				// Slash
-				if ( state ) state = '/'+state.replace(/^\/+/, '');
-				
-				// Return state
-				return state;
+				// Return querystring
+				return querystring;
 			},
 			
 			/**
@@ -564,7 +627,7 @@
 				if ( typeof UserState === 'string' ) {
 					// We have just a state
 					UserState = {
-						state: UserState
+						url: UserState
 					};
 				}
 				
@@ -573,56 +636,43 @@
 				$.extend(true,State,UserState);
 				
 				// --------------------------
-				// Ensure state and log
+				// Ensure parts
 				
-				// We have a URL and no state
-				if ( !State.state||false && State.url||false ) {
-					State.state = Ajaxy.extractState(State.url);
-					delete State.url;
-					// Don't log by default
-					if ( State.log === null || State.log === undefined ) {
-						State.log = false;
-					}
+				// Check for !state and url
+				if ( !(State.state||false) && (State.url||false) ) {
+					State.state	= Ajaxy.extractState(State.url);
 				}
-				// We have a form
-				else if ( State.form ) {
-					// Don't log by default
-					if ( State.log === null || State.log === undefined ) {
-						State.log = false;
-					}
+				
+				// Rebuild the state
+				Ajaxy.rebuildState(State);
+				
+				// Fix anchor
+				if ( State.anchor === State.state || State.anchor === State.hash ) {
+					State.anchor = '';
 				}
-				// We are normal
-				else {
-					// Do log by default
-					if ( State.log === null || State.log === undefined ) {
-						State.log = true;
-					}
+				
+				// Check for !hash and !querystring and anchor
+				var querystring = (State.querystring||'').replace(/anchor=([a-zA-Z0-9-_]+)/g,'');
+				if ( !(State.hash||false) && !querystring && (State.anchor||'') ) {
+					// We are just an anchor change
+					// Let's grab the currentState's hash and use that, as we want to modify the state so we don't actually go to the anchor in the url
+					State.hash = Ajaxy.currentState.hash||'';
+					State.querystring = querystring;
+					
+					// Rebuild the state
+					Ajaxy.rebuildState(State);
 				}
-			
-				// Ensure log is a boolean (never null)
-				State.log = State.log ? true : false
-			
-				// --------------------------
 				
 				// Check state
-				if ( !State.state ) {
-					window.console.error('Ajaxy.go: No state', [this, arguments]);
+				if ( !State.state || (!State.hash && !querystring) ) {
+					window.console.warn('Ajaxy.go: No state or (hash and querystring)', [this, arguments], [State]);
 					return false;
-				} else {
-					State.state = Ajaxy.extractState(State.state);
 				}
+				delete querystring;
 				
-				// Place anchor in QueryString
-				if ( State.anchor ) {
-					var hashdata = State.state.queryStringToJSON();
-					hashdata.anchor = State.anchor;
-					var querystring = $.param(hashdata);
-					State.state = State.state.replace(/\?.*/, '')+'?'+querystring;
-				}
-				
-				// Figure it out
-				if ( State.state === History.getHash() && Ajaxy.options.debug ) {
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go: Trigger but no change.', State.state);
+				// Ensure mode
+				if ( State.mode||false ) {
+					State.mode = State.form ? 'silent' : 'default';
 				}
 				
 				// Store it
@@ -631,14 +681,19 @@
 				// --------------------------
 				
 				// Trigger state
-				if ( State.log ) {
-					// Log the history
-					// Trigger automaticly
-					History.go(State.state);
-				} else {
-					// Don't log
-					// Trigger manually
-					Ajaxy.stateChange(State.state);
+				switch ( State.mode ) {
+					case 'silent':
+						// Don't log
+						// Trigger manually
+						Ajaxy.stateChange(State.state)
+						break;
+					
+					case 'default':
+					default:
+						// Log the history
+						// Trigger automaticly
+						History.go(State.state);
+						break;
 				}
 				
 				// --------------------------
@@ -748,6 +803,47 @@
 			},
 			
 			/**
+			 * Rebuild a State
+			 * @param {&State} State
+			 * @return {State}
+			 */
+			rebuildState: function(State,mode){
+				var Ajaxy = $.Ajaxy;
+				
+				// Extract
+				var state = Ajaxy.extractState(State.state),
+					hash = Ajaxy.ensureString(State.hash) || Ajaxy.extractHash(state),
+					anchor = Ajaxy.ensureString(State.anchor) || Ajaxy.extractAnchor(state),
+					querystring = Ajaxy.ensureString(State.querystring) || Ajaxy.extractQuerystring(state);
+				
+				// Assign the state
+				State.state = hash;
+				
+				// Anchor
+				if ( anchor ) {
+					// Place anchor into querystring
+					var params = querystring.queryStringToJSON();
+					params.anchor = anchor;
+					querystring = unescape($.param(params));
+					delete params;
+				}
+				
+				// Querystring
+				if ( querystring ) {
+					// Add querystring
+					State.state += '?'+querystring;
+				}
+				
+				// Assign the rest
+				State.hash = hash;
+				State.anchor = anchor;
+				State.querystring = querystring; // this may have been updated in the anchor code a few lines above
+				
+				// Return State
+				return State;
+			},
+			
+			/**
 			 * Store a State Object
 			 * @param {Object} state
 			 */
@@ -758,12 +854,15 @@
 				var result = true,
 					stateType = typeof (State||undefined);
 				
+				// Rebuild State
+				Ajaxy.rebuildState(State);
+				
 				// Fetch
 				if ( stateType === 'object' && typeof State.state === 'string' ) {
 					result = Ajaxy.States[State.state] = State;
 				}
 				else {
-					window.console.error('Ajaxy.getState: Unkown State Format', [this, arguments]);
+					window.console.error('Ajaxy.storeState: Unkown State Format', [this, arguments]);
 					window.console.trace();
 					result = false;
 				}
@@ -781,18 +880,16 @@
 				var Ajaxy = $.Ajaxy;
 				
 				// Prepare
+				state = Ajaxy.extractState((state||{}).state||state);
 				var State = undefined,
-					stateType = typeof (state||undefined);
+					type = typeof (state||undefined);
 				
 				// Fetch
-				if ( (stateType === 'number' || stateType === 'string') && typeof Ajaxy.States[state] !== 'undefined' ) {
+				if ( (type === 'number' || type === 'string') && typeof Ajaxy.States[state] !== 'undefined' ) {
 					State = Ajaxy.States[state];
 				}
-				else if ( stateType === 'object' && typeof state.state === 'string' ) {
-					State = Ajaxy.getState(state.state,create);
-				}
 				else if ( create ) {
-					State = $.extend(true,{},Ajaxy.defaults.State);
+					State = Ajaxy.createState(state);
 				}
 				else if ( create === false ) {
 					// Don't report couldn't find
@@ -802,7 +899,33 @@
 					window.console.error('Ajaxy.getState: State does not exist', [this, arguments]);
 					window.console.trace();
 				}
+				
+				// Rebuild State
+				Ajaxy.rebuildState(State);
+				
+				// Return State
+				return State;
+			},
 			
+			/**
+			 * Create a new State Object
+			 * @param {String|Object} state
+			 * @return {Object|undefined}
+			 */
+			createState: function ( state ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				state = Ajaxy.extractState((state||{}).state||state);
+				
+				// Create State
+				State = $.extend(true,{},Ajaxy.defaults.State,{
+					state: state
+				});
+				
+				// Rebuild State
+				Ajaxy.rebuildState(State);
+				
 				// Return State
 				return State;
 			},
@@ -888,6 +1011,42 @@
 				return matchedController;
 			},
 			
+			stateCompleted: function(State,$content){
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var ajaxify = Ajaxy.options.auto_ajaxify_documentReady;
+				
+				// Prepare Content
+				if ( !(($content||{}).length||false) ) {
+					$content = $('body');
+				}
+				
+				// Auto Sparkle
+				if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
+					if ( Ajaxy.options.add_sparkle_extension ) ajaxify = false; // as the sparkle extension will handle this
+					$content.sparkle();
+				}
+				
+				// Auto Ajaxify
+				if ( ajaxify ) {
+					$content.ajaxify();
+				}
+				
+				// Check for Anchor
+				var anchor = State.anchor||false;
+				if ( anchor ) {
+					// Reset the anchor
+					State.anchor = false;
+					$('.target').removeClass('target');
+					// Fire the anchor
+					$('#'+anchor).addClass('target').ScrollTo(Ajaxy.options.scrollto_options);
+				}
+				
+				// Return true
+				return true;
+			},
+			
 			/**
 			 * Send an Ajaxy Request
 			 * @param {Object} state
@@ -899,10 +1058,12 @@
 				// Prepare variables
 				var skip_ajax = false;
 				
-				// --------------------------
 				
-				// Format the state
-				state = Ajaxy.extractState(state);
+				// --------------------------
+				// Initialise State
+				
+				// Determine State
+				var State = Ajaxy.getState(state,true);
 				
 				// Check if we were a redirect
 				if ( Ajaxy.redirected !== false ) {
@@ -910,47 +1071,77 @@
 					Ajaxy.redirected = false;
 					return;
 				}
-			
+				
+				
+				// --------------------------
+				// Current State
+				
+				// Are we a repeat request
+				var currentQuerystring = (Ajaxy.currentState.querystring||'').replace(/anchor=([a-zA-Z0-9-_]+)/g,''),
+					newQuerystring = State.querystring.replace(/anchor=([a-zA-Z0-9-_]+)/g,'');
+				if ( (Ajaxy.currentState.state||false) && Ajaxy.currentState.hash === State.hash && currentQuerystring === newQuerystring ) {
+					// We are the same hash and querystring
+					
+					// Are we the same anchor
+					if ( Ajaxy.currentState.anchor !== State.anchor ) {
+						// Only the anchor has changed
+						// So we only need to fire the stateCompleted to relocate the anchor
+						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has only been an anchor change', [this, arguments], [Ajaxy.currentState,State,state]);
+						Ajaxy.stateCompleted(State);
+					}
+					
+					// Update the currentState
+					Ajaxy.currentState = State;
+					
+					// There has been no considerate state change
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has been no considerable change', [this, arguments], [Ajaxy.currentState,State,state]);
+					return true;
+				}
+				delete currentQuerystring;
+				delete newQuerystring;
+				
 				// Add to AJAX queue
 				Ajaxy.ajaxQueue.push(state);
 				if ( Ajaxy.ajaxQueue.length !== 1 ) {
 					// Already processing an event
+					// We will call stateChange when that event finishes
+					// Which will call request
 					return false;
 				}
+				// We are now the current event
 			
 				// Fire the analytics
 				if ( Ajaxy.options.analytics ) {
 					Ajaxy.track(state);
 				}
 				
-				// --------------------------
+				// Update the currentState
+				Ajaxy.currentState = State;
 				
-				// Determine State
-				var State = Ajaxy.getState(state,true);
+				
+				// --------------------------
+				// Update the State
 				
 				// Determine controller
 				var controller = State.controller || Ajaxy.match(state) || undefined;
 				
-				// Determine anchor
-				var anchor = State.anchor || Ajaxy.extractAnchorFromQueryString(state);
-				
-				// --------------------------
-				
 				// Prepare the State
-				State.state = state;
 				State.controller = controller;
-				State.anchor = anchor;
 				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state || '?'));
 				
-				// Store the State
+				// Store the State (in case it hasn't been stored yet - eg. we came through somewhere else other than go)
 				Ajaxy.storeState(State);
 				
+				
 				// --------------------------
+				// Trigger State
 				
 				// Trigger Request
 				Ajaxy.trigger(controller, 'request');
 				
+				
 				// --------------------------
+				// Handle Request
 				
 				// Define handlers
 				var Request = {
@@ -980,7 +1171,7 @@
 						};
 						
 						// Success function
-						Ajaxy.ajaxQueue.shift()
+						Ajaxy.ajaxQueue.shift();
 						var queueState = Ajaxy.ajaxQueue.pop();
 						if (queueState && queueState !== state) {
 							Ajaxy.ajaxQueue = []; // abandon others
@@ -1326,8 +1517,7 @@
 				// Send the Request
 				return $.ajax(request);
 			},
-		
-		
+			
 			/**
 			 * Handler for a stateChange
 			 * @param {Object} state
@@ -1356,7 +1546,7 @@
 				var Controllers = options.Controllers||options.controllers||options;
 				
 				// Set options
-				Ajaxy.options = $.extend(true, Ajaxy.options, options.options||options||{});
+				Ajaxy.options = $.extend(true, Ajaxy.options, options.options||options);
 			
 				// Set params
 				Ajaxy.bind(Controllers);
@@ -1380,6 +1570,11 @@
 				Ajaxy.options.root_url = Ajaxy.options.root_url.replace(/\/+$/, '');
 				Ajaxy.options.base_url = Ajaxy.options.base_url.replace(/\/+$/, '');
 				Ajaxy.options.relative_url = Ajaxy.extractRelativeUrl(Ajaxy.options.relative_url);
+				
+				// Check
+				if ( Ajaxy.options.root_url === '/' ) Ajaxy.options.root_url = ''; 
+				if ( Ajaxy.options.base_url === '/' ) Ajaxy.options.base_url = ''; 
+				if ( Ajaxy.options.relative_url === '/' ) Ajaxy.options.relative_url = ''; 
 				
 				// --------------------------
 				
@@ -1486,6 +1681,14 @@
 					Ajaxy.ajaxifyController(controller);
 				});
 				
+				// Handle special cases
+				if ( Ajaxy.options.track_all_internal_links ) {
+					$el.findAndSelf('a[href^=/],a[href^=./]').filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+				}
+				if ( Ajaxy.options.track_all_anchors ) {
+					$el.findAndSelf('a[href^=#]:not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+				}
+				
 				// Add the onclick handler for ajax compatiable links
 				$el.findAndSelf('a.ajaxy').once('click',Ajaxy.ajaxify_helpers.a);
 				
@@ -1540,8 +1743,8 @@
 					
 					// Prepare
 					var href = Ajaxy.extractRelativeUrl($a.attr('href')).replace(/^\/?\.\//,'/');
-					var anchor = Ajaxy.extractAnchor(href);
 					var state = Ajaxy.extractState(href);
+					var anchor = Ajaxy.extractAnchor(href);
 					if ( '/'+anchor === state || anchor === state ) anchor = '';
 					var log = !$a.hasClass(Ajaxy.options.no_log_class);
 					var controller = $a.data('ajaxy-controller')||null;

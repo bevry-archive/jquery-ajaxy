@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.0-beta
- * @date August 03, 2010
+ * @version 1.5.1-beta
+ * @date August 05, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -41,11 +41,21 @@ Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
 
 Known Issues:
-- None! Youhou!
+- ScrollTo plugin does not always animate under some special circumstances. [minor]
 
 ----
 
 Changelog:
+
+v1.5.1-beta, August 05, 2010
+- Fixed a redirection issue
+- Support for anchors is now complete. We can now detect all types of anchors and adjust the page and state accordingly.
+- Able to detect the severity of the page change, and if it is not considerable (such as only an anchor change) then do not both performing the request. 
+- $.fn.SrollTo can now take the options argument. We also have a $.Ajaxy.options.scrollto_options for this.
+- Added the options [track_all_anchors] and [track_all_internal_links] to keep your Ajaxy website in sync; these are set to false by default.
+- A few more options added, should refer to the documentation about these.
+- Introduces a minor known issue that the ScrollTo plugin does no always scroll with animation.
+- Updated jQuery History dependencies to [v1.4.1-beta, August 05, 2010]
 
 v1.5.0-beta, August 03, 2010
 - Renamed format to extractHash. This change may break backwards compatibility in advanced cases.
