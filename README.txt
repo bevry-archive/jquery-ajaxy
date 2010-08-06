@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.1-beta
- * @date August 05, 2010
+ * @version 1.5.2-beta
+ * @date August 07, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -35,7 +35,7 @@ Installation & Usage:
 1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-ajaxy if the demo is not included.
 
 Todo:
-- None! Youhou!
+- Need to add timeout for AjaxQueue. As in rare circumstances it just never pops out.
 
 Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
@@ -46,6 +46,23 @@ Known Issues:
 ----
 
 Changelog:
+
+v1.5.2-beta, August 07, 2010
+- Added the Ajaxy.htmlCompat function which will convert a html document into a jQuery compatible document.
+  This is based on old functionality and includes fixes.
+  The Response.data returned on normal html ajaxy links is now as follows:
+	{
+		"controller": controller,
+		"responseText": responseText, /* raw result */
+		"html": html, /* raw result put through Ajaxy.htmlCompat */
+		"title": title, /* the value of the title element, or #ajaxy-title */
+		"head": head, /* the value of the head element, or #ajaxy-head */
+		"body": body, /* the value of the body element, or #ajaxy-body */
+		"content": content /* the value of the body element, or #ajaxy-body, or the html */
+	}
+- It is a backwards compatible release
+- Changed the demo to always use the unminified version, and included the minified version in a HTML comment
+- Added the HTML5 doctype and the utf8 meta element to the demo pages
 
 v1.5.1-beta, August 05, 2010
 - Fixed a redirection issue

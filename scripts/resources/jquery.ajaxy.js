@@ -18,8 +18,8 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.1
-	 * @date August 05, 2010
+	 * @version 1.5.2
+	 * @date August 07, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -1377,7 +1377,22 @@
 				// Return result
 				return result;
 			},
-		
+			
+			/**
+			 * Convert a HTML document into one compatiable with jQuery
+			 * Will remove doctype, and convert html,head,body,title,meta elements to divs.
+			 * @param {String} html
+			 */
+			htmlCompat: function(html){
+				var result = String(html)
+					.replace(/<\!DOCTYPE[^>]*>/i, '')
+					.replace(/<(html|head|body|title|meta)/gi,'<div id="ajaxy-$1"')
+					.replace(/<\/(html|head|body|title|meta)/gi,'</div')
+				;
+				
+				// Return result
+				return result;
+			},
 		
 			/**
 			 * Wrapper for Ajaxy Request
@@ -1440,25 +1455,28 @@
 						// Invalid JSON
 						catch (e) {
 							// Extract details
-							var html = responseText,
-								$html = $(html
-											.replace(/<(html|head|body|title)>/g,'<div id="ajaxy-$1">')
-											.replace(/<\/(html|head|body|title)/g,'</div>')
-										),
+							var html = Ajaxy.htmlCompat(responseText),
+								$html = $(html),
+								$head = $html.find('#ajaxy-head'),
 								$body = $html.find('#ajaxy-body'),
 								$title = $html.find('#ajaxy-title'),
-								$controller = $html.find('#ajaxy-controller'),
-								title = ($title.length ? $title.text() : null),
-								content = ($body.length ? $body.html() : html),
-								controller = ($controller.length ? $controller.text() : null),
+								$controller = $html.find('#ajaxy-controller'), /* special case support for controller in html pages */
+								title = ($title.length ? $title.text() : ''),
+								head = ($head.length ? $head.html() : ''),
+								body = ($body.length ? $body.html() : ''),
+								content = (body || html),
+								controller = ($controller.length ? $controller.text() : null);
 							// ^ We do the above workaround with element types as jQuery does not support loadin in documents
 							
 							// Create
 							responseData = {
-								"title": title,
-								"content": content,
 								"controller": controller,
-								"html": html
+								"responseText": responseText,
+								"html": html,
+								"title": title,
+								"head": head,
+								"body": body,
+								"content": content
 							};
 						}
 					}
