@@ -18,7 +18,7 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.2
+	 * @version 1.5.3
 	 * @date August 07, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -1462,11 +1462,10 @@
 								$title = $html.find('#ajaxy-title'),
 								$controller = $html.find('#ajaxy-controller'), /* special case support for controller in html pages */
 								title = ($title.length ? $title.text() : ''),
-								head = ($head.length ? $head.html() : ''),
-								body = ($body.length ? $body.html() : ''),
-								content = (body || html),
-								controller = ($controller.length ? $controller.text() : null);
-							// ^ We do the above workaround with element types as jQuery does not support loadin in documents
+								head = ($head.length ? $head.htmlAndSelf() : ''),
+								body = ($body.length ? $body.htmlAndSelf() : ''),
+								content = ($body.length ? $body.html() : html),
+								controller = ($controller.length ? $controller.text().trim() : null);
 							
 							// Create
 							responseData = {

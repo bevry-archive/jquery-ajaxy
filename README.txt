@@ -19,7 +19,7 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.2-beta
+ * @version 1.5.3-beta
  * @date August 07, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
@@ -46,6 +46,19 @@ Known Issues:
 ----
 
 Changelog:
+
+v1.5.3-beta, August 07, 2010
+- The Response.data returned on normal html ajaxy links is now as follows:
+	{
+		"controller": controller,
+		"responseText": responseText, /* raw result */
+		"html": html, /* raw result put through Ajaxy.htmlCompat */
+		"title": title, /* the text of the title/#ajaxy-title element */
+		"head": head, /* the outerHTML of the head/#ajaxy-head element */
+		"body": body, /* the outerHTML of the body/#ajaxy-body element */
+		"content": content /* the innerHTML of the body/#ajaxy-body element or the html value */
+	}
+- Updated jQuery Sparkle dependencies to [v1.4.10-beta, August 07, 2010]
 
 v1.5.2-beta, August 07, 2010
 - Added the Ajaxy.htmlCompat function which will convert a html document into a jQuery compatible document.
