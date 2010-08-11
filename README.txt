@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.3-beta
- * @date August 07, 2010
+ * @version 1.5.4-beta
+ * @date August 12, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -46,6 +46,10 @@ Known Issues:
 ----
 
 Changelog:
+
+v1.5.4-beta, August 12, 2010
+- Updated jQuery History dependencies to [v1.4.2-final, August 12, 2010].
+- This is a recommended update for all users.
 
 v1.5.3-beta, August 07, 2010
 - The Response.data returned on normal html ajaxy links is now as follows:
