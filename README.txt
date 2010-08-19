@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.4-beta
- * @date August 12, 2010
+ * @version 1.5.5-beta
+ * @date August 19, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -46,6 +46,14 @@ Known Issues:
 ----
 
 Changelog:
+
+v1.5.5-beta, August 19, 2010
+- Fixed issue with external links. http://getsatisfaction.com/balupton/topics/external_links_dont_work
+- Improved installation instructions to make more clear.
+- Updated Syntax Highlighter include and initialisation. We use http://www.balupton.com/projects/jquery-syntaxhighlighter
+- Code blocks within the demo are now using PRE instead of CODE elements due to an IE bug
+- Updated jQuery Sparkle dependencies to [v1.4.13-final, August 19, 2010].
+- Updated jQuery History dependencies to [v1.4.3-final, August 19, 2010].
 
 v1.5.4-beta, August 12, 2010
 - Updated jQuery History dependencies to [v1.4.2-final, August 12, 2010].

@@ -70,7 +70,7 @@
 	$.fn.enter = $.fn.enter || function(data,callback){
 		return $(this).binder('enter',data,callback);
 	};
-	$.event.special.enter = $.event.special.cancel || {
+	$.event.special.enter = $.event.special.enter || {
 		setup: function( data, namespaces ) {
 			$(this).bind('keypress', $.event.special.enter.handler);
 		},

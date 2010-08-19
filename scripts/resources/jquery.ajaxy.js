@@ -18,8 +18,8 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.3
-	 * @date August 07, 2010
+	 * @version 1.5.5
+	 * @date August 19, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -1731,11 +1731,11 @@
 				var Controller = Ajaxy.getController(controller);
 				
 				// Do selector
-				if ( Controller && typeof Controller['selector'] !== 'undefined' ) {
+				if ( Controller && (Controller.selector||false) ) {
 					// We have a selector
 					$(function(){
 						// Onload
-						var $els = $(Controller['selector']);
+						var $els = $(Controller.selector);
 						$els.data('ajaxy-controller',controller).once('click',Ajaxy.ajaxify_helpers.a);
 					});
 				}
