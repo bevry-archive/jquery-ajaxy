@@ -47,7 +47,7 @@ Known Issues:
 
 Changelog:
 
-v1.5.6-final, August 21, 2010
+v1.5.6-beta, August 21, 2010
 - Updated jQuery Sparkle dependencies to [v1.4.17-final, August 21, 2010]
 - Updated jQuery History dependencies to [v1.4.4-final, August 21, 2010]
 
