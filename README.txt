@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.5-beta
- * @date August 19, 2010
+ * @version 1.5.6-beta
+ * @date August 21, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -46,6 +46,10 @@ Known Issues:
 ----
 
 Changelog:
+
+v1.5.6-final, August 21, 2010
+- Updated jQuery Sparkle dependencies to [v1.4.17-final, August 21, 2010]
+- Updated jQuery History dependencies to [v1.4.4-final, August 21, 2010]
 
 v1.5.5-beta, August 19, 2010
 - Fixed issue with external links. http://getsatisfaction.com/balupton/topics/external_links_dont_work

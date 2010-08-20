@@ -38,6 +38,7 @@ refresh:
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.extra.js -O scripts/resources/jquery.extra.js ;
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.utilities.js -O scripts/resources/jquery.utilities.js ;
 	wget -q http://github.com/balupton/jquery-history/raw/master/scripts/resources/jquery.history.js -O scripts/resources/jquery.history.js ;
+	wget -q http://github.com/balupton/jquery-history/raw/master/demo/styles/generic.css -O demo/styles/generic.css ;
 
 
 pack:
