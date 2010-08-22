@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.6-beta
- * @date August 21, 2010
+ * @version 1.5.7-beta
+ * @date August 22, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -42,10 +42,15 @@ Options:
 
 Known Issues:
 - ScrollTo plugin does not always animate under some special circumstances. [minor]
+- Ajaxy form submit does not care for multiple submit buttons and only uses the last one. [medium]
 
 ----
 
 Changelog:
+
+v1.5.7-beta, August 22, 2010
+- Added demo for Ajaxy Forms
+- Fixed Ajaxy Forms when used with Controller Selectors
 
 v1.5.6-beta, August 21, 2010
 - Updated jQuery Sparkle dependencies to [v1.4.17-final, August 21, 2010]

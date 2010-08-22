@@ -1890,8 +1890,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.5
-	 * @date August 19, 2010
+	 * @version 1.5.7
+	 * @date August 22, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -2951,7 +2951,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Are we a repeat request
 				var currentQuerystring = (Ajaxy.currentState.querystring||'').replace(/anchor=([a-zA-Z0-9-_]+)/g,''),
 					newQuerystring = State.querystring.replace(/anchor=([a-zA-Z0-9-_]+)/g,'');
-				if ( (Ajaxy.currentState.state||false) && Ajaxy.currentState.hash === State.hash && currentQuerystring === newQuerystring ) {
+				if ( (Ajaxy.currentState.state||false) && (Ajaxy.currentState.hash === State.hash) && (currentQuerystring === newQuerystring) && !(State.form || Ajaxy.currentState.form) ) {
 					// We are the same hash and querystring
 					
 					// Are we the same anchor
@@ -3563,19 +3563,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// --------------------------
 				
 				// Prepare
-				var $el = $(this);
+				var $el = $(this).addClass('ajaxy');
+				options = $.extend({
+					complete: true
+				}, options);
 				
-				// Ajaxify the controllers
-				$.each(Ajaxy.Controllers, function(controller,Controller){
-					Ajaxy.ajaxifyController(controller);
-				});
+				// Handle
+				if ( options.complete ) {
+					// Ajaxify the controllers
+					$.each(Ajaxy.Controllers, function(controller,Controller){
+						Ajaxy.ajaxifyController(controller);
+					});
 				
-				// Handle special cases
-				if ( Ajaxy.options.track_all_internal_links ) {
-					$el.findAndSelf('a[href^=/],a[href^=./]').filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
-				}
-				if ( Ajaxy.options.track_all_anchors ) {
-					$el.findAndSelf('a[href^=#]:not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+					// Handle special cases
+					if ( Ajaxy.options.track_all_internal_links ) {
+						$el.findAndSelf('a[href^=/],a[href^=./]').filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+					}
+					if ( Ajaxy.options.track_all_anchors ) {
+						$el.findAndSelf('a[href^=#]:not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+					}
 				}
 				
 				// Add the onclick handler for ajax compatiable links
@@ -3584,12 +3590,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Add the onclick handler for ajax compatiable forms
 				$el.findAndSelf('form.ajaxy').once('submit',Ajaxy.ajaxify_helpers.form);
 				
+				
 				// --------------------------
 				
 				// Chain
 				return $el;
 			},
-		
+			
 			/**
 			 * Ajaxify a particullar controller
 			 * @param {String} controller
@@ -3608,7 +3615,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					$(function(){
 						// Onload
 						var $els = $(Controller.selector);
-						$els.data('ajaxy-controller',controller).once('click',Ajaxy.ajaxify_helpers.a);
+						$els.data('ajaxy-controller',controller).ajaxify({complete:false});
 					});
 				}
 				
@@ -3674,7 +3681,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					}
 					
 					// Generate the state
-					var state = Ajaxy.extractState($form.attr('action'));//.replace(/[?\.]?\/?/, '#/');
+					var href = Ajaxy.extractRelativeUrl($form.attr('action')).replace(/^\/?\.\//,'/');
+					var state = Ajaxy.extractState(href);
 					
 					// Perform the request
 					Ajaxy.go({
