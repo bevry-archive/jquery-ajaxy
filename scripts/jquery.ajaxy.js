@@ -1890,8 +1890,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.7
-	 * @date August 22, 2010
+	 * @version 1.5.8
+	 * @date August 23, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -3577,7 +3577,12 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 					// Handle special cases
 					if ( Ajaxy.options.track_all_internal_links ) {
-						$el.findAndSelf('a[href^=/],a[href^=./]').filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+						var $internalLinks = $el.findAndSelf('a[href^=/],a[href^=./]');
+						if ( Ajaxy.options.root_url ) {
+							$internalLinks.add($('a[href^='+Ajaxy.options.root_url+']'));
+						}
+						$internalLinks.filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+						delete $internalLinks;
 					}
 					if ( Ajaxy.options.track_all_anchors ) {
 						$el.findAndSelf('a[href^=#]:not(.ajaxy,.no-ajaxy)').addClass('ajaxy');

@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.7-beta
- * @date August 22, 2010
+ * @version 1.5.8-beta
+ * @date August 23, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -47,6 +47,9 @@ Known Issues:
 ----
 
 Changelog:
+
+v1.5.8-beta, August 23, 2010
+- Added root_url to internal link checks
 
 v1.5.7-beta, August 22, 2010
 - Added demo for Ajaxy Forms
