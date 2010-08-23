@@ -1622,7 +1622,7 @@
 			 */
 			construct: function ( ) {
 				// Construct our Plugin
-				var Ajaxy = $.Ajaxy; var History = $.History;
+				var Ajaxy = $.Ajaxy, History = $.History, Sparkle = $.Sparkle;
 				
 				// --------------------------
 				
@@ -1635,12 +1635,21 @@
 				
 				// --------------------------
 				
-				// Set AJAX History Handler
+				// Bind Ajaxy History Handler
 				History.bind(function(state){
 					// History Handler
 					return Ajaxy.stateChange(state);
 				});
 			
+				// Bind Sparkle Extension
+				if ( $.Sparkle||false && Ajaxy.options.add_sparkle_extension ) {
+					// Add Ajaxify to Sparkle
+					$.Sparkle.addExtension('ajaxy', function(){
+						// Find all internal links, mark them as Ajaxy links
+						$(this).ajaxify();
+					});
+				}
+				
 				// Bind fn functions
 				$.fn.ajaxify = Ajaxy.ajaxify;
 				$.fn.ajaxy = Ajaxy.ajaxify;
@@ -1664,17 +1673,6 @@
 			domReady: function ( ) {
 				// We are good
 				var Ajaxy = $.Ajaxy;
-				
-				// --------------------------
-				
-				// Check for Sparkle
-				if ( $.Sparkle||false && Ajaxy.options.add_sparkle_extension ) {
-					// Add Ajaxify to Sparkle
-					$.Sparkle.addExtension('ajaxy', function(){
-						// Find all internal links, mark them as Ajaxy links
-						$(this).ajaxify();
-					});
-				}
 				
 				// --------------------------
 				
