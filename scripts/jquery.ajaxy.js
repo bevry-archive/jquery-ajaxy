@@ -3563,10 +3563,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// --------------------------
 				
 				// Prepare
-				var $el = $(this).addClass('ajaxy');
+				var $el = $(this);
 				options = $.extend({
 					complete: true
 				}, options);
+				
+				// Adjust
+				if ( $el.is('form,a') ) {
+					$el.addClass('ajaxy');
+				}
 				
 				// Handle
 				if ( options.complete ) {
@@ -3579,9 +3584,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					if ( Ajaxy.options.track_all_internal_links ) {
 						var $internalLinks = $el.findAndSelf('a[href^=/],a[href^=./]');
 						if ( Ajaxy.options.root_url ) {
-							$internalLinks.add($('a[href^='+Ajaxy.options.root_url+']'));
+							var $internalLinksRoot = $('a[href^='+Ajaxy.options.root_url+']');
+							$internalLinks = $internalLinks.add($internalLinksRoot);
+							delete $internalLinksRoot;
 						}
-						$internalLinks.filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
+						$internalLinks = $internalLinks.filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
 						delete $internalLinks;
 					}
 					if ( Ajaxy.options.track_all_anchors ) {
@@ -3590,10 +3597,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				}
 				
 				// Add the onclick handler for ajax compatiable links
-				$el.findAndSelf('a.ajaxy').once('click',Ajaxy.ajaxify_helpers.a);
+				$el.findAndSelf('a.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('click',Ajaxy.ajaxify_helpers.a);
 				
 				// Add the onclick handler for ajax compatiable forms
-				$el.findAndSelf('form.ajaxy').once('submit',Ajaxy.ajaxify_helpers.form);
+				$el.findAndSelf('form.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('submit',Ajaxy.ajaxify_helpers.form);
 				
 				
 				// --------------------------

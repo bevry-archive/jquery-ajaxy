@@ -50,6 +50,7 @@ Changelog:
 
 v1.5.8-beta, August 23, 2010
 - Added root_url to internal link checks
+- Improved internal links adding
 
 v1.5.7-beta, August 22, 2010
 - Added demo for Ajaxy Forms
