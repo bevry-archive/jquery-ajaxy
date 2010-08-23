@@ -944,6 +944,23 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	};
 	
 	/**
+	 * Gives target to the element, and removes target from everything else
+	 * @version 1.0.0
+	 * @date August 23, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+	 */
+	$.fn.giveTarget = $.fn.giveTarget || function(){
+		// Give focus to the current element
+		var $this = $(this);
+		$('.target').removeClass('target');
+		$this.addClass('target');
+		return this;
+	};
+	
+	/**
 	 * Perform the highlight effect
 	 * @version 1.0.0
 	 * @date June 30, 2010
@@ -1890,7 +1907,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.8
+	 * @version 1.5.9
 	 * @date August 23, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -2910,9 +2927,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				if ( anchor ) {
 					// Reset the anchor
 					State.anchor = false;
-					$('.target').removeClass('target');
 					// Fire the anchor
-					$('#'+anchor).addClass('target').ScrollTo(Ajaxy.options.scrollto_options);
+					var $anchor = $('#'+anchor).giveTarget();
+					$anchor.ScrollTo(Ajaxy.options.scrollto_options);
 				}
 				
 				// Return true
@@ -2944,6 +2961,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					return;
 				}
 				
+				// Remove Target
+				$('.target').removeClass('target');
 				
 				// --------------------------
 				// Current State

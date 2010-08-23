@@ -309,6 +309,23 @@
 	};
 	
 	/**
+	 * Gives target to the element, and removes target from everything else
+	 * @version 1.0.0
+	 * @date August 23, 2010
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+	 */
+	$.fn.giveTarget = $.fn.giveTarget || function(){
+		// Give focus to the current element
+		var $this = $(this);
+		$('.target').removeClass('target');
+		$this.addClass('target');
+		return this;
+	};
+	
+	/**
 	 * Perform the highlight effect
 	 * @version 1.0.0
 	 * @date June 30, 2010

@@ -18,7 +18,7 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.8
+	 * @version 1.5.9
 	 * @date August 23, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -1038,9 +1038,9 @@
 				if ( anchor ) {
 					// Reset the anchor
 					State.anchor = false;
-					$('.target').removeClass('target');
 					// Fire the anchor
-					$('#'+anchor).addClass('target').ScrollTo(Ajaxy.options.scrollto_options);
+					var $anchor = $('#'+anchor).giveTarget();
+					$anchor.ScrollTo(Ajaxy.options.scrollto_options);
 				}
 				
 				// Return true
@@ -1072,6 +1072,8 @@
 					return;
 				}
 				
+				// Remove Target
+				$('.target').removeClass('target');
 				
 				// --------------------------
 				// Current State

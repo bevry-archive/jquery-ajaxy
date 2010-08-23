@@ -19,7 +19,7 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.8-beta
+ * @version 1.5.9-beta
  * @date August 23, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
@@ -47,6 +47,10 @@ Known Issues:
 ----
 
 Changelog:
+
+v1.5.9-beta, August 23, 2010
+- Improved target adding
+- Updated jQuery Sparkle dependencies to [v1.4.18-final, August 23, 2010]
 
 v1.5.8-beta, August 23, 2010
 - Added root_url to internal link checks
