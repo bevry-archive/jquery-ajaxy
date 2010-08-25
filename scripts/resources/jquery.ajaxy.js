@@ -195,12 +195,14 @@
 					// Options
 					mode: null,
 					form: false,
+					a: false,
 					
 					// Parts
 					state: '',
 					hash: '',
 					anchor: '',
 					querystring: '',
+					location: '',
 					
 					// System
 					controller: null,
@@ -234,7 +236,12 @@
 			 * Have we been constructed
 			 */
 			constructed: false,
-		
+			
+			/**
+			 * Whether or not we are in postpone mode
+			 */
+			postpone: false,
+			
 			/**
 			 * Collection of Controllers
 			 */
@@ -614,13 +621,13 @@
 			},
 		
 			/**
-			 * Perform an Ajaxy Request
+			 * Build an Ajaxy State
 			 * @param {String|Object} UserState
 			 */
-			go: function ( UserState ) {
+			buildState: function ( UserState ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
-				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go:', [this, arguments]);
-			
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.buildState:', [this, arguments]);
+				
 				// --------------------------
 				
 				// Ensure format
@@ -671,9 +678,36 @@
 				delete querystring;
 				
 				// Ensure mode
-				if ( State.mode||false ) {
-					State.mode = State.form ? 'silent' : 'default';
-				}
+				if ( !State.mode ) {
+					if ( State.a && Ajaxy.postponse ) {
+						State.mode = 'postpone';
+					}
+					else if ( State.form ) {
+						State.mode = 'silent';
+					}
+					else {
+						State.mode = 'default';
+					}
+				}	
+				
+				// --------------------------
+				
+				// Return State
+				return State;
+			},
+			
+			/**
+			 * Perform an Ajaxy Request
+			 * @param {String|Object} UserState
+			 */
+			go: function ( UserState ) {
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go:', [this, arguments]);
+			
+				// --------------------------
+				
+				// Build State
+				var State = Ajaxy.buildState(UserState);
 				
 				// Store it
 				Ajaxy.storeState(State);
@@ -688,6 +722,11 @@
 						Ajaxy.stateChange(State.state)
 						break;
 					
+					case 'postpone':
+						// Redirect the browser
+						document.location = State.location;
+						break;
+						
 					case 'default':
 					default:
 						// Log the history
@@ -838,6 +877,7 @@
 				State.hash = hash;
 				State.anchor = anchor;
 				State.querystring = querystring; // this may have been updated in the anchor code a few lines above
+				State.location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+State.state;
 				
 				// Return State
 				return State;
@@ -1618,6 +1658,7 @@
 				// Redirectable
 				if ( Ajaxy.options.relative_url && Ajaxy.options.relative_url !== null ) {
 					if ( Ajaxy.options.redirect === true ) {
+						// Redirect Now
 						var location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+Ajaxy.options.relative_url,
 							hash = History.getHash();
 						if ( hash ) {
@@ -1625,9 +1666,16 @@
 						}
 						document.location = location;
 					}
+					else if ( Ajaxy.options.redirect === 'postpone' ) {
+						// Handled Elsewhere
+						Ajaxy.postpone = true;
+					}
 					else if ( Ajaxy.options.redirect === 'disable' ) {
+						// Disable Ajaxy Script
 						Ajaxy.addAjaxy = Ajaxy.ajaxify = Ajaxy.bind = function(){};
-						$('.ajaxy').removeAjaxy();
+						$(function(){
+							$('.ajaxy').removeAjaxy();
+						});
 					}
 				}
 				
@@ -1865,7 +1913,8 @@
 						'state': state,
 						'controller': controller,
 						'log': log,
-						'anchor': anchor
+						'anchor': anchor,
+						'a': this
 					});
 					
 					// --------------------------

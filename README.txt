@@ -49,6 +49,7 @@ Known Issues:
 Changelog:
 
 v1.5.9-dev, August 25, 2010
+- Added Ajaxy.options.redirect = 'postpone' option
 - Added Ajaxy.options.redirect = 'disable' option
 - Added $.fn.addAjaxy and $.fn.removeAjaxy for advanced use cases
 - Readded $('body').ajaxify() on domReady if auto_ajaxify is true
