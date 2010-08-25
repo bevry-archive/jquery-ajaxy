@@ -3450,14 +3450,29 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// --------------------------
 				
+				// Check
+				if ( typeof options !== 'object' ) {
+					window.console.error('Ajaxy.configure: Invalid Options Passed', [this,arguments]);
+					return;
+				}
+				
 				// Prepare
-				var Controllers = options.Controllers||options.controllers||options;
+				var Controllers;
+				if ( typeof options.Controllers === 'object' ) {
+					Controllers = options.Controllers;
+					delete options.Controllers;
+				}
+				else if ( typeof options.controllers === 'object' ) {
+					Controllers = options.controllers;
+					delete options.controllers;
+				}
+				else {
+					Controllers = options;
+					options = {};
+				}
 				
 				// Set options
 				Ajaxy.options = $.extend(true, Ajaxy.options, options.options||options);
-			
-				// Set params
-				Ajaxy.bind(Controllers);
 				
 				// --------------------------
 				
@@ -3489,15 +3504,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Debug
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.configure:', [this, arguments]);
 				
-				// Initial redirect
-				if ( Ajaxy.options.redirect && Ajaxy.options.relative_url && Ajaxy.options.relative_url !== null  ) {
-					var location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+Ajaxy.options.relative_url,
-						hash = History.getHash();
-					if ( hash ) {
-						location += '?anchor='+hash;
+				// Redirectable
+				if ( Ajaxy.options.relative_url && Ajaxy.options.relative_url !== null ) {
+					if ( Ajaxy.options.redirect === true ) {
+						var location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+Ajaxy.options.relative_url,
+							hash = History.getHash();
+						if ( hash ) {
+							location += '?anchor='+hash;
+						}
+						document.location = location;
 					}
-					document.location = location;
+					else if ( Ajaxy.options.redirect === 'disable' ) {
+						Ajaxy.bind = function(){};
+					}
 				}
+				
+				// --------------------------
+				
+				// Bind the Controllers
+				Ajaxy.bind(Controllers);
 				
 				// --------------------------
 				

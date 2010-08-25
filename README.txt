@@ -19,7 +19,7 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.9-beta
+ * @version 1.5.9-dev
  * @date August 25, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
@@ -48,7 +48,8 @@ Known Issues:
 
 Changelog:
 
-v1.5.9-beta, August 25, 2010
+v1.5.9-dev, August 25, 2010
+- Added Ajaxy.options.redirect = 'disable' option
 - Added $.fn.addAjaxy and $.fn.removeAjaxy for advanced use cases
 - Readded $('body').ajaxify() on domReady if auto_ajaxify is true
 - Improved target adding
