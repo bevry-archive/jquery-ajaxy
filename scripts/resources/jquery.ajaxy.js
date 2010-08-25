@@ -19,7 +19,7 @@
 	/**
 	 * jQuery Ajaxy
 	 * @version 1.5.9
-	 * @date August 23, 2010
+	 * @date August 25, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -1651,8 +1651,10 @@
 				}
 				
 				// Bind fn functions
-				$.fn.ajaxify = Ajaxy.ajaxify;
-				$.fn.ajaxy = Ajaxy.ajaxify;
+				$.fn.ajaxy = Ajaxy.fn.ajaxify;
+				$.each(Ajaxy.fn,function(key,fn){
+					$.fn[key] = fn;
+				});
 			
 				// Modify the document
 				$(function(){
@@ -1676,39 +1678,38 @@
 				
 				// --------------------------
 				
-				// Return true
-				return true;
-			},
-		
-			/**
-			 * Ajaxify an Element
-			 * Eg. $('#id').ajaxify();
-			 * @param {Object} options
-			 */
-			ajaxify: function ( options ) {
-				var Ajaxy = $.Ajaxy;
+				// Auto ajaxify?
+				if ( Ajaxy.options.auto_ajaxify ) {
+					$('body').ajaxify();
+				}
+				// ^ this is here as well as ajaxifyController/bind as ajaxifyController will only do that controller's selector, instead of all ajaxy links
 				
 				// --------------------------
 				
-				// Prepare
-				var $el = $(this);
-				options = $.extend({
-					complete: true
-				}, options);
-				
-				// Adjust
-				if ( $el.is('form,a') ) {
-					$el.addClass('ajaxy');
-				}
-				
-				// Handle
-				if ( options.complete ) {
+				// Return true
+				return true;
+			},
+			
+			/**
+			 * jQuery Prototype Extensions
+			 */
+			fn: {
+				/**
+				 * Ajaxify an Element
+				 * Eg. $('#id').ajaxify();
+				 */
+				ajaxify: function(){
+					var Ajaxy = $.Ajaxy;
+					
+					// Prepare
+					var $el = $(this);
+					
 					// Ajaxify the controllers
 					$.each(Ajaxy.Controllers, function(controller,Controller){
 						Ajaxy.ajaxifyController(controller);
 					});
-				
-					// Handle special cases
+			
+					// Ajaxify Internal Links
 					if ( Ajaxy.options.track_all_internal_links ) {
 						var $internalLinks = $el.findAndSelf('a[href^=/],a[href^=./]');
 						if ( Ajaxy.options.root_url ) {
@@ -1719,22 +1720,70 @@
 						$internalLinks = $internalLinks.filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
 						delete $internalLinks;
 					}
+					
+					// Ajaxify Anchors
 					if ( Ajaxy.options.track_all_anchors ) {
 						$el.findAndSelf('a[href^=#]:not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
 					}
+					
+					// Add Ajaxy Handlers
+					$el.addAjaxy();
+					
+					// Chain
+					return $el;
+				},
+				
+				/**
+				 * Add the Ajaxy handlers
+				 * Eg. $('#id').addAjaxy();
+				 */
+				addAjaxy: function(){
+					var Ajaxy = $.Ajaxy;
+					
+					// Prepare
+					var $el = $(this);
+					
+					// Adjust
+					if ( $el.is('form,a') ) {
+						$el.addClass('ajaxy');
+					}
+					
+					// Add the onclick handler for ajax compatiable links
+					$el.findAndSelf('a.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('click',Ajaxy.ajaxifyHelpers.a);
+				
+					// Add the onclick handler for ajax compatiable forms
+					$el.findAndSelf('form.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('submit',Ajaxy.ajaxifyHelpers.form);
+				
+					// Chain
+					return $el;
+				},
+				
+				/**
+				 * Remove the Ajaxy handlers
+				 * Eg. $('#id').removeAjaxy();
+				 * @param {Object} options
+				 */
+				removeAjaxy: function(options){
+					var Ajaxy = $.Ajaxy;
+					
+					// Prepare
+					var	$el = $(this),
+						config = $.extend({
+							permanently: true
+						},options);
+					
+					// Remove
+					var $a = $el.findAndSelf('a.ajaxy').removeClass('ajaxy ajaxy-has').unbind('click',Ajaxy.ajaxifyHelpers.a);
+					var $form = $el.findAndSelf('form.ajaxy').removeClass('ajaxy ajaxy-has').unbind('submit',Ajaxy.ajaxifyHelpers.form);
+					
+					// Permanently
+					if ( config.permanently ) {
+						$a.add($form).addClass('no-ajaxy');
+					}
+					
+					// Chain
+					return $el;
 				}
-				
-				// Add the onclick handler for ajax compatiable links
-				$el.findAndSelf('a.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('click',Ajaxy.ajaxify_helpers.a);
-				
-				// Add the onclick handler for ajax compatiable forms
-				$el.findAndSelf('form.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('submit',Ajaxy.ajaxify_helpers.form);
-				
-				
-				// --------------------------
-				
-				// Chain
-				return $el;
 			},
 			
 			/**
@@ -1755,7 +1804,7 @@
 					$(function(){
 						// Onload
 						var $els = $(Controller.selector);
-						$els.data('ajaxy-controller',controller).ajaxify({complete:false});
+						$els.data('ajaxy-controller',controller).addAjaxy();
 					});
 				}
 				
@@ -1768,7 +1817,7 @@
 			/**
 			 * Ajaxify Helpers for particular types of elements
 			 */
-			ajaxify_helpers: {
+			ajaxifyHelpers: {
 				a: function(event){
 					var Ajaxy = $.Ajaxy;
 					

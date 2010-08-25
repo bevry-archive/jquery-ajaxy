@@ -20,7 +20,7 @@
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
  * @version 1.5.9-beta
- * @date August 23, 2010
+ * @date August 25, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -48,7 +48,9 @@ Known Issues:
 
 Changelog:
 
-v1.5.9-beta, August 23, 2010
+v1.5.9-beta, August 25, 2010
+- Added $.fn.addAjaxy and $.fn.removeAjaxy for advanced use cases
+- Readded $('body').ajaxify() on domReady if auto_ajaxify is true
 - Improved target adding
 - Updated jQuery Sparkle dependencies to [v1.4.18-final, August 23, 2010]
 
