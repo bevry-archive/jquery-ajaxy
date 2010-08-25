@@ -3515,7 +3515,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						document.location = location;
 					}
 					else if ( Ajaxy.options.redirect === 'disable' ) {
-						Ajaxy.bind = function(){};
+						Ajaxy.addAjaxy = Ajaxy.ajaxify = Ajaxy.bind = function(){};
+						$('.ajaxy').removeAjaxy();
 					}
 				}
 				
