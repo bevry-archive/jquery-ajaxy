@@ -2568,7 +2568,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// Ensure mode
 				if ( !State.mode ) {
-					if ( State.a && Ajaxy.postponse ) {
+					if ( State.a && Ajaxy.postpone ) {
 						State.mode = 'postpone';
 					}
 					else if ( State.form ) {
