@@ -238,6 +238,16 @@
 			constructed: false,
 			
 			/**
+			 * Have we been configured
+			 */
+			configured: false,
+			
+			/**
+			 * The list of Ajaxy onReady handlers
+			 */
+			onReadyHandlers: [],
+			
+			/**
 			 * Whether or not we are in postpone mode
 			 */
 			postpone: false,
@@ -1684,18 +1694,64 @@
 				// Bind the Controllers
 				Ajaxy.bind(Controllers);
 				
+				// We are now Configured
+				Ajaxy.configured = true;
+				
+				// Fire the Configured Promise
+				Ajaxy.onReady();
+				
 				// --------------------------
 				
 				// Return true
 				return true;
 			},
-		
+			
+			/**
+			 * Bind a Function to the Ajaxy onReady Promise
+			 * We use promise as the function will fire if the event was already fired as it is still true
+			 * @param {Function} handler [optional]
+			 */
+			onReady: function(handler){
+				var Ajaxy = $.Ajaxy;
+				
+				// --------------------------
+				
+				// Handle
+				if ( typeof handler === 'undefined' ) {
+					// Check
+					if ( Ajaxy.configured && Ajaxy.onReadyHandlers.length ) {
+						// Fire the handlers
+						$.each(Ajaxy.onReadyHandlers, function(i,handler){
+							handler.call(Ajaxy);
+						});
+						// Clear the handlers
+						Ajaxy.onReadyHandlers = [];
+					}
+					// Else do nothing
+				}
+				else if ( typeof handler === 'function' ) {
+					// Check
+					if ( Ajaxy.configured ) {
+						// Fire the event handler
+						handler.call(Ajaxy);
+					}
+					else {
+						// Add to the handlers
+						Ajaxy.onReadyHandlers.push(onReadyHandlers);
+					}
+				}
+				
+				// --------------------------
+				
+				// Chain
+				return Ajaxy;
+			},
+			
 			/**
 			 * Construct Ajaxy
 			 * @param {Object} options
 			 */
 			construct: function ( ) {
-				// Construct our Plugin
 				var Ajaxy = $.Ajaxy, History = $.History, Sparkle = $.Sparkle;
 				
 				// --------------------------
