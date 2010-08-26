@@ -1737,7 +1737,7 @@
 					}
 					else {
 						// Add to the handlers
-						Ajaxy.onReadyHandlers.push(onReadyHandlers);
+						Ajaxy.onReadyHandlers.push(handler);
 					}
 				}
 				

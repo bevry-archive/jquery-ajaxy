@@ -3626,7 +3626,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					}
 					else {
 						// Add to the handlers
-						Ajaxy.onReadyHandlers.push(onReadyHandlers);
+						Ajaxy.onReadyHandlers.push(handler);
 					}
 				}
 				
