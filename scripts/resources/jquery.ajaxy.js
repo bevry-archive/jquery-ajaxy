@@ -1785,12 +1785,13 @@
 				$.each(Ajaxy.fn,function(key,fn){
 					$.fn[key] = fn;
 				});
-			
-				// Modify the document
-				$(function(){
-					// On document ready
-					Ajaxy.domReady();
-					History.domReady();
+				
+				// Bind onReady Function
+				Ajaxy.onReady(function(){
+					// Bind onDocumentReady Functions
+					$(function(){
+						Ajaxy.domReady();
+					});
 				});
 				
 				// --------------------------
