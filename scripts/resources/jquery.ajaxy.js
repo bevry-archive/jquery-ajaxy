@@ -706,7 +706,7 @@
 				// Ensure mode
 				if ( !State.mode ) {
 					if ( State.a && Ajaxy.postpone ) {
-						if ( Ajaxy.anchor && !Ajaxy.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
+						if ( State.anchor && !Ajaxy.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
 							// We are in postpone mode, but we are just an anchor change...
 							State.mode = 'default';
 						}
