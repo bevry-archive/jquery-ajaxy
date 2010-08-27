@@ -1176,7 +1176,9 @@
 				// Initialise State
 				
 				// Are we an ignored state?
-				if ( (typeof Ajaxy.ignoredStates[state] !== 'undefined') || ((Ajaxy.options.request_match instanceof RegExp) && !Ajaxy.options.request_match.test(state)) ) {
+				var ignoredByMatch = (Ajaxy.options.request_match instanceof RegExp) && !Ajaxy.options.request_match.test(state),
+					ignoredByState = (typeof Ajaxy.ignoredStates[state] !== 'undefined');
+				if ( ignoredByMatch || ignoredByState ) {
 					// We are an ignored state
 					
 					// Fire the State Completed Handler
@@ -1186,6 +1188,8 @@
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: We are an ignored state', [this, arguments], [state]);
 					return true;
 				}
+				delete ignoredByMatch;
+				delete ignoredByState;
 				
 				// Determine State
 				var State = Ajaxy.getState(state,true);
