@@ -679,6 +679,9 @@
 				// Rebuild the state
 				Ajaxy.rebuildState(State);
 				
+				// --------------------------
+				// Anchor Fixes
+				
 				// Fix anchor
 				if ( State.anchor === State.state || State.anchor === State.hash ) {
 					State.anchor = '';
@@ -696,17 +699,19 @@
 					Ajaxy.rebuildState(State);
 				}
 				
+				// --------------------------
+				// Additional Checks
+				
 				// Check state
 				if ( !State.state || (!State.hash && !State.raw.querystring) ) {
 					window.console.warn('Ajaxy.go: No state or (hash and querystring)', [this, arguments], [State]);
 					return false;
 				}
-				delete querystring;
 				
 				// Ensure mode
 				if ( !State.mode ) {
 					if ( State.a && Ajaxy.postpone ) {
-						if ( State.anchor && !Ajaxy.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
+						if ( State.anchor && !State.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
 							// We are in postpone mode, but we are just an anchor change...
 							State.mode = 'default';
 						}
