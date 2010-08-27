@@ -50,8 +50,16 @@
 				 */
 				base_url: '',
 				/**
-				 The short url of the page we are using. */
+				 * The short url of the page we are using.
+				 */
 				relative_url: '',
+				/**
+				 * An optional regular expression which the Ajaxy State must match against in order for it be considered a valid Ajaxy Request.
+				 * In other words if the Ajaxy State does not match against this regular expression, then we do not proceed with the Ajaxy request.
+				 * If set to false, then we do assume all URLs which reach Ajaxy.request are Ajaxy URLs.
+				 * If set to true, then we will use the default regular expression to match against.
+				 */
+				request_match: false,
 				
 				/**
 				 * The CSS class that can be attached to a Ajaxy link to indicate we should not log this page in history.
@@ -1127,7 +1135,9 @@
 				
 				// Auto Sparkle
 				if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
-					if ( Ajaxy.options.add_sparkle_extension ) ajaxify = false; // as the sparkle extension will handle this
+					if ( Ajaxy.options.add_sparkle_extension ) {
+						ajaxify = false; // as the sparkle extension will handle this
+					}
 					$content.sparkle();
 				}
 				
@@ -1166,7 +1176,7 @@
 				// Initialise State
 				
 				// Are we an ignored state?
-				if ( typeof Ajaxy.ignoredStates[state] !== 'undefined' ) {
+				if ( (typeof Ajaxy.ignoredStates[state] !== 'undefined') || ((Ajaxy.options.request_match instanceof RegExp) && Ajaxy.options.request_match.test(state)) ) {
 					// We are an ignored state
 					
 					// Fire the State Completed Handler
@@ -1717,6 +1727,24 @@
 				if ( Ajaxy.options.relative_url === '/' ) Ajaxy.options.relative_url = ''; 
 				
 				// --------------------------
+				// Other Options
+				
+				// URL Match
+				if ( Ajaxy.options.request_match === true ) {
+					var regParts = [];
+					if ( Ajaxy.options.root_url ) {
+						regParts.push('^'+Ajaxy.options.root_url+Ajaxy.options.base_url);
+					}
+					if ( Ajaxy.options.base_url ) {
+						regParts.push('^'+Ajaxy.options.base_url);
+					}
+					regParts.push('^/');
+					Ajaxy.options.request_match = RegExp(regParts.join('|'),'g');
+					delete regParts;
+				}
+				
+				// --------------------------
+				// Redirect
 				
 				// Debug
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.configure:', [this, arguments]);
