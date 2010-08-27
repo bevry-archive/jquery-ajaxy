@@ -2104,6 +2104,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						locationShort: ''
 					},
 					vanilla: {
+						state: '',
 						location: '',
 						locationShort: ''
 					},
@@ -2165,6 +2166,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 * Collection of states
 			 */
 			States: {},
+			
+			/**
+			 * Collection of Ignored States
+			 */
+			ignoredStates: {},
 			
 			/**
 			 * Our Current State
@@ -2602,7 +2608,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					if ( State.a && Ajaxy.postpone ) {
 						if ( State.anchor && !State.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
 							// We are in postpone mode, but we are just an anchor change...
-							State.mode = 'default';
+							// We can't use default here as we are still in a relative url
+							// So we just pretend as if this is not happening
+							State.mode = 'ignore';
 						}
 						else {
 							State.mode = 'postpone';
@@ -2646,6 +2654,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Don't log
 						// Trigger manually
 						Ajaxy.stateChange(State.state)
+						break;
+						
+					case 'ignore':
+						// Ignore the State
+						Ajaxy.ignoredStates[State.vanilla.state] = true;
+						// Redirect the browser
+						document.location = State.vanilla.location;
 						break;
 						
 					case 'postpone':
@@ -2811,6 +2826,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				State.raw.location = root_url+State.raw.locationShort;
 				
 				// Vanilla: Without Ajaxy
+				State.vanilla.state = State.anchor;
 				State.vanilla.locationShort = base_url+State.raw.state+(State.anchor ? '#'+State.anchor : '');
 				State.vanilla.location = root_url+State.vanilla.locationShort;
 				
@@ -2990,12 +3006,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				var Ajaxy = $.Ajaxy;
 				
 				// Prepare
-				var ajaxify = Ajaxy.options.auto_ajaxify_documentReady;
-				
-				// Prepare Content
-				if ( !(($content||{}).length||false) ) {
-					$content = $('body');
+				if ( typeof State !== 'object' ) {
+					State = {};
 				}
+				if ( !($content instanceof jQuery) || !$content.length ) {
+					$content = $(document.body);
+				}
+				var ajaxify = Ajaxy.options.auto_ajaxify_documentReady;
 				
 				// Auto Sparkle
 				if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
@@ -3036,6 +3053,18 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// --------------------------
 				// Initialise State
+				
+				// Are we an ignored state?
+				if ( typeof Ajaxy.ignoredStates[state] !== 'undefined' ) {
+					// We are an ignored state
+					
+					// Fire the State Completed Handler
+					Ajaxy.stateCompleted();
+					
+					// Log this minor state change
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: We are an ignored state', [this, arguments], [state]);
+					return true;
+				}
 				
 				// Determine State
 				var State = Ajaxy.getState(state,true);
