@@ -2594,8 +2594,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// Ensure mode
 				if ( !State.mode ) {
-					if ( State.a && Ajaxy.postpone && !(Ajaxy.anchor && !Ajaxy.raw.querystring && Ajaxy.hash === Ajaxy.options.relative_url) ) {
-						State.mode = 'postpone';
+					if ( State.a && Ajaxy.postpone ) {
+						if ( Ajaxy.anchor && !Ajaxy.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
+							// We are in postpone mode, but we are just an anchor change...
+							State.mode = 'default';
+						}
+						else {
+							State.mode = 'postpone';
+						}
 					}
 					else if ( State.form ) {
 						State.mode = 'silent';
@@ -2636,7 +2642,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Trigger manually
 						Ajaxy.stateChange(State.state)
 						break;
-					
+						
 					case 'postpone':
 						// Redirect the browser
 						document.location = State.location;
