@@ -20,7 +20,7 @@
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
  * @version 1.5.9-dev
- * @date August 25, 2010
+ * @date August 27, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -48,7 +48,8 @@ Known Issues:
 
 Changelog:
 
-v1.5.9-dev, August 25, 2010
+v1.5.9-dev, August 27, 2010
+- Improvements to anchor handling and page tracking
 - Added Ajaxy.options.redirect = 'postpone' option
 - Added Ajaxy.options.redirect = 'disable' option
 - Added $.fn.addAjaxy and $.fn.removeAjaxy for advanced use cases

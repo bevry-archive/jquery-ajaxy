@@ -107,6 +107,10 @@
 					easing:'swing' /* unless you are using the jQuery Easing plugin, only [swing] and [linear] are available. */
 				},
 				/**
+				 * What we should call our anchor param
+				 */
+				anchor_param_name: 'anchor',
+				/**
 				 * Whether or not we should track all the anchors with Ajaxyy (even if they don't have the ajaxy class).
 				 * If you are using jQuery Ajaxy to power your entire site, then this should be enabled.
 				 */
@@ -203,6 +207,17 @@
 					anchor: '',
 					querystring: '',
 					location: '',
+					locationShort: '',
+					raw: {
+						state: '',
+						querystring: '',
+						location: '',
+						locationShort: ''
+					},
+					vanilla: {
+						location: '',
+						locationShort: ''
+					},
 					
 					// System
 					controller: null,
@@ -374,7 +389,8 @@
 				var Ajaxy = $.Ajaxy;
 				
 				// Strip urls
-				var state = Ajaxy.extractState(state);
+				var	state = Ajaxy.extractState(state),
+					anchor_param_name = Ajaxy.options.anchor_param_name;
 				
 				// Extract the anchor
 				var anchor = state.replace(/[^#]+#/g,'#').match(/#+([^#\?]*)/)||'';
@@ -390,7 +406,7 @@
 				// Check
 				if ( !anchor ) {
 					// Extract anchor from QueryString
-					var anchor = state.match(/anchor=([a-zA-Z0-9-_]+)/)||'';
+					var anchor = state.match(RegExp(anchor_param_name+'=([a-zA-Z0-9-_]+)')) || '';
 					if ( anchor && anchor.length||false === 2 ) {
 						anchor = anchor[1]||'';
 					}
@@ -669,19 +685,19 @@
 				}
 				
 				// Check for !hash and !querystring and anchor
-				var querystring = (State.querystring||'').replace(/anchor=([a-zA-Z0-9-_]+)/g,'');
-				if ( !(State.hash||false) && !querystring && (State.anchor||'') ) {
+				if ( !(State.hash||false) && !State.raw.querystring && (State.anchor||'') ) {
 					// We are just an anchor change
 					// Let's grab the currentState's hash and use that, as we want to modify the state so we don't actually go to the anchor in the url
+					// As otherwise the anchor will become the hash, and this is a problem.
 					State.hash = Ajaxy.currentState.hash||'';
-					State.querystring = querystring;
+					State.querystring = State.raw.querystring;
 					
 					// Rebuild the state
 					Ajaxy.rebuildState(State);
 				}
 				
 				// Check state
-				if ( !State.state || (!State.hash && !querystring) ) {
+				if ( !State.state || (!State.hash && !State.raw.querystring) ) {
 					window.console.warn('Ajaxy.go: No state or (hash and querystring)', [this, arguments], [State]);
 					return false;
 				}
@@ -689,7 +705,7 @@
 				
 				// Ensure mode
 				if ( !State.mode ) {
-					if ( State.a && Ajaxy.postpone ) {
+					if ( State.a && Ajaxy.postpone && !(Ajaxy.anchor && !Ajaxy.raw.querystring && Ajaxy.hash === Ajaxy.options.relative_url) ) {
 						State.mode = 'postpone';
 					}
 					else if ( State.form ) {
@@ -863,10 +879,10 @@
 				var state = Ajaxy.extractState(State.state),
 					hash = Ajaxy.ensureString(State.hash) || Ajaxy.extractHash(state),
 					anchor = Ajaxy.ensureString(State.anchor) || Ajaxy.extractAnchor(state),
-					querystring = Ajaxy.ensureString(State.querystring) || Ajaxy.extractQuerystring(state);
-				
-				// Assign the state
-				State.state = hash;
+					querystring = Ajaxy.ensureString(State.querystring) || Ajaxy.extractQuerystring(state),
+					base_url = Ajaxy.options.base_url,
+					root_url = Ajaxy.options.root_url,
+					anchor_param_name = Ajaxy.options.anchor_param_name;
 				
 				// Anchor
 				if ( anchor ) {
@@ -877,17 +893,26 @@
 					delete params;
 				}
 				
-				// Querystring
-				if ( querystring ) {
-					// Add querystring
-					State.state += '?'+querystring;
-				}
-				
-				// Assign the rest
+				// Standard: With Anchor + Ajaxy
+				State.state = hash+(querystring ? '?'+querystring : '');
 				State.hash = hash;
 				State.anchor = anchor;
-				State.querystring = querystring; // this may have been updated in the anchor code a few lines above
-				State.location = Ajaxy.options.root_url+Ajaxy.options.base_url+'#'+State.state;
+				State.querystring = querystring;
+				State.locationShort = base_url+'#'+State.state;
+				State.location = root_url+State.locationShort;
+				
+				// Raw: Without Anchor
+				State.raw.querystring = State.querystring.replace(RegExp('&?'+anchor_param_name+'=[a-zA-Z0-9-_]+'),''),
+				State.raw.state = hash;
+				if ( State.raw.querystring ) {
+					State.raw.state += '?'+State.raw.querystring;
+				}
+				State.raw.locationShort = base_url+'#'+State.raw.state;
+				State.raw.location = root_url+State.raw.locationShort;
+				
+				// Vanilla: Without Ajaxy
+				State.vanilla.locationShort = base_url+State.raw.state+(State.anchor ? '#'+State.anchor : '');
+				State.vanilla.location = root_url+State.vanilla.locationShort;
 				
 				// Return State
 				return State;
@@ -982,14 +1007,14 @@
 			
 			/**
 			 * Track a state change in Google Analytics
-			 * @param {String} state
+			 * @param {Object} State
 			 */
-			track: function ( state ) {
+			track: function ( State ) {
 				var Ajaxy = $.Ajaxy;
 			
 				// Inform Google Analytics of a state change
 				if ( typeof pageTracker !== 'undefined' ) {
-					var url = Ajaxy.options.base_url+(state || '?');
+					var url = State.vanilla.locationShort;
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.track', [this,arguments], [url]);
 					pageTracker._trackPageview(url);
 					// ^ we do not use root url here as google doesn't want that
@@ -1129,28 +1154,19 @@
 				// Current State
 				
 				// Are we a repeat request
-				var currentQuerystring = (Ajaxy.currentState.querystring||'').replace(/anchor=([a-zA-Z0-9-_]+)/g,''),
-					newQuerystring = State.querystring.replace(/anchor=([a-zA-Z0-9-_]+)/g,'');
-				if ( (Ajaxy.currentState.state||false) && (Ajaxy.currentState.hash === State.hash) && (currentQuerystring === newQuerystring) && !(State.form || Ajaxy.currentState.form) ) {
+				if ( (Ajaxy.currentState.state||false) && (Ajaxy.currentState.raw.state === State.raw.state) && !(State.form || Ajaxy.currentState.form) ) {
 					// We are the same hash and querystring
-					
-					// Are we the same anchor
-					if ( Ajaxy.currentState.anchor !== State.anchor ) {
-						// Only the anchor has changed
-						// So we only need to fire the stateCompleted to relocate the anchor
-						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has only been an anchor change', [this, arguments], [Ajaxy.currentState,State,state]);
-						Ajaxy.stateCompleted(State);
-					}
 					
 					// Update the currentState
 					Ajaxy.currentState = State;
 					
-					// There has been no considerate state change
+					// Fire the State Completed Handler
+					Ajaxy.stateCompleted(State);
+					
+					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has been no considerable change', [this, arguments], [Ajaxy.currentState,State,state]);
 					return true;
 				}
-				delete currentQuerystring;
-				delete newQuerystring;
 				
 				// Add to AJAX queue
 				Ajaxy.ajaxQueue.push(state);
@@ -1164,7 +1180,7 @@
 			
 				// Fire the analytics
 				if ( Ajaxy.options.analytics ) {
-					Ajaxy.track(state);
+					Ajaxy.track(State);
 				}
 				
 				// Update the currentState
@@ -1179,7 +1195,7 @@
 				
 				// Prepare the State
 				State.controller = controller;
-				State.Request.url = (State.Request.url || Ajaxy.options.root_url+Ajaxy.options.base_url+(state || '?'));
+				State.Request.url = (State.Request.url || State.vanilla.locationShort);
 				
 				// Store the State (in case it hasn't been stored yet - eg. we came through somewhere else other than go)
 				Ajaxy.storeState(State);
