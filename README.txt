@@ -50,12 +50,13 @@ Changelog:
 
 v1.5.9-dev, August 27, 2010
 - Improvements to anchor handling and page tracking
+- Improvements to anchor scrolling
 - Added Ajaxy.options.redirect = 'postpone' option
 - Added Ajaxy.options.redirect = 'disable' option
 - Added $.fn.addAjaxy and $.fn.removeAjaxy for advanced use cases
-- Readded $('body').ajaxify() on domReady if auto_ajaxify is true
-- Improved target adding
-- Updated jQuery Sparkle dependencies to [v1.4.18-final, August 23, 2010]
+- Re-Added $('body').ajaxify() on domReady if auto_ajaxify is true
+- We now use jQuery ScrollTo [v1.0.0-beta, August 28, 2010] as our ScrollTo Plugin
+- Updated jQuery Sparkle dependencies to [v1.4.19-final, August 28, 2010]
 
 v1.5.8-beta, August 23, 2010
 - Added root_url to internal link checks

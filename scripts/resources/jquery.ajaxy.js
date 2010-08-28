@@ -111,7 +111,7 @@
 				 * The options to pass to $.fn.ScrollTo when we have detected an anchor.
 				 */
 				scrollto_options: {
-					duration:400, /* Set to 0 to have no scroll animation effect */
+					duration: 400, /* Set to 0 to have no scroll animation effect */
 					easing:'swing' /* unless you are using the jQuery Easing plugin, only [swing] and [linear] are available. */
 				},
 				/**

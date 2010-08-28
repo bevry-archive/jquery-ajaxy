@@ -37,6 +37,7 @@ refresh:
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.events.js -O scripts/resources/jquery.events.js ;
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.extra.js -O scripts/resources/jquery.extra.js ;
 	wget -q http://github.com/balupton/jquery-sparkle/raw/master/scripts/resources/jquery.utilities.js -O scripts/resources/jquery.utilities.js ;
+	wget -q http://github.com/balupton/jquery-scrollto/raw/master/scripts/resources/jquery.scrollto.js -O scripts/resources/jquery.scrollto.js ;
 	wget -q http://github.com/balupton/jquery-history/raw/master/scripts/resources/jquery.history.js -O scripts/resources/jquery.history.js ;
 	wget -q http://github.com/balupton/jquery-history/raw/master/demo/styles/generic.css -O demo/styles/generic.css ;
 
@@ -55,8 +56,7 @@ pack:
 
 compress:
 	java -jar $(CLOSUREFILE) --create_source_map ./scripts/closure.map --js_output_file=./scripts/jquery.ajaxy.min.js --js=./scripts/jquery.ajaxy.js;
-	#java -jar $(YUIFILE) ./styles/jquery.ajaxy.css -o ./styles/jquery.ajaxy.min.css
-
+	
 build:
 	$(MAKE) pack;
 	$(MAKE) compress;
