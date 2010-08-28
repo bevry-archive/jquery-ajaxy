@@ -190,11 +190,11 @@
 					preventDefault: function(){
 						this.propagate = false;
 					},
-					documentReady: function($el){
+					documentReady: function($el,options){
 						var Ajaxy = $.Ajaxy; var Action = this;
 						
 						// Fire Ajaxy's stateCompleted
-						return Ajaxy.stateCompleted(Action.State,$el);
+						return Ajaxy.stateCompleted(Action.State,$el,options);
 					}
 				},
 				
@@ -1121,28 +1121,33 @@
 				return matchedController;
 			},
 			
-			stateCompleted: function(State,$content){
+			stateCompleted: function(State,$content,options){
 				var Ajaxy = $.Ajaxy;
 				
-				// Prepare
+				// Prepare Arguments
 				if ( typeof State !== 'object' ) {
 					State = {};
 				}
 				if ( !($content instanceof jQuery) || !$content.length ) {
 					$content = $(document.body);
 				}
-				var ajaxify = Ajaxy.options.auto_ajaxify_documentReady;
+				if ( typeof options !== 'object' ) {
+					options = {};
+				}
+				
+				// Prepare Options
+				var config = $.extend({},Ajaxy.options,options);
 				
 				// Auto Sparkle
-				if ( Ajaxy.options.auto_sparkle_documentReady && $.Sparkle||false ) {
-					if ( Ajaxy.options.add_sparkle_extension ) {
-						ajaxify = false; // as the sparkle extension will handle this
+				if ( config.auto_sparkle_documentReady && $.Sparkle||false ) {
+					if ( config.add_sparkle_extension ) {
+						config.auto_ajaxify_documentReady = false; // as the sparkle extension will handle this
 					}
 					$content.sparkle();
 				}
 				
 				// Auto Ajaxify
-				if ( ajaxify ) {
+				if ( config.auto_ajaxify_documentReady ) {
 					$content.ajaxify();
 				}
 				
@@ -1153,7 +1158,7 @@
 					State.anchor = false;
 					// Fire the anchor
 					var $anchor = $('#'+anchor).giveTarget();
-					$anchor.ScrollTo(Ajaxy.options.scrollto_options);
+					$anchor.ScrollTo(config.scrollto_options);
 				}
 				
 				// Return true
