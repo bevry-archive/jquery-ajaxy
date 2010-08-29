@@ -134,6 +134,12 @@
 				 */
 				debug: true,
 				/**
+				 * A series of location aliases
+				 */
+				aliases: [
+					['','/']
+				],
+				/**
 				 * The Controllers to use
 				 */
 				Controllers: {}
@@ -265,6 +271,11 @@
 			 * Have we been configured
 			 */
 			configured: false,
+			
+			/**
+			 * Aliases Hashtable
+			 */
+			aliases: {},
 			
 			/**
 			 * The list of Ajaxy onReady handlers
@@ -452,6 +463,38 @@
 				
 				// Return querystring
 				return querystring;
+			},
+			
+			/**
+			 * Compare two States with each other
+			 * @param {State} newState
+			 * @param {State} oldState
+			 * @return {Boolean}
+			 */
+			statesEquivalent: function(newState, oldState) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Check for Forms
+				if ( newState.form || oldState.form ) {
+					// If we are a form, we are always new
+					return false;
+				}
+				
+				// Check State Variables
+				if ( newState.state||false ) {
+					// Cycle through the aliases for the state
+					var aliases = Aajxy.aliases[newState.hash]||[newState.hash];
+					$.each(aliases,function(i,alias){
+						// Compare Aliases State with Old State
+						if ( alias === oldState.hash && newState.raw.querystring === oldState.raw.querystring ) {
+							// We have found a match, don't care for anchor
+							return true;
+						}
+					});
+				}
+				
+				// We didn't find a match
+				return false;
 			},
 			
 			/**
@@ -1216,7 +1259,7 @@
 				// Current State
 				
 				// Are we a repeat request
-				if ( (Ajaxy.currentState.state||false) && (Ajaxy.currentState.raw.state === State.raw.state) && !(State.form || Ajaxy.currentState.form) ) {
+				if ( Ajaxy.statesEquivalent(State, Ajaxy.currentState) ) {
 					// We are the same hash and querystring
 					
 					// Update the currentState
@@ -1786,6 +1829,14 @@
 				}
 				
 				// --------------------------
+				
+				// Aliases
+				Ajaxy.aliases = [];
+				$.each(Ajaxy.options.aliases,function(i,aliasesGroup){
+					$.each(aliasesGroup,function(i,alias){
+						Ajaxy.aliases[alias] = aliasesGroup;
+					});
+				});
 				
 				// Bind the Controllers
 				Ajaxy.bind(Controllers);
