@@ -2609,6 +2609,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					State.state	= Ajaxy.extractState(State.url);
 				}
 				
+				// Fix state
+				if ( !State.state ) {
+					State.state = '/';
+				}
+				
 				// Rebuild the state
 				Ajaxy.rebuildState(State);
 				
@@ -3666,7 +3671,6 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						regParts.push('^'+Ajaxy.options.base_url);
 					}
 					regParts.push('^/');
-					regParts.push('^$');
 					Ajaxy.options.request_match = RegExp(regParts.join('|'),'i');
 					delete regParts;
 				}
