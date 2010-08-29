@@ -1292,7 +1292,8 @@
 					Ajaxy.storeState(Ajaxy.currentState);
 					
 					// Trigger handler
-					Ajaxy.trigger(State.controller, 'refresh', Ajaxy.currentState);
+					Ajaxy.stateCompleted(Ajaxy.currentState);
+					//Ajaxy.trigger(State.controller, 'refresh', Ajaxy.currentState);
 					
 					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has been no considerable change', [this, arguments], [Ajaxy.currentState,State,state]);
