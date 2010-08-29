@@ -2229,8 +2229,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 * Extract a Relative URL from a URL
 			 * @param {String} url
 			 */
-			extractRelativeUrl: function (url){
+			extractRelativeUrl: function (url,fixSlash){
 				var Ajaxy = $.Ajaxy; var History = $.History;
+				if ( typeof fixSlash === 'undefined' ) {
+					fixSlash = true;
+				}
 				
 				// Prepare
 				url = Ajaxy.ensureString(url);
@@ -2239,7 +2242,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				var relative_url = url.stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
 				
 				// Check
-				if ( relative_url === '/' ) relative_url = ''; 
+				if ( fixSlash && relative_url === '/' ) relative_url = ''; 
 				
 				// Return relative_url
 				return relative_url;
@@ -2254,7 +2257,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				var Ajaxy = $.Ajaxy;
 				
 				// Strip urls
-				var state = Ajaxy.extractRelativeUrl(url);
+				var state = Ajaxy.extractRelativeUrl(url,false);
 				
 				// Return state
 				return state;
