@@ -1895,7 +1895,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	/**
 	 * jQuery Ajaxy
 	 * @version 1.5.9
-	 * @date August 25, 2010
+	 * @date August 29, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -2244,6 +2244,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// Strip urls
 				var state = Ajaxy.extractRelativeUrl(url);
+				
+				// Check
+				if ( state === '' ) state = '/'; 
 				
 				// Return state
 				return state;
@@ -2594,8 +2597,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				
 				// Check state
 				if ( !State.state || (!State.hash && !State.raw.querystring) ) {
-					window.console.warn('Ajaxy.go: No state or (hash and querystring)', [this, arguments], [State]);
-					return false;
+					window.console.warn('Ajaxy.go: No state or (hash and querystring).', [this, arguments], [State]);
+					
 				}
 				
 				// Ensure mode

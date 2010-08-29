@@ -20,7 +20,7 @@
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
  * @version 1.5.9-dev
- * @date August 27, 2010
+ * @date August 29, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -48,14 +48,15 @@ Known Issues:
 
 Changelog:
 
-v1.5.9-dev, August 27, 2010
+v1.5.9-dev, August 29, 2010
+- documentReady callback now supports options
 - Improvements to anchor handling and page tracking
 - Improvements to anchor scrolling
-- Added Ajaxy.options.redirect = 'postpone' option
-- Added Ajaxy.options.redirect = 'disable' option
+- Added postpone value for redirect option
+- Added disable value for redirect option
 - Added $.fn.addAjaxy and $.fn.removeAjaxy for advanced use cases
 - Re-Added $('body').ajaxify() on domReady if auto_ajaxify is true
-- We now use jQuery ScrollTo [v1.0.0-beta, August 28, 2010] as our ScrollTo Plugin
+- We now use jQuery ScrollTo [v1.0.0-beta, August 28, 2010] as our ScrollTo Plugin: http://www.balupton.com/projects/jquery-scrollto
 - Updated jQuery Sparkle dependencies to [v1.4.19-final, August 28, 2010]
 
 v1.5.8-beta, August 23, 2010
