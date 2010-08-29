@@ -380,9 +380,6 @@
 				// Strip urls
 				var state = Ajaxy.extractRelativeUrl(url);
 				
-				// Check
-				if ( state === '' ) state = '/'; 
-				
 				// Return state
 				return state;
 			},
@@ -483,7 +480,7 @@
 				// Check State Variables
 				if ( newState.state||false ) {
 					// Cycle through the aliases for the state
-					var aliases = Aajxy.aliases[newState.hash]||[newState.hash];
+					var aliases = Ajaxy.aliases[newState.hash]||[newState.hash];
 					$.each(aliases,function(i,alias){
 						// Compare Aliases State with Old State
 						if ( alias === oldState.hash && newState.raw.querystring === oldState.raw.querystring ) {
@@ -765,7 +762,6 @@
 				// Check state
 				if ( !State.state || (!State.hash && !State.raw.querystring) ) {
 					window.console.warn('Ajaxy.go: No state or (hash and querystring).', [this, arguments], [State]);
-					
 				}
 				
 				// Ensure mode
