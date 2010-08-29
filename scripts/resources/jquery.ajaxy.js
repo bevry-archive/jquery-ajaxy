@@ -108,10 +108,14 @@
 				 */
 				add_sparkle_extension: true,
 				/**
+				 * Whether or not we should ScrollTo the content automatically on a StateCompleted Event
+				 */
+				scrollto_content: false,
+				/**
 				 * The options to pass to $.fn.ScrollTo when we have detected an anchor.
 				 */
 				scrollto_options: {
-					duration: 400, /* Set to 0 to have no scroll animation effect */
+					duration: 800, /* Set to 0 to have no scroll animation effect */
 					easing:'swing' /* unless you are using the jQuery Easing plugin, only [swing] and [linear] are available. */
 				},
 				/**
@@ -606,13 +610,21 @@
 				
 				// Check Controller Action
 				if ( typeof ControllerAction === 'undefined' ) {
-					// No Action
-					window.console.error('Ajaxy.trigger: No Controller Action', [this, arguments]);
-					window.console.trace();
-					if ( controller !== '_generic' ) {
-						Ajaxy.trigger('_generic', 'error', State);
+					// Check Action Type
+					if ( action === 'refresh' ) {
+						// Forward to Response
+						window.console.warn('Ajaxy.trigger: Controller Action [refresh] does not exist. Defaulting to [response] Action.', [this, arguments]);
+						return Ajaxy.trigger(controller, 'response', State);
 					}
-					return false;
+					else {
+						// No Action
+						window.console.error('Ajaxy.trigger: No Controller Action', [this, arguments]);
+						window.console.trace();
+						if ( controller !== '_generic' ) {
+							Ajaxy.trigger('_generic', 'error', State);
+						}
+						return false;
+					}
 				}
 				
 				// --------------------------
@@ -1040,7 +1052,7 @@
 			 * @param {String|Object} state
 			 * @return {Object|undefined}
 			 */
-			getState: function ( state, create ) {
+			getState: function ( state, create, error ) {
 				var Ajaxy = $.Ajaxy;
 				
 				// Prepare
@@ -1058,7 +1070,7 @@
 				else if ( create === false ) {
 					// Don't report couldn't find
 				}
-				else {
+				else if ( error||false ) {
 					// Report couldn't find
 					window.console.error('Ajaxy.getState: State does not exist', [this, arguments]);
 					window.console.trace();
@@ -1214,6 +1226,10 @@
 					var $anchor = $('#'+anchor).giveTarget();
 					$anchor.ScrollTo(config.scrollto_options);
 				}
+				else if ( config.scrollto_content && !$content.is('body') ) {
+					// ScrollTo the content
+					$content.ScrollTo(config.scrollto_options);
+				}
 				
 				// Return true
 				return true;
@@ -1241,7 +1257,7 @@
 					// We are an ignored state
 					
 					// Fire the State Completed Handler
-					Ajaxy.stateCompleted();
+					Ajaxy.stateCompleted(state ? Ajaxy.getState(state,false,false) : undefined);
 					
 					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: We are an ignored state', [this, arguments], [state]);
@@ -1270,11 +1286,11 @@
 				if ( Ajaxy.statesEquivalent(State, Ajaxy.currentState) ) {
 					// We are the same hash and querystring
 					
-					// Update the currentState
-					Ajaxy.currentState = State;
+					// Ensure the Stored State is the Latest, sometimes it gets out of sync
+					Ajaxy.storeState(Ajaxy.currentState);
 					
-					// Fire the State Completed Handler
-					Ajaxy.stateCompleted(State);
+					// Trigger handler
+					Ajaxy.trigger(State.controller, 'refresh', Ajaxy.currentState);
 					
 					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has been no considerable change', [this, arguments], [Ajaxy.currentState,State,state]);
