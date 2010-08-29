@@ -2350,10 +2350,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			statesEquivalent: function(newState, oldState) {
 				var Ajaxy = $.Ajaxy;
 				
+				// Prepare
+				var result = false;
+				
 				// Check for Forms
 				if ( newState.form || oldState.form ) {
 					// If we are a form, we are always new
-					return false;
+					result = false;
 				}
 				
 				// Check State Variables
@@ -2364,13 +2367,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Compare Aliases State with Old State
 						if ( alias === oldState.hash && newState.raw.querystring === oldState.raw.querystring ) {
 							// We have found a match, don't care for anchor
-							return true;
+							result = true;
+							return false; // break
 						}
 					});
 				}
 				
-				// We didn't find a match
-				return false;
+				// Return result
+				return result;
 			},
 			
 			/**
