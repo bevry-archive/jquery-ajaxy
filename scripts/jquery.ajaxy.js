@@ -3666,6 +3666,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						regParts.push('^'+Ajaxy.options.base_url);
 					}
 					regParts.push('^/');
+					regParts.push('^$');
 					Ajaxy.options.request_match = RegExp(regParts.join('|'),'i');
 					delete regParts;
 				}
