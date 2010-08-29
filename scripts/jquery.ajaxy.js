@@ -2953,7 +2953,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				}
 				
 				// Rebuild State
-				Ajaxy.rebuildState(State);
+				if ( State ) {
+					Ajaxy.rebuildState(State);
+				}
 				
 				// Return State
 				return State;

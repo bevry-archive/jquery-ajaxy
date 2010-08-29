@@ -1077,7 +1077,9 @@
 				}
 				
 				// Rebuild State
-				Ajaxy.rebuildState(State);
+				if ( State ) {
+					Ajaxy.rebuildState(State);
+				}
 				
 				// Return State
 				return State;
