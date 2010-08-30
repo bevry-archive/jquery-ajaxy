@@ -12,3 +12,7 @@ All Projects:
 
 Project Specific:
 - Have you remembered to set it back to the minified version in the demo?
+- Do root urls work?
+- Do postponed anchors work?
+- Do postponed anchors work with back and forward buttons? (scrolling)
+- Do ajaxy anchors work?

@@ -2047,7 +2047,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// Actions
 					response: null,
 					request: null,
-					error: null
+					error: null,
+					refresh: null
 				},
 				
 				Action: {
@@ -2079,8 +2080,28 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					documentReady: function($el,options){
 						var Ajaxy = $.Ajaxy; var Action = this;
 						
+						// Options
+						if ( typeof options !== 'object' ) {
+							options = {};
+						}
+						
+						// Default Options
+						var defaults = {};
+						switch ( Action.action ) {
+							case 'refresh':
+								defaults.auto_ajaxify_documentReady = 
+								defaults.auto_sparkle_documentReady = false;
+								break;
+							
+							default:
+								break;
+						}
+						
+						// Merge with Defaults
+						var config = $.extend(true,{},defaults,options);
+						
 						// Fire Ajaxy's stateCompleted
-						return Ajaxy.stateCompleted(Action.State,$el,options);
+						return Ajaxy.stateCompleted(Action.State,$el,config);
 					}
 				},
 				
@@ -2489,7 +2510,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// Check Action Type
 					if ( action === 'refresh' ) {
 						// Forward to Response
-						window.console.warn('Ajaxy.trigger: Controller Action [refresh] does not exist. Defaulting to [response] Action.', [this, arguments]);
+						window.console.log('Ajaxy.trigger: Controller Action ['+controller+'].[refresh] does not exist. Defaulting to ['+controller+'].[response] Action.', [this, arguments]);
 						return Ajaxy.trigger(controller, 'response', State);
 					}
 					else {
@@ -2719,7 +2740,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						
 					case 'ignore':
 						// Ignore the State
-						Ajaxy.ignoredStates[State.vanilla.state] = true;
+						Ajaxy.ignoredStates[State.vanilla.state] = State;
 						// Redirect the browser
 						document.location = State.vanilla.location;
 						break;
@@ -2934,10 +2955,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Prepare
 				state = Ajaxy.extractState((state||{}).state||state);
 				var State = undefined,
-					type = typeof (state||undefined);
+					type = typeof (state||undefined),
+					typeStringable = (type === 'number' || type === 'string');
 				
 				// Fetch
-				if ( (type === 'number' || type === 'string') && typeof Ajaxy.States[state] !== 'undefined' ) {
+				if ( typeStringable && typeof Ajaxy.States[state] !== 'undefined' ) {
 					State = Ajaxy.States[state];
 				}
 				else if ( create ) {
@@ -3134,9 +3156,6 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				if ( ignoredByMatch || ignoredByState ) {
 					// We are an ignored state
 					
-					// Fire the State Completed Handler
-					Ajaxy.stateCompleted(state ? Ajaxy.getState(state,false,false) : undefined);
-					
 					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: We are an ignored state', [this, arguments], [state]);
 					return true;
@@ -3163,13 +3182,23 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Are we a repeat request
 				if ( Ajaxy.statesEquivalent(State, Ajaxy.currentState) ) {
 					// We are the same hash and querystring
+					// currentState contains request and response etc, however new state contains anchor information, need to figure out a middle ground
 					
-					// Ensure the Stored State is the Latest, sometimes it gets out of sync
-					Ajaxy.storeState(Ajaxy.currentState);
+					// Move the Response and Request into the new State
+					State.controller = Ajaxy.currentState.controller;
+					State.Request = Ajaxy.currentState.Request;
+					State.Response = Ajaxy.currentState.Response;
+					State.Error = Ajaxy.currentState.Error;
+					
+					// Update the Current State
+					Ajaxy.currentState = State;
+					
+					// Store/Update the State
+					Ajaxy.storeState(State); // really this shouldn't be needed, but somewhere our expectations of references are wrong
 					
 					// Trigger handler
-					Ajaxy.stateCompleted(Ajaxy.currentState);
-					//Ajaxy.trigger(State.controller, 'refresh', Ajaxy.currentState);
+					//Ajaxy.stateCompleted(Ajaxy.currentState);
+					Ajaxy.trigger(State.controller, 'refresh', Ajaxy.currentState);
 					
 					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has been no considerable change', [this, arguments], [Ajaxy.currentState,State,state]);
@@ -3352,8 +3381,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					complete:	function ( XMLHttpRequest, textStatus ) {
 						// Request completed
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.complete:', [this, arguments]);
+						
 						// Set XMLHttpRequest
 						State.Request.XMLHttpRequest = XMLHttpRequest;
+						
 						// Ignore for some reason
 						if ( false && this.url !== XMLHttpRequest.channel.name ) {
 							// A redirect was performed, set a option so we know what to do
