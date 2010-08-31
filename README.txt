@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.5.9-dev
- * @date August 29, 2010
+ * @version 1.6.0-dev
+ * @date August 31, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -41,23 +41,29 @@ Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
 
 Known Issues:
-- ScrollTo plugin does not always animate under some special circumstances. [minor]
-- Ajaxy form submit does not care for multiple submit buttons and only uses the last one. [medium]
+- Under Google Chrome, when in postpone or disable mode anchors may not scroll to the correct position when using back and forward buttons. [minor]
+- Ajaxy form submit does not care for multiple submit buttons and only uses the last one. Issue due to jQuery's submit function. [minor]
 
 ----
 
 Changelog:
 
-v1.5.9-dev, August 29, 2010
-- documentReady callback now supports options
-- Improvements to anchor handling and page tracking
-- Improvements to anchor scrolling
-- Added postpone value for redirect option
-- Added disable value for redirect option
-- Added $.fn.addAjaxy and $.fn.removeAjaxy for advanced use cases
-- Re-Added $('body').ajaxify() on domReady if auto_ajaxify is true
-- We now use jQuery ScrollTo [v1.0.0-beta, August 28, 2010] as our ScrollTo Plugin: http://www.balupton.com/projects/jquery-scrollto
-- Updated jQuery Sparkle dependencies to [v1.4.19-final, August 28, 2010]
+v1.6.0-dev, August 31, 2010
+- Added Ajaxy form demo.
+- Added Ajaxy.onReady, Ajaxy.onDocumentReady and Ajaxy.onConfigured promises
+- Controllers should now use classname instead of selector. B/C Break.
+- $.fn.addAjaxy now supports passing a controller so we can add the Controller.classname to the element(s)
+- Added $.fn.addAjaxy and $.fn.removeAjaxy
+- State.actionCompleted callback now supports options.
+- Added Refresh Action, this is triggered when we click the same Ajaxy link twice. If the refresh action does not exist a log will be outputted, and the Response action will be used instead. B/C Partial Break.
+- Improvements to the anchor handling, page tracking and scrolling.
+- While in postponed mode, and a anchor is clicked, we will treat the anchor as normal and not perform a redirect.
+- Added postpone and disable redirect option values. Postpone will postpone ajaxy functionality until the page is changed. Disable will disable ajaxy functionality all together.
+- Made Ajaxy.bind alias Ajaxy.addControllers, and add Ajaxy.addController
+- Fixed issue with jQuery UI AutoComplete. Fix due to update of sparkle dependencies.
+- We now use jQuery ScrollTo [v1.0.1-beta, August 31, 2010] as our ScrollTo Plugin: http://www.balupton.com/projects/jquery-scrollto
+- Updated jQuery History dependencies to [v1.5.0-final, August 31, 2010]
+- Updated jQuery Sparkle dependencies to [v1.5.2-beta, August 31, 2010]
 
 v1.5.8-beta, August 23, 2010
 - Added root_url to internal link checks

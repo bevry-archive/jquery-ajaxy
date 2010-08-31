@@ -147,5 +147,76 @@
 		return object;
 	};
 	
-
+	/**
+	 * Handle a Promise
+	 * @param {Object} options.object
+	 * @param {String} options.handlers
+	 * @param {String} options.flag
+	 * @param {Funtion} options.handler
+	 * @return {Boolean} Whether or not the promise is ready
+	 * @version 1.0.0
+	 * @date August 31, 2010
+	 * @since 1.0.0
+     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
+	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+	 */
+	$.promise = $.promise || function(options){
+		// Extract
+		var	object = options.object||this;
+		
+		// Check
+		if ( typeof object[options.handlers] === 'undefined' ) {
+			object[options.handlers] = [];
+		}
+		if ( typeof object[options.flag] === 'undefined' ) {
+			object[options.flag] = false;
+		}
+		
+		// Extract
+		var	handlers = object[options.handlers],
+			flag = object[options.flag],
+			handler = options.arguments[0];
+		
+		// Handle
+		switch ( typeof handler ) {
+			case 'boolean':
+				// We want to set the flag as true or false, then continue on
+				flag = object[options.flag] = handler;
+				// no break, as we want to continue on
+				
+			case 'undefined':
+				// We want to fire the handlers, so check if the flag is true
+				if ( flag && handlers.length ) {
+					// Fire the handlers
+					$.each(handlers, function(i,handler){
+						handler.call(object);
+					});
+					// Clear the handlers
+					object[options.handlers] = [];
+				}
+				break;
+			
+			case 'function':
+				// We want to add or fire a handler, so check the flag
+				if ( flag ) {
+					// Fire the event handler
+					handler.call(object);
+				}
+				else {
+					// Add to the handlers
+					object[options.handlers].push(handler);
+				}
+				break;
+			
+			default:
+				window.console.error('Unknown arguments for $.promise', [this, arguments]);
+				break;
+		}
+	
+		// Return flag
+		return flag;
+	}
+	
 })(jQuery);

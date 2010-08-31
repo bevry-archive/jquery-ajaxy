@@ -356,15 +356,15 @@
 	
 	/**
 	 * Prevent the default action when a click is performed
-	 * @version 1.0.0
-	 * @date August 19, 2010
+	 * @version 1.0.1
+	 * @date August 31, 2010
 	 * @since 1.0.0, August 19, 2010
      * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
 	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
 	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
 	 */
-	$.fn.preventDefault = $.fn.preventDefault || function(){
+	$.fn.preventDefaultOnClick = $.fn.preventDefaultOnClick || function(){
 		return $(this).click(function(event){
 			event.preventDefault();
 			return false;

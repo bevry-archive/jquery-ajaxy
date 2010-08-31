@@ -32,7 +32,7 @@
 	
 	<div class="section links" id="links">
 		<h1>jQuery Ajaxy - Simple Ajax Handler/Remote for Hash, State, Bookmarking, and Forward Back Buttons</h1>
-		<h2><a href="http://github.com/balupton/jquery-ajaxy/zipball/master" title="Download the Latest" id="download">Download the Latest</a></h2>
+		<h2><a href="http://github.com/balupton/jquery-ajaxy/zipball/master" title="Download the Latest" id="download">Download</a></h2>
 		<h2><a href="http://www.balupton.com/projects/jquery-ajaxy" title="Home Page">Home Page</a></h2>
 		<h2><a href="http://github.com/balupton/jquery-ajaxy" title="Project Page">Project Page</a></h2>
 		<h2><a href="http://getsatisfaction.com/balupton/products/balupton_jquery_ajaxy" title="Support Page" class="gsfnwidget">Get Support</a></h2>
@@ -186,8 +186,10 @@
 						 * It allows us to do such things as display the loading animation, and debug requests.
 						 */
 						request: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers._generic.request', &#91;this,arguments&#93;);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.request', &#91;this,arguments&#93;);
 							// Loading
 							$body.addClass('loading');
 							// Done
@@ -203,7 +205,7 @@
 							// Prepare
 							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers._generic.response', &#91;this,arguments&#93;, data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.response', &#91;this,arguments&#93;, data, state);
 							// Title
 							var title = data.title||false; // if we have a title in the response JSON
 							if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
@@ -226,10 +228,10 @@
 							// Prepare
 							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
 							// Error
-							var error = data.error||data.responseText||false;
+							var error = data.error||data.responseText||'Unknown Error.';
 							var error_message = data.content||error;
 							// Log what is happening
-							window.console.error('$.Ajaxy.configure.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
+							window.console.error('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
 							// Loaded
 							$body.removeClass('loading');
 							// Display State
@@ -247,12 +249,12 @@
 					 */
 					'page': {
 						/**
-						 * Our Page Controller's Selector &#91;optional&#93;
-						 * This associates our controller with the particular elements which match this selector.
+						 * Our Page Controller's Classname &#91;optional&#93;
+						 * This associates our controller with the particular elements which match this classname.
 						 * It allows for when one of our Ajax links to be clicked, Ajaxy will know to fire the Page Controller's Request action.
 						 * This is important as without this there would be no possible way for us to know that the Ajax Request is for our Controller.
 						 */
-						selector: '.ajaxy-page',
+						classname: 'ajaxy-page',
 						
 						/**
 						 * Our Page Controller's Matches &#91;optional&#93;
@@ -274,10 +276,12 @@
 						 * We use this to prepare our tab area for incoming content, so we deselect all items in the tab menu, and fade out the content.
 						 */
 						request: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers.page.request', &#91;this,arguments&#93;);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.request', &#91;this,arguments&#93;);
 							// Adjust Menu
-							$menu.children('.active').removeClass('active');
+							$menu.find('.active').removeClass('active');
 							// Hide Content
 							$content.stop(true,true).fadeOut(400);
 							// Return true
@@ -292,11 +296,11 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state;
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state; var State = this.State;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers.page.response', &#91;this,arguments&#93;, data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', &#91;this,arguments&#93;, data, state);
 							// Adjust Menu
-							$menu.children(':has(a&#91;href*="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
+							$menu.children(':has(a&#91;href*="'+State.raw.state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
 							var Action = this;
 							$content.html(data.content).fadeIn(400,function(){
@@ -310,7 +314,9 @@
 								 * 1. It tells Ajaxy that the document is now ready for post processing.
 								 * 2. Ajaxy will then determine if the state included a anchor that we want to scroll to and initiate, and do that.
 								 * 3. Ajaxy will ajaxify the new content (provided the option &#91;auto_ajaxify_documentReady&#93; is true).
-								 * 4. Ajaxy will sparkle the new contnet (provided the option &#91;auto_sparkle_documentReady&#93; is true, and jQuery Sparkle exists). This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look: http://www.balupton.com/projects/jquery-sparkle/
+								 * 4. Ajaxy will sparkle the new contnet (provided the option &#91;auto_sparkle_documentReady&#93; is true, and jQuery Sparkle exists).
+								 *    This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look:
+								 *    http://www.balupton.com/projects/jquery-sparkle/
 								 */
 							});
 							// Return true
@@ -355,8 +361,7 @@
 				'Controllers': {
 					'_generic': {
 						request: function(){
-							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers._generic.request', &#91;this,arguments&#93;);
+						request: function(){
 							// Loading
 							$body.addClass('loading');
 							// Done
@@ -365,8 +370,6 @@
 						response: function(){
 							// Prepare
 							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
-							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers._generic.response', &#91;this,arguments&#93;, data, state);
 							// Title
 							var title = data.title||false; // if we have a title in the response JSON
 							if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
@@ -382,10 +385,10 @@
 							// Prepare
 							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
 							// Error
-							var error = data.error||data.responseText||false;
+							var error = data.error||data.responseText||'Unknown Error.';
 							var error_message = data.content||error;
 							// Log what is happening
-							window.console.error('$.Ajaxy.configure.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
+							window.console.error('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
 							// Loaded
 							$body.removeClass('loading');
 							// Display State
@@ -395,13 +398,13 @@
 						}
 					},
 					'page': {
-						selector: '.ajaxy-page',
+						classname: 'ajaxy-page',
 						matches: /^\/pages\/?/,
 						request: function(){
-							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers.page.request', &#91;this,arguments&#93;);
+							// Prepare
+							var Ajaxy = $.Ajaxy;
 							// Adjust Menu
-							$menu.children('.active').removeClass('active');
+							$menu.find('.active').removeClass('active');
 							// Hide Content
 							$content.stop(true,true).fadeOut(400);
 							// Return true
@@ -409,11 +412,9 @@
 						},
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state;
-							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers.page.response', &#91;this,arguments&#93;, data, state);
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state; var State = this.State;
 							// Adjust Menu
-							$menu.children(':has(a&#91;href*="'+state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
+							$menu.children(':has(a&#91;href*="'+State.raw.state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
 							var Action = this;
 							$content.html(data.content).fadeIn(400,function(){
@@ -479,9 +480,18 @@
 		<p>
 			This work is powered by coffee and distributed for free. Donations are how we afford our coffee. Coffee is how we stay awake after our day job hours to work on things like this free open-source project which you're looking at. So go ahead, and get that warm fuzzy feeling knowing you just helped some poor fellow working after hours for free to buy his coffee. You only need to spare a few dollars, or as much as you feel this piece of work is worth. Thanks so much. Alternatively; if you are not in a donating mood, then spreading the word about this project on twitter, your blog, or whatever is just as good. You can also give praise by clicking the feedback button or visiting our "Get Support" link. Thanks a bunch, we appreciate the help deeply.
 		</p>
-		<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><p> 
-		    <input type="hidden" name="cmd" value="_s-xclick" /> <input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-but21.gif" name="submit" alt="Make payments with PayPal - it's fast, free and secure!" /> <img alt="" src="https://www.paypal.com/en_AU/i/scr/pixel.gif" width="1" height="1" /> <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----" /> 
-		</p></form>
+		<form id="paypal-form" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+			<input type="hidden" name="cmd" value="_donations">
+			<input type="hidden" name="business" value="APWCX9D4EJPXG">
+			<input type="hidden" name="lc" value="AU">
+			<input type="hidden" name="item_name" value="Donation to Benjamin Arthur Lupton">
+			<input type="hidden" name="currency_code" value="AUD">
+			<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_SM.gif:NonHostedGuest">
+			<p>
+				<img alt="" border="0" src="https://www.paypal.com/en_AU/i/scr/pixel.gif" width="1" height="1">
+				<input id="paypal-submit" type="image" src="https://www.paypal.com/en_AU/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online.">
+			</p>
+		</form>
 		<p> 
 			This work is licensed under a <a rel="license" href="http://www.gnu.org/licenses/agpl.html">GNU Affero General Public License</a>.
 		</p>
@@ -543,8 +553,10 @@
 						 * It allows us to do such things as display the loading animation, and debug requests.
 						 */
 						request: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers._generic.request', [this,arguments]);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.request', [this,arguments]);
 							// Loading
 							$body.addClass('loading');
 							// Done
@@ -560,7 +572,7 @@
 							// Prepare
 							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers._generic.response', [this,arguments], data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.response', [this,arguments], data, state);
 							// Title
 							var title = data.title||false; // if we have a title in the response JSON
 							if ( !title && this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
@@ -583,10 +595,10 @@
 							// Prepare
 							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
 							// Error
-							var error = data.error||data.responseText||false;
+							var error = data.error||data.responseText||'Unknown Error.';
 							var error_message = data.content||error;
 							// Log what is happening
-							window.console.error('$.Ajaxy.configure.Controllers._generic.error', [this, arguments], error_message);
+							window.console.error('$.Ajaxy.Controllers._generic.error', [this, arguments], error_message);
 							// Loaded
 							$body.removeClass('loading');
 							// Display State
@@ -604,12 +616,12 @@
 					 */
 					'page': {
 						/**
-						 * Our Page Controller's Selector [optional]
-						 * This associates our controller with the particular elements which match this selector.
+						 * Our Page Controller's Classname [optional]
+						 * This associates our controller with the particular elements which match this classname.
 						 * It allows for when one of our Ajax links to be clicked, Ajaxy will know to fire the Page Controller's Request action.
 						 * This is important as without this there would be no possible way for us to know that the Ajax Request is for our Controller.
 						 */
-						selector: '.ajaxy-page',
+						classname: 'ajaxy-page',
 						
 						/**
 						 * Our Page Controller's Matches [optional]
@@ -631,10 +643,12 @@
 						 * We use this to prepare our tab area for incoming content, so we deselect all items in the tab menu, and fade out the content.
 						 */
 						request: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers.page.request', [this,arguments]);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.request', [this,arguments]);
 							// Adjust Menu
-							$menu.children('.active').removeClass('active');
+							$menu.find('.active').removeClass('active');
 							// Hide Content
 							$content.stop(true,true).fadeOut(400);
 							// Return true
@@ -649,11 +663,11 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state;
+							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state; var State = this.State;
 							// Log what is happening
-							window.console.debug('$.Ajaxy.configure.Controllers.page.response', [this,arguments], data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', [this,arguments], data, state);
 							// Adjust Menu
-							$menu.children(':has(a[href*="'+state+'"])').addClass('active').siblings('.active').removeClass('active');
+							$menu.children(':has(a[href*="'+State.raw.state+'"])').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
 							var Action = this;
 							$content.html(data.content).fadeIn(400,function(){
@@ -667,7 +681,9 @@
 								 * 1. It tells Ajaxy that the document is now ready for post processing.
 								 * 2. Ajaxy will then determine if the state included a anchor that we want to scroll to and initiate, and do that.
 								 * 3. Ajaxy will ajaxify the new content (provided the option [auto_ajaxify_documentReady] is true).
-								 * 4. Ajaxy will sparkle the new contnet (provided the option [auto_sparkle_documentReady] is true, and jQuery Sparkle exists). This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look: http://www.balupton.com/projects/jquery-sparkle/
+								 * 4. Ajaxy will sparkle the new contnet (provided the option [auto_sparkle_documentReady] is true, and jQuery Sparkle exists).
+								 *    This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look:
+								 *    http://www.balupton.com/projects/jquery-sparkle/
 								 */
 							});
 							// Return true

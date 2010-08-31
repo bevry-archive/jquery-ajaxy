@@ -11,8 +11,8 @@
 	
 	/**
 	 * jQuery History
-	 * @version 1.4.2
-	 * @date August 12, 2010
+	 * @version 1.5.0
+	 * @date August 31, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-history {@link http://www.balupton/projects/jquery-history}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -76,6 +76,7 @@
 			 */
 			setState: function ( state ) {
 				var History = $.History;
+				
 				// Format the state
 				state = History.extractHash(state)
 			
@@ -133,8 +134,8 @@
 				to = History.extractHash(to);
 			
 				// Get current
-				var hash = History.getHash();
-				var state = History.getState();
+				var	hash = History.getHash(),
+					state = History.getState();
 			
 				// Has the hash changed
 				if ( to !== hash ) {
@@ -181,7 +182,7 @@
 			bind: function ( state, handler ) {
 				var History = $.History;
 			
-				// 
+				// Handle
 				if ( handler ) {
 					// We have a state specific handler
 					// Prepare

@@ -18,8 +18,8 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.5.9
-	 * @date August 29, 2010
+	 * @version 1.6.0
+	 * @date August 31, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -31,10 +31,12 @@
 		 * Ajaxy
 		 */
 		$.Ajaxy = {
-		
-			// -----------------
+			
+			
+			// ====================================================
 			// Options
-		
+			
+			
 			/**
 			 * User configuration
 			 */
@@ -148,9 +150,11 @@
 				 */
 				Controllers: {}
 			},
-		
-			// -----------------
-			// Variables
+			
+			
+			// ====================================================
+			// Defaults
+			
 			
 			/**
 			 * Default Structures
@@ -162,6 +166,7 @@
 				 */
 				Controller: {
 					// Options
+					classname: null,
 					selector: null,
 					matches: null,
 					
@@ -237,23 +242,37 @@
 				State: {
 					// Options
 					mode: null,
-					form: false,
-					a: false,
+					el: null,
+					isLink: false,
+					isForm: false,
 					
 					// Parts
-					state: '',
-					hash: '',
 					anchor: '',
 					querystring: '',
+					state: '',
+					hash: '',
 					location: '',
 					locationShort: '',
 					raw: {
-						state: '',
+						anchor: '',
 						querystring: '',
+						hash: '',
+						state: '',
 						location: '',
 						locationShort: ''
 					},
 					vanilla: {
+						anchor: '',
+						querystring: '',
+						hash: '',
+						state: '',
+						location: '',
+						locationShort: ''
+					},
+					clean: {
+						anchor: '',
+						querystring: '',
+						hash: '',
 						state: '',
 						location: '',
 						locationShort: ''
@@ -287,25 +306,20 @@
 				}
 			},
 			
+			
+			// ====================================================
+			// Variables
+			
+			
 			/**
 			 * Have we been constructed
 			 */
-			constructed: false,
-			
-			/**
-			 * Have we been configured
-			 */
-			configured: false,
+			isConstructed: false,
 			
 			/**
 			 * Aliases Hashtable
 			 */
 			aliases: {},
-			
-			/**
-			 * The list of Ajaxy onReady handlers
-			 */
-			onReadyHandlers: [],
 			
 			/**
 			 * Whether or not we are in postpone mode
@@ -350,8 +364,49 @@
 			 */
 			redirected: false,
 			
-			// --------------------------------------------------
-			// Functions
+			
+			// ====================================================
+			// Data
+			
+			
+			/**
+			 * Get a piece of data
+			 * @param {Object} name
+			 */
+			get: function ( name ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Fetch data
+				if ( typeof Ajaxy.data[name] !== 'undefined' ) {
+					return Ajaxy.data[name];
+				} else {
+					return undefined;
+				}
+			},
+		
+			/**
+			 * Set a piece (or pieces) of data
+			 * Ajaxy.set(data), Ajaxy.set(name, value)
+			 * @param {Object} data
+			 * @param {Object} value
+			 */
+			set: function ( data, value ) {
+				var Ajaxy = $.Ajaxy;
+			
+				// Set route data
+				if ( typeof value === 'undefined' ) {
+					if ( typeof data === 'object' ) {
+						Ajaxy.data.extend(true, data);
+					}
+				} else {
+					Ajaxy.data[data] = value;
+				}
+			},
+			
+			
+			// ====================================================
+			// URLS
+			
 			
 			/**
 			 * Ensure we return a valid String value
@@ -491,646 +546,6 @@
 			},
 			
 			/**
-			 * Compare two States with each other
-			 * @param {State} newState
-			 * @param {State} oldState
-			 * @return {Boolean}
-			 */
-			statesEquivalent: function(newState, oldState) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare
-				var result = false;
-				
-				// Check for Forms
-				if ( newState.form || oldState.form ) {
-					// If we are a form, we are always new
-					result = false;
-				}
-				
-				// Check State Variables
-				if ( newState.state||false ) {
-					// Cycle through the aliases for the state
-					var aliases = Ajaxy.aliases[newState.hash]||[newState.hash];
-					$.each(aliases,function(i,alias){
-						// Compare Aliases State with Old State
-						if ( alias === oldState.hash && newState.raw.querystring === oldState.raw.querystring ) {
-							// We have found a match, don't care for anchor
-							result = true;
-							return false; // break
-						}
-					});
-				}
-				
-				// Return result
-				return result;
-			},
-			
-			/**
-			 * Bind controllers
-			 * Either via Ajaxy.bind(controller, options), or Ajaxy.bind(controllers)
-			 * @param {String} controller
-			 * @param {Object} Controller
-			 */
-			bind: function ( controller, Controller ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Add a controller
-				if ( typeof Controller === 'undefined' && typeof controller === 'object' ) {
-					// Array of controllers
-					$.each(controller,Ajaxy.bind);
-					return true;
-				}
-				else if ( typeof Controller === 'function' ) {
-					// We just have the response handler
-					Controller = {
-						'response': Controller
-					}
-				}
-				else if ( typeof Controller !== 'object' ) {
-					// Unknown handlers
-					window.console.error('Ajaxy.bind: Unknown option type', [this, arguments]);
-					window.console.trace();
-					return false;
-				}
-				
-				// Create the Controller
-				if ( typeof Ajaxy.getController(controller,false) === 'undefined' ) {
-					Ajaxy.storeController(
-						$.prepareObject(
-							Ajaxy.defaults.Controller,
-							{
-								'controller': controller
-							},
-							Controller
-						)
-					);
-				}
-				else {
-					// Already bound
-					window.console.error('Ajaxy.bind: Controller already bound.', [this, arguments]);
-					window.console.trace();
-					return false;
-				}
-				
-				// Ajaxify the Controller
-				if ( Ajaxy.options.auto_ajaxify ) {
-					Ajaxy.ajaxifyController(controller);
-					return true; // prevent closure complaint
-				}
-			
-				// Done
-				return true;
-			},
-			
-			/**
-			 * Trigger the action for the particular controller
-			 * @param {String} controller
-			 * @param {String} action
-			 * @param {Object} State
-			 */
-			trigger: function ( controller, action, state ) {
-				var Ajaxy = $.Ajaxy;
-				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.trigger: ', [this, arguments]);
-				
-				// Prepare
-				var i, n, list, call_generic = true;
-				
-				// Check Input
-				if ( !controller ) {
-					window.console.warn('Ajaxy.trigger: No controller was passed, reset to _generic.', [this, arguments]);
-					controller = '_generic';
-				}
-				
-				// --------------------------
-				// Fetch
-				
-				// Fetch Controller
-				var Controller = Ajaxy.getController(controller);
-				
-				// Fetch Controller Action
-				var ControllerAction = Ajaxy.getControllerAction(controller,action,false);
-				
-				// Fetch the State
-				var State = Ajaxy.getState(state,true),
-					state = State.state||undefined;
-				
-				// --------------------------
-				// Checks
-				
-				// Check Controller
-				if ( typeof Controller === 'undefined' ) {
-					// No Controller
-					window.console.error('Ajaxy.trigger: Controller does not exist', [this, arguments]);
-					window.console.trace();
-					if ( controller !== '_generic' ) {
-						Ajaxy.trigger('_generic', 'error', State);
-					}
-					return false;
-				}
-				
-				// Check Controller Action
-				if ( typeof ControllerAction === 'undefined' ) {
-					// Check Action Type
-					if ( action === 'refresh' ) {
-						// Forward to Response
-						window.console.log('Ajaxy.trigger: Controller Action ['+controller+'].[refresh] does not exist. Defaulting to ['+controller+'].[response] Action.', [this, arguments]);
-						return Ajaxy.trigger(controller, 'response', State);
-					}
-					else {
-						// No Action
-						window.console.error('Ajaxy.trigger: No Controller Action', [this, arguments]);
-						window.console.trace();
-						if ( controller !== '_generic' ) {
-							Ajaxy.trigger('_generic', 'error', State);
-						}
-						return false;
-					}
-				}
-				
-				// --------------------------
-				// Prepare Action
-				
-				// Generate Action
-				var Action = $.extend(true,{},Ajaxy.defaults.Action,{
-					'action':action,
-					'controller':controller,
-					'Controller':Controller,
-					'state':state,
-					'State':State
-				});
-				
-				// Setup up the Trigger + Forward Actions
-				Action.forward = Action.trigger = function(_controller, _action, _state){
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.Action.trigger:', [this, arguments]);
-					
-					// Prepare
-					_controller = _controller||controller;
-					_action = _action||action;
-					_state = _state||state;
-					
-					// Trigger
-					Ajaxy.trigger(_controller, _action, _state);
-					
-					// Return true
-					return true;
-				};
-				
-				// --------------------------
-				// Fire
-				
-				// Fire the ControllerAction Handler
-				var result = ControllerAction.apply(Action, []);
-				
-				// Should we continue to Propagate through
-				if ( Action.propagate === false ) {
-					// Break
-					call_generic = false;
-				}
-				
-				// Fire generic?
-				if ( call_generic && controller !== '_generic' ) {
-					// Fire generic
-					Action.forward('_generic');
-				}
-				
-				// --------------------------
-				
-				// Return true
-				return true;
-			},
-		
-			/**
-			 * Get a piece of data
-			 * @param {Object} name
-			 */
-			get: function ( name ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Fetch data
-				if ( typeof Ajaxy.data[name] !== 'undefined' ) {
-					return Ajaxy.data[name];
-				} else {
-					return undefined;
-				}
-			},
-		
-			/**
-			 * Set a piece (or pieces) of data
-			 * Ajaxy.set(data), Ajaxy.set(name, value)
-			 * @param {Object} data
-			 * @param {Object} value
-			 */
-			set: function ( data, value ) {
-				var Ajaxy = $.Ajaxy;
-			
-				// Set route data
-				if ( typeof value === 'undefined' ) {
-					if ( typeof data === 'object' ) {
-						Ajaxy.data.extend(true, data);
-					}
-				} else {
-					Ajaxy.data[data] = value;
-				}
-			},
-			
-			/**
-			 * Refresh
-			 */
-			refresh: function(){
-				var Ajaxy = $.Ajaxy; var History = $.History;
-				// Go
-				return Ajaxy.go(History.getHash());
-			},
-		
-			/**
-			 * Build an Ajaxy State
-			 * @param {String|Object} UserState
-			 */
-			buildState: function ( UserState ) {
-				var Ajaxy = $.Ajaxy; var History = $.History;
-				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.buildState:', [this, arguments]);
-				
-				// --------------------------
-				
-				// Ensure format
-				if ( typeof UserState === 'string' ) {
-					// We have just a state
-					UserState = {
-						url: UserState
-					};
-				}
-				
-				// Prepare State
-				var State = Ajaxy.getState(false,true);
-				$.extend(true,State,UserState);
-				
-				// --------------------------
-				// Ensure parts
-				
-				// Check for !state and url
-				if ( !(State.state||false) && (State.url||false) ) {
-					State.state	= Ajaxy.extractState(State.url);
-				}
-				
-				// Fix state
-				if ( !State.state ) {
-					State.state = '/';
-				}
-				
-				// Rebuild the state
-				Ajaxy.rebuildState(State);
-				
-				// --------------------------
-				// Anchor Fixes
-				
-				// Fix anchor
-				if ( State.anchor === State.state || State.anchor === State.hash ) {
-					State.anchor = '';
-				}
-				
-				// Check for !hash and !querystring and anchor
-				if ( !(State.hash||false) && !State.raw.querystring && (State.anchor||'') ) {
-					// We are just an anchor change
-					// Let's grab the currentState's hash and use that, as we want to modify the state so we don't actually go to the anchor in the url
-					// As otherwise the anchor will become the hash, and this is a problem.
-					State.hash = Ajaxy.currentState.hash||'';
-					State.querystring = State.raw.querystring;
-					
-					// Rebuild the state
-					Ajaxy.rebuildState(State);
-				}
-				
-				// --------------------------
-				// Additional Checks
-				
-				// Check state
-				if ( !State.state || (!State.hash && !State.raw.querystring) ) {
-					window.console.warn('Ajaxy.go: No state or (hash and querystring).', [this, arguments], [State]);
-				}
-				
-				// Ensure mode
-				if ( !State.mode ) {
-					if ( State.a && Ajaxy.postpone ) {
-						if ( State.anchor && !State.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
-							// We are in postpone mode, but we are just an anchor change...
-							// We can't use default here as we are still in a relative url
-							// So we just pretend as if this is not happening
-							State.mode = 'ignore';
-						}
-						else {
-							State.mode = 'postpone';
-						}
-					}
-					else if ( State.form ) {
-						State.mode = 'silent';
-					}
-					else {
-						State.mode = 'default';
-					}
-				}	
-				
-				// --------------------------
-				
-				// Return State
-				return State;
-			},
-			
-			/**
-			 * Perform an Ajaxy Request
-			 * @param {String|Object} UserState
-			 */
-			go: function ( UserState ) {
-				var Ajaxy = $.Ajaxy; var History = $.History;
-				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go:', [this, arguments]);
-			
-				// --------------------------
-				
-				// Build State
-				var State = Ajaxy.buildState(UserState);
-				
-				// Store it
-				Ajaxy.storeState(State);
-			
-				// --------------------------
-				
-				// Trigger state
-				switch ( State.mode ) {
-					case 'silent':
-						// Don't log
-						// Trigger manually
-						Ajaxy.stateChange(State.state)
-						break;
-						
-					case 'ignore':
-						// Ignore the State
-						Ajaxy.ignoredStates[State.vanilla.state] = State;
-						// Redirect the browser
-						document.location = State.vanilla.location;
-						break;
-						
-					case 'postpone':
-						// Redirect the browser
-						document.location = State.location;
-						break;
-						
-					case 'default':
-					default:
-						// Log the history
-						// Trigger automaticly
-						History.go(State.state);
-						break;
-				}
-				
-				// --------------------------
-				
-				// Return true
-				return true;
-			},
-			
-			/**
-			 * Get the Controller Action
-			 * @param {String|Object} controller
-			 * @return {Object|undefined}
-			 */
-			getControllerAction: function ( controller, action, create ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare
-				var ControllerAction = undefined,
-					Controller = Ajaxy.getController(controller,false);
-				
-				// Fetch
-				if ( typeof Controller === 'undefined' ) {
-					if ( create === false ) {
-						// Don't report couldn't find
-					}
-					else {
-						window.console.error('Ajaxy.getControllerAction: Controller does not exist', [this, arguments]);
-						window.console.trace();
-					}
-				}
-				else {
-					var controllerActionType = typeof (Controller[action]||undefined);
-					if ( controllerActionType === 'function' || controllerActionType === 'object' ) {
-						ControllerAction = Controller[action];
-					}
-					else if ( create === false ) {
-						// Don't report couldn't find
-					}
-					else {
-						window.console.error('Ajaxy.getControllerAction: Controller Action does not exist', [this, arguments]);
-						window.console.trace();
-					}
-				}
-				
-				// Return ControllerAction
-				return ControllerAction;
-			},
-			
-			/**
-			 * Store a Controller Object
-			 * @param {Object} Controller
-			 */
-			storeController: function ( Controller ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare
-				var result = true,
-					controllerType = typeof (Controller||undefined);
-					
-				// Fetch
-				if ( controllerType === 'object' && typeof Controller.controller === 'string' ) {
-					result = Ajaxy.Controllers[Controller.controller] = Controller;
-				}
-				else {
-					window.console.error('Ajaxy.getController: Unkown Controller Format', [this, arguments]);
-					window.console.trace();
-					result = false;
-				}
-			
-				// Return result
-				return result;
-			},
-			
-			/**
-			 * Get the controller's Controller Object
-			 * @param {String|Object} controller
-			 * @return {Object|undefined}
-			 */
-			getController: function ( controller, create ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare
-				var Controller = undefined,
-					controllerType = typeof (controller||undefined);
-				
-				// Fetch
-				if ( (controllerType === 'number' || controllerType === 'string') && typeof Ajaxy.Controllers[controller] !== 'undefined' ) {
-					Controller = Ajaxy.Controllers[controller];
-				}
-				else if ( controllerType === 'object' && typeof controller.controller === 'string' ) {
-					Controller = Ajaxy.getController(controller.controller,create);
-				}
-				else if ( create ) {
-					Controller = $.extend(true,{},Ajaxy.defaults.Controller);
-				}
-				else if ( create === false ) {
-					// Don't report couldn't find
-				}
-				else {
-					// Report couldn't find
-					window.console.error('Ajaxy.getController: Controller does not exist', [this, arguments]);
-					window.console.trace();
-				}
-			
-				// Return Controller
-				return Controller;
-			},
-			
-			/**
-			 * Rebuild a State
-			 * @param {&State} State
-			 * @return {State}
-			 */
-			rebuildState: function(State,mode){
-				var Ajaxy = $.Ajaxy;
-				
-				// Extract
-				var state = Ajaxy.extractState(State.state),
-					hash = Ajaxy.ensureString(State.hash) || Ajaxy.extractHash(state),
-					anchor = Ajaxy.ensureString(State.anchor) || Ajaxy.extractAnchor(state),
-					querystring = Ajaxy.ensureString(State.querystring) || Ajaxy.extractQuerystring(state),
-					base_url = Ajaxy.options.base_url,
-					root_url = Ajaxy.options.root_url,
-					anchor_param_name = Ajaxy.options.anchor_param_name;
-				
-				// Anchor
-				if ( anchor ) {
-					// Place anchor into querystring
-					var params = querystring.queryStringToJSON();
-					params.anchor = anchor;
-					querystring = unescape($.param(params));
-					delete params;
-				}
-				
-				// Standard: With Anchor + Ajaxy
-				State.state = hash+(querystring ? '?'+querystring : '');
-				State.hash = hash;
-				State.anchor = anchor;
-				State.querystring = querystring;
-				State.locationShort = base_url+'#'+State.state;
-				State.location = root_url+State.locationShort;
-				
-				// Raw: Without Anchor
-				State.raw.querystring = State.querystring.replace(RegExp('&?'+anchor_param_name+'=[a-zA-Z0-9-_]+'),''),
-				State.raw.state = hash;
-				if ( State.raw.querystring ) {
-					State.raw.state += '?'+State.raw.querystring;
-				}
-				State.raw.locationShort = base_url+'#'+State.raw.state;
-				State.raw.location = root_url+State.raw.locationShort;
-				
-				// Vanilla: Without Ajaxy
-				State.vanilla.state = State.anchor;
-				State.vanilla.locationShort = base_url+State.raw.state+(State.anchor ? '#'+State.anchor : '');
-				State.vanilla.location = root_url+State.vanilla.locationShort;
-				
-				// Return State
-				return State;
-			},
-			
-			/**
-			 * Store a State Object
-			 * @param {Object} state
-			 */
-			storeState: function ( State ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare
-				var result = true,
-					stateType = typeof (State||undefined);
-				
-				// Rebuild State
-				Ajaxy.rebuildState(State);
-				
-				// Fetch
-				if ( stateType === 'object' && typeof State.state === 'string' ) {
-					result = Ajaxy.States[State.state] = State;
-				}
-				else {
-					window.console.error('Ajaxy.storeState: Unkown State Format', [this, arguments]);
-					window.console.trace();
-					result = false;
-				}
-			
-				// Return result
-				return result;
-			},
-			
-			/**
-			 * Get the state's State Object
-			 * @param {String|Object} state
-			 * @return {Object|undefined}
-			 */
-			getState: function ( state, create, error ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare
-				state = Ajaxy.extractState((state||{}).state||state);
-				var State = undefined,
-					type = typeof (state||undefined),
-					typeStringable = (type === 'number' || type === 'string');
-				
-				// Fetch
-				if ( typeStringable && typeof Ajaxy.States[state] !== 'undefined' ) {
-					State = Ajaxy.States[state];
-				}
-				else if ( create ) {
-					State = Ajaxy.createState(state);
-				}
-				else if ( create === false ) {
-					// Don't report couldn't find
-				}
-				else if ( error||false ) {
-					// Report couldn't find
-					window.console.error('Ajaxy.getState: State does not exist', [this, arguments]);
-					window.console.trace();
-				}
-				
-				// Rebuild State
-				if ( State ) {
-					Ajaxy.rebuildState(State);
-				}
-				
-				// Return State
-				return State;
-			},
-			
-			/**
-			 * Create a new State Object
-			 * @param {String|Object} state
-			 * @return {Object|undefined}
-			 */
-			createState: function ( state ) {
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare
-				state = Ajaxy.extractState((state||{}).state||state);
-				
-				// Create State
-				State = $.extend(true,{},Ajaxy.defaults.State,{
-					state: state
-				});
-				
-				// Rebuild State
-				Ajaxy.rebuildState(State);
-				
-				// Return State
-				return State;
-			},
-			
-			/**
 			 * Track a state change in Google Analytics
 			 * @param {Object} State
 			 */
@@ -1211,6 +626,500 @@
 				return matchedController;
 			},
 			
+			
+			// ====================================================
+			// Controllers
+			
+			
+			/**
+			 * Get the controller's Controller Object
+			 * @param {String|Object} controller
+			 * @return {Object|undefined}
+			 */
+			getController: function ( controller, create ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var Controller = undefined,
+					controllerType = typeof (controller||undefined);
+				
+				// Fetch
+				if ( (controllerType === 'number' || controllerType === 'string') && typeof Ajaxy.Controllers[controller] !== 'undefined' ) {
+					Controller = Ajaxy.Controllers[controller];
+				}
+				else if ( controllerType === 'object' && typeof controller.controller === 'string' ) {
+					Controller = Ajaxy.getController(controller.controller,create);
+				}
+				else if ( create ) {
+					Controller = $.extend(true,{},Ajaxy.defaults.Controller);
+				}
+				else if ( create === false ) {
+					// Don't report couldn't find
+				}
+				else {
+					// Report couldn't find
+					window.console.error('Ajaxy.getController: Controller does not exist', [this, arguments]);
+					window.console.trace();
+				}
+			
+				// Return Controller
+				return Controller;
+			},
+			
+			/**
+			 * Get the Controller Action
+			 * @param {String|Object} controller
+			 * @return {Object|undefined}
+			 */
+			getControllerAction: function ( controller, action, create ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var ControllerAction = undefined,
+					Controller = Ajaxy.getController(controller,false);
+				
+				// Fetch
+				if ( typeof Controller === 'undefined' ) {
+					if ( create === false ) {
+						// Don't report couldn't find
+					}
+					else {
+						window.console.error('Ajaxy.getControllerAction: Controller does not exist', [this, arguments]);
+						window.console.trace();
+					}
+				}
+				else {
+					var controllerActionType = typeof (Controller[action]||undefined);
+					if ( controllerActionType === 'function' || controllerActionType === 'object' ) {
+						ControllerAction = Controller[action];
+					}
+					else if ( create === false ) {
+						// Don't report couldn't find
+					}
+					else {
+						window.console.error('Ajaxy.getControllerAction: Controller Action does not exist', [this, arguments]);
+						window.console.trace();
+					}
+				}
+				
+				// Return ControllerAction
+				return ControllerAction;
+			},
+			
+			/**
+			 * Ajaxy.bind
+			 * @alias Ajaxy.addControllers
+			 */
+			bind: function ( ) {
+				var Ajaxy = $.Ajaxy;
+				return Ajaxy.addControllers.apply(this, arguments);
+			},
+			
+			/**
+			 * Ajaxy.addController
+			 * @param {String|Object} controller
+			 * @param {Object|Function} Controller
+			 */
+			addController: function ( controller, Controller ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// --------------------------
+				// Prepare the Controller
+				
+				// Add a controller
+				if ( typeof Controller === 'undefined' && typeof controller === 'object' ) {
+					// Ajaxy.addController({});
+					Controller = controller;
+				}
+				else if ( typeof controller === 'string' && typeof Controller === 'function' ) {
+					// Ajaxy.addController('controller',function(){});
+					Controller = {
+						'controller': controller,
+						'response': Controller
+					};
+				}
+				else if ( typeof controller === 'string' && typeof Controller === 'object' ) {
+					if ( typeof Controller.controller === 'undefined' ) {
+						Controller.controller = controller;
+					}
+				}
+				else {
+					// Unknown
+					window.console.error('Ajaxy.addController: Unknown Controller Format', [this, arguments]);
+					window.console.trace();
+				}
+				
+				// Check Bound Status
+				if ( typeof Ajaxy.Controllers[Controller.controller] !== 'undefined' ) {
+					// Already Bound
+					window.console.error('Ajaxy.addController: Controller ['+Controller.controller+'] has already been bound.', [this, arguments], [Controller]);
+					window.console.trace();
+					return false;
+				}
+				
+				// --------------------------
+				// Ensure then Store the Controller
+				
+				// Ensure the Controller
+				Controller = $.prepareObject(
+					Ajaxy.defaults.Controller,
+					Controller
+				);
+				
+				// Adjust Controller
+				if ( !Controller.selector && Controller.classname ) {
+					Controller.selector = '.'+Controller.classname;
+				}
+				
+				// Store the Controller
+				Ajaxy.Controllers[Controller.controller] = Controller;
+				
+				// Ajaxify the Controller
+				if ( Ajaxy.options.auto_ajaxify ) {
+					Ajaxy.ajaxifyController(Controller);
+				}
+				
+				// --------------------------
+				
+				// Return the Controller
+				return Controller;
+			},
+			
+			/**
+			 * Ajaxy.addControllers
+			 * @param {Object|Array} Controllers
+			 */
+			addControllers: function ( Controllers ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Create the Controller
+				if ( typeof Controllers === 'object' && typeof Controllers.controller === 'string' ) {
+					// We were meant to be an addController call
+					window.console.warn('Ajaxy.addControllers: It seems you intended to call addController instead.', [this, arguments]);
+				}
+				else if ( typeof Controllers === 'object' || typeof Controllers === 'array' ) {
+					// Bind Controllers
+					$.each(Controllers,function(controller,Controller){
+						Ajaxy.addController(controller,Controller);
+					});
+				}
+				
+				// Return true
+				return true;
+			},
+			
+			
+			// ====================================================
+			// States
+			
+			
+			/**
+			 * Get the state's State Object
+			 * @param {String|Object} state
+			 * @return {Object|undefined}
+			 */
+			getState: function ( state, create, error ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				state = Ajaxy.extractState((state||{}).state||state);
+				var State = undefined,
+					type = typeof (state||undefined),
+					typeStringable = (type === 'number' || type === 'string');
+				
+				// Fetch
+				if ( typeStringable && typeof Ajaxy.States[state] !== 'undefined' ) {
+					State = Ajaxy.States[state];
+				}
+				else if ( create ) {
+					State = Ajaxy.createState(state);
+				}
+				else if ( create === false ) {
+					// Don't report couldn't find
+				}
+				else if ( error||false ) {
+					// Report couldn't find
+					window.console.error('Ajaxy.getState: State does not exist', [this, arguments]);
+					window.console.trace();
+				}
+				
+				// Rebuild State
+				if ( State ) {
+					Ajaxy.rebuildState(State);
+				}
+				
+				// Return State
+				return State;
+			},
+			
+			/**
+			 * Create a new State Object
+			 * @param {String|Object} state
+			 * @return {Object|undefined}
+			 */
+			createState: function ( state ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				state = Ajaxy.extractState((state||{}).state||state);
+				
+				// Create State
+				State = $.extend(true,{},Ajaxy.defaults.State,{
+					state: state
+				});
+				
+				// Rebuild State
+				Ajaxy.rebuildState(State);
+				
+				// Return State
+				return State;
+			},
+			
+			/**
+			 * Build an Ajaxy State
+			 * @param {String|Object} UserState
+			 */
+			buildState: function ( UserState ) {
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.buildState:', [this, arguments]);
+				
+				// --------------------------
+				
+				// Ensure format
+				if ( typeof UserState === 'string' ) {
+					// We have just a state
+					UserState = {
+						url: UserState
+					};
+				}
+				
+				// Prepare State
+				var State = Ajaxy.getState(false,true);
+				$.extend(true,State,UserState);
+				
+				// --------------------------
+				// Ensure parts
+				
+				// Check for !state and url
+				if ( !(State.state||false) && (State.url||false) ) {
+					State.state	= Ajaxy.extractState(State.url);
+				}
+				
+				// Fix state
+				if ( !State.state ) {
+					State.state = '/';
+				}
+				
+				// Handle Element
+				if ( State.el ) {
+					var $el = $(State.el);
+					if ( $el.is('form') ) {
+						State.isForm = true;
+						State.isLink = false;
+					}
+					else if ( $el.is('a') ) {
+						State.isForm = false;
+						State.isLink = true;
+					}
+					else {
+						window.console.warn('Ajaxy.buildState: Unknown element type passed.', [this,arguments], [State.el]);
+					}
+					delete $el;
+				}
+				
+				// Rebuild the state
+				Ajaxy.rebuildState(State);
+				
+				// --------------------------
+				// Anchor Fixes
+				
+				// Fix anchor
+				if ( State.anchor === State.state || State.anchor === State.hash ) {
+					State.anchor = '';
+				}
+				
+				// Check for !hash and !querystring and anchor
+				if ( !(State.hash||false) && !State.raw.querystring && (State.anchor||'') ) {
+					// We are just an anchor change
+					// Let's grab the currentState's hash and use that, as we want to modify the state so we don't actually go to the anchor in the url
+					// As otherwise the anchor will become the hash, and this is a problem.
+					State.hash = Ajaxy.currentState.hash||'';
+					State.querystring = State.raw.querystring;
+					
+					// Rebuild the state
+					Ajaxy.rebuildState(State);
+				}
+				
+				// --------------------------
+				// Additional Checks
+				
+				// Check state
+				if ( !State.state || (!State.hash && !State.raw.querystring) ) {
+					window.console.warn('Ajaxy.go: No state or (hash and querystring).', [this, arguments], [State]);
+				}
+				
+				// Ensure mode
+				if ( !State.mode ) {
+					if ( State.isLink && Ajaxy.postpone ) {
+						if ( State.anchor && !State.raw.querystring && (State.hash === Ajaxy.options.relative_url) ) {
+							// We are in postpone mode, but we are just an anchor change...
+							// We can't use default here as we are still in a relative url
+							// So we just pretend as if this is not happening
+							State.mode = 'ignore';
+						}
+						else {
+							State.mode = 'postpone';
+						}
+					}
+					else if ( State.isForm ) {
+						State.mode = 'silent';
+					}
+					else {
+						State.mode = 'default';
+					}
+				}	
+				
+				// --------------------------
+				
+				// Return State
+				return State;
+			},
+			
+			/**
+			 * Rebuild a State
+			 * @param {&State} State
+			 * @return {State}
+			 */
+			rebuildState: function(State,mode){
+				var Ajaxy = $.Ajaxy;
+				
+				// Extract
+				var state = Ajaxy.extractState(State.state),
+					hash = Ajaxy.ensureString(State.hash) || Ajaxy.extractHash(state),
+					anchor = Ajaxy.ensureString(State.anchor) || Ajaxy.extractAnchor(state),
+					querystring = Ajaxy.ensureString(State.querystring) || Ajaxy.extractQuerystring(state),
+					base_url = Ajaxy.options.base_url,
+					root_url = Ajaxy.options.root_url,
+					anchor_param_name = Ajaxy.options.anchor_param_name;
+				
+				// Anchor
+				if ( anchor ) {
+					// Place anchor into querystring
+					var params = querystring.queryStringToJSON();
+					params.anchor = anchor;
+					querystring = unescape($.param(params));
+					delete params;
+				}
+				
+				// Standard: +Ajaxy +Anchor
+				// http://site.com/page/#state?anchor=top&a=true
+				State.anchor = anchor;
+				State.querystring = querystring;
+				State.hash = hash;
+				State.state = hash+(querystring ? '?'+querystring : '');
+				State.locationShort = base_url+'#'+State.state;
+				State.location = root_url+State.locationShort;
+				
+				// Raw: +Ajaxy -Anchor
+				// http://site.com/page/#state?a=true
+				State.raw.anchor = '';
+				State.raw.querystring = State.querystring.replace(RegExp('&?'+anchor_param_name+'=[a-zA-Z0-9-_]+','gi'),'').replace(/^&+/g,'');
+				State.raw.hash = State.hash;
+				State.raw.state = State.hash+(State.raw.querystring ? '?'+State.raw.querystring : '');
+				State.raw.locationShort = base_url+(State.raw.state ? '#'+State.raw.state : '');
+				State.raw.location = root_url+State.raw.locationShort;
+				
+				// Vanilla: -Ajaxy +Anchor
+				// http://site.com/page/?a=true#top
+				State.vanilla.anchor = State.anchor;
+				State.vanilla.querystring = State.raw.querystring;
+				State.vanilla.hash = State.vanilla.anchor;
+				State.vanilla.state = State.vanilla.anchor;
+				State.vanilla.locationShort = base_url+State.raw.hash+(State.vanilla.querystring ? '?'+State.vanilla.querystring : '')+(State.vanilla.anchor ? '#'+State.vanilla.anchor : '');
+				State.vanilla.location = root_url+State.vanilla.locationShort;
+				
+				// Clean: -Ajaxy -Anchor
+				// http://site.com/page/?a=true
+				State.clean.anchor = '';
+				State.clean.querystring = State.raw.querystring;
+				State.clean.hash = '';
+				State.clean.state = '';
+				State.clean.locationShort = base_url+State.hash+(State.clean.querystring ? '?'+State.clean.querystring : '');
+				State.clean.location = root_url+State.clean.locationShort;
+				
+				// Return State
+				return State;
+			},
+			
+			/**
+			 * Store a State Object
+			 * @param {Object} state
+			 */
+			storeState: function ( State ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var result = true,
+					stateType = typeof (State||undefined);
+				
+				// Rebuild State
+				Ajaxy.rebuildState(State);
+				
+				// Fetch
+				if ( stateType === 'object' && typeof State.state === 'string' ) {
+					result = Ajaxy.States[State.state] = State;
+				}
+				else {
+					window.console.error('Ajaxy.storeState: Unknown State Format', [this, arguments]);
+					window.console.trace();
+					result = false;
+				}
+			
+				// Return result
+				return result;
+			},
+			
+			/**
+			 * Compare two States with each other
+			 * @param {State} newState
+			 * @param {State} oldState
+			 * @return {Boolean}
+			 */
+			statesEquivalent: function(newState, oldState) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare
+				var result = false;
+				
+				// Check for Forms
+				if ( newState.isForm || oldState.isForm ) {
+					// If we are a form, we are always new
+					result = false;
+				}
+				// Check State Variables
+				else if ( newState.state||false ) {
+					// Cycle through the aliases for the state
+					var aliases = Ajaxy.aliases[newState.hash]||[newState.hash];
+					$.each(aliases,function(i,alias){
+						// Compare Aliases State with Old State
+						if ( alias === oldState.hash && newState.raw.querystring === oldState.raw.querystring ) {
+							// We have found a match, don't care for anchor
+							result = true;
+							return false; // break
+						}
+					});
+				}
+				
+				// Return result
+				return result;
+			},
+			
+			/**
+			 * Function which fires once a state has completed it's cycle
+			 * @param {Object} State
+			 * @param {Element|undefined} $content
+			 * @param {Object|undefined} options
+			 */
 			stateCompleted: function(State,$content,options){
 				var Ajaxy = $.Ajaxy;
 				
@@ -1254,6 +1163,193 @@
 					// ScrollTo the content
 					$content.ScrollTo(config.scrollto_options);
 				}
+				
+				// Return true
+				return true;
+			},
+			
+			
+			// ====================================================
+			// Actions
+			
+			
+			/**
+			 * Refresh
+			 */
+			refresh: function(){
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				// Go
+				return Ajaxy.go(History.getHash());
+			},
+		
+			
+			/**
+			 * Perform an Ajaxy Request
+			 * @param {String|Object} UserState
+			 */
+			go: function ( UserState ) {
+				var Ajaxy = $.Ajaxy; var History = $.History;
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go:', [this, arguments]);
+			
+				// --------------------------
+				
+				// Build State
+				var State = Ajaxy.buildState(UserState);
+				
+				// Store it
+				Ajaxy.storeState(State);
+			
+				// --------------------------
+				
+				// Trigger state
+				switch ( State.mode ) {
+					case 'silent':
+						// Don't log
+						// Trigger manually
+						Ajaxy.stateChange(State.state)
+						break;
+						
+					case 'ignore':
+						// Ignore the State
+						Ajaxy.ignoredStates[State.vanilla.state] = State;
+						// Redirect the browser
+						document.location = State.vanilla.location;
+						break;
+						
+					case 'postpone':
+						// Redirect the browser
+						document.location = State.location;
+						break;
+						
+					case 'default':
+					default:
+						// Log the history
+						// Trigger automaticly
+						History.go(State.state);
+						break;
+				}
+				
+				// --------------------------
+				
+				// Return true
+				return true;
+			},
+			
+			/**
+			 * Trigger the action for the particular controller
+			 * @param {String} controller
+			 * @param {String} action
+			 * @param {Object} State
+			 */
+			trigger: function ( controller, action, state ) {
+				var Ajaxy = $.Ajaxy;
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.trigger: ', [this, arguments]);
+				
+				// Prepare
+				var i, n, list, call_generic = true;
+				
+				// Check Input
+				if ( !controller ) {
+					window.console.warn('Ajaxy.trigger: No controller was passed, reset to _generic.', [this, arguments]);
+					controller = '_generic';
+				}
+				
+				// --------------------------
+				// Fetch
+				
+				// Fetch Controller
+				var Controller = Ajaxy.getController(controller);
+				
+				// Fetch Controller Action
+				var ControllerAction = Ajaxy.getControllerAction(controller,action,false);
+				
+				// Fetch the State
+				var State = Ajaxy.getState(state,true),
+					state = State.state||undefined;
+				
+				// --------------------------
+				// Checks
+				
+				// Check Controller
+				if ( typeof Controller === 'undefined' ) {
+					// No Controller
+					window.console.error('Ajaxy.trigger: Controller does not exist', [this, arguments]);
+					window.console.trace();
+					if ( controller !== '_generic' ) {
+						Ajaxy.trigger('_generic', 'error', State);
+					}
+					return false;
+				}
+				
+				// Check Controller Action
+				if ( typeof ControllerAction === 'undefined' ) {
+					// Check Action Type
+					if ( action === 'refresh' ) {
+						// Forward to Response
+						window.console.warn('Ajaxy.trigger: Controller Action ['+controller+'].['+action+'] does not exist. Defaulting to ['+controller+'].['+action+'] Action.', [this, arguments]);
+						return Ajaxy.trigger(controller, 'response', State);
+					}
+					else {
+						// No Action
+						if ( controller === '_generic' ) {
+							window.console.error('Ajaxy.trigger: Controller Action ['+controller+'].['+action+'] does not exist.', [this, arguments]);
+							window.console.trace();
+						}
+						else {
+							window.console.warn('Ajaxy.trigger: Controller Action ['+controller+'].['+action+'] does not exist. Defaulting to [_generic].['+action+'] Action.', [this, arguments]);
+							Ajaxy.trigger('_generic', action, State);
+						}
+						return false;
+					}
+				}
+				
+				// --------------------------
+				// Prepare Action
+				
+				// Generate Action
+				var Action = $.extend(true,{},Ajaxy.defaults.Action,{
+					'action':action,
+					'controller':controller,
+					'Controller':Controller,
+					'state':state,
+					'State':State
+				});
+				
+				// Setup up the Trigger + Forward Actions
+				Action.forward = Action.trigger = function(_controller, _action, _state){
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.Action.trigger:', [this, arguments]);
+					
+					// Prepare
+					_controller = _controller||controller;
+					_action = _action||action;
+					_state = _state||state;
+					
+					// Trigger
+					Ajaxy.trigger(_controller, _action, _state);
+					
+					// Return true
+					return true;
+				};
+				
+				// --------------------------
+				// Fire
+				
+				// Fire the ControllerAction Handler
+				var result = ControllerAction.apply(Action, []);
+				
+				// Should we continue to Propagate through
+				if ( Action.propagate === false ) {
+					// Break
+					call_generic = false;
+				}
+				
+				// Fire generic?
+				if ( call_generic && controller !== '_generic' ) {
+					// Fire generic
+					Action.forward('_generic');
+				}
+				
+				// --------------------------
 				
 				// Return true
 				return true;
@@ -1356,7 +1452,7 @@
 				
 				// Prepare the State
 				State.controller = controller;
-				State.Request.url = (State.Request.url || State.vanilla.locationShort);
+				State.Request.url = (State.Request.url || State.clean.location);
 				
 				// Store the State (in case it hasn't been stored yet - eg. we came through somewhere else other than go)
 				Ajaxy.storeState(State);
@@ -1527,8 +1623,8 @@
 				// --------------------------
 				
 				// Handle form if need be
-				if ( State.form ) {
-					var $form = $(State.form);
+				if ( State.isForm ) {
+					var $form = $(State.el);
 					
 					// Determine form type
 					var enctype = $form.attr('enctype');
@@ -1609,22 +1705,6 @@
 				return result;
 			},
 			
-			/**
-			 * Convert a HTML document into one compatiable with jQuery
-			 * Will remove doctype, and convert html,head,body,title,meta elements to divs.
-			 * @param {String} html
-			 */
-			htmlCompat: function(html){
-				var result = String(html)
-					.replace(/<\!DOCTYPE[^>]*>/i, '')
-					.replace(/<(html|head|body|title|meta)/gi,'<div id="ajaxy-$1"')
-					.replace(/<\/(html|head|body|title|meta)/gi,'</div')
-				;
-				
-				// Return result
-				return result;
-			},
-		
 			/**
 			 * Wrapper for Ajaxy Request
 			 * @param {Object} data
@@ -1766,20 +1846,11 @@
 				return $.ajax(request);
 			},
 			
-			/**
-			 * Handler for a stateChange
-			 * @param {Object} state
-			 */
-			stateChange: function ( state ) {
-				var Ajaxy = $.Ajaxy; var History = $.History;
 			
-				// Perform the Request
-				Ajaxy.request(state);
-			},
-		
-			// --------------------------------------------------
+			// ====================================================
 			// Constructors
-		
+			
+			
 			/**
 			 * Configure Ajaxy
 			 * @param {Object} options
@@ -1897,59 +1968,15 @@
 				});
 				
 				// Bind the Controllers
-				Ajaxy.bind(Controllers);
-				
-				// We are now Configured
-				Ajaxy.configured = true;
+				Ajaxy.addControllers(Controllers);
 				
 				// Fire the Configured Promise
-				Ajaxy.onReady();
+				Ajaxy.onConfigured(true);
 				
 				// --------------------------
 				
 				// Return true
 				return true;
-			},
-			
-			/**
-			 * Bind a Function to the Ajaxy onReady Promise
-			 * We use promise as the function will fire if the event was already fired as it is still true
-			 * @param {Function} handler [optional]
-			 */
-			onReady: function(handler){
-				var Ajaxy = $.Ajaxy;
-				
-				// --------------------------
-				
-				// Handle
-				if ( typeof handler === 'undefined' ) {
-					// Check
-					if ( Ajaxy.configured && Ajaxy.onReadyHandlers.length ) {
-						// Fire the handlers
-						$.each(Ajaxy.onReadyHandlers, function(i,handler){
-							handler.call(Ajaxy);
-						});
-						// Clear the handlers
-						Ajaxy.onReadyHandlers = [];
-					}
-					// Else do nothing
-				}
-				else if ( typeof handler === 'function' ) {
-					// Check
-					if ( Ajaxy.configured ) {
-						// Fire the event handler
-						handler.call(Ajaxy);
-					}
-					else {
-						// Add to the handlers
-						Ajaxy.onReadyHandlers.push(handler);
-					}
-				}
-				
-				// --------------------------
-				
-				// Chain
-				return Ajaxy;
 			},
 			
 			/**
@@ -1962,10 +1989,10 @@
 				// --------------------------
 				
 				// Check if we've been constructed
-				if ( Ajaxy.constructed ) {
+				if ( Ajaxy.isConstructed ) {
 					return;
 				} else {
-					Ajaxy.constructed = true;
+					Ajaxy.isConstructed = true;
 				}
 				
 				// --------------------------
@@ -1991,11 +2018,30 @@
 					$.fn[key] = fn;
 				});
 				
-				// Bind onReady Function
+				// --------------------------
+				// Setup Promises
+				
+				// Bind DomReady Handler
+				$(function(){
+					// Fire DocumentReady Promise
+					Ajaxy.onDocumentReady(true);
+				});
+				
+				// Bind Ready Handler
 				Ajaxy.onReady(function(){
-					// Bind onDocumentReady Functions
-					$(function(){
-						Ajaxy.domReady();
+					// Auto ajaxify?
+					if ( Ajaxy.options.auto_ajaxify ) {
+						$('body').ajaxify();
+					}
+					// ^ this is here as well as ajaxifyController/bind as ajaxifyController will only do that controller's selector, instead of all ajaxy links
+				});
+				
+				// Bind Configured Handler
+				Ajaxy.onConfigured(function(){
+					// Bind DocumentReady Handler
+					Ajaxy.onDocumentReady(function(){
+						// Fire Ready Promise
+						Ajaxy.onReady(true);
 					});
 				});
 				
@@ -2005,20 +2051,31 @@
 				return true;
 			},
 		
+			
+			// ====================================================
+			// Ajaxify
+			
 			/**
-			 * Perform any DOM manipulation
+			 * Ajaxify a particullar controller
+			 * @param {String} controller
 			 */
-			domReady: function ( ) {
-				// We are good
+			ajaxifyController: function(controller) {
 				var Ajaxy = $.Ajaxy;
 				
 				// --------------------------
 				
-				// Auto ajaxify?
-				if ( Ajaxy.options.auto_ajaxify ) {
-					$('body').ajaxify();
+				// Fetch Controller
+				var Controller = Ajaxy.getController(controller);
+				
+				// Do selector
+				if ( Controller && (Controller.selector||false) ) {
+					// We have a selector
+					$(function(){
+						// Onload
+						var $els = $(Controller.selector);
+						$els.data('ajaxy-controller',controller).addAjaxy();
+					});
 				}
-				// ^ this is here as well as ajaxifyController/bind as ajaxifyController will only do that controller's selector, instead of all ajaxy links
 				
 				// --------------------------
 				
@@ -2072,8 +2129,9 @@
 				/**
 				 * Add the Ajaxy handlers
 				 * Eg. $('#id').addAjaxy();
+				 * @param {String|undefined} controller
 				 */
-				addAjaxy: function(){
+				addAjaxy: function(controller){
 					var Ajaxy = $.Ajaxy;
 					
 					// Prepare
@@ -2082,6 +2140,14 @@
 					// Adjust
 					if ( $el.is('form,a') ) {
 						$el.addClass('ajaxy');
+					}
+					
+					// Add Controller Classname
+					if ( controller ) {
+						var Controller = Ajaxy.getController(controller);
+						if ( Controller.classname ) {
+							$el.addClass(Controller.classname);
+						}
 					}
 					
 					// Add the onclick handler for ajax compatiable links
@@ -2123,34 +2189,6 @@
 			},
 			
 			/**
-			 * Ajaxify a particullar controller
-			 * @param {String} controller
-			 */
-			ajaxifyController: function(controller) {
-				var Ajaxy = $.Ajaxy;
-				
-				// --------------------------
-				
-				// Fetch Controller
-				var Controller = Ajaxy.getController(controller);
-				
-				// Do selector
-				if ( Controller && (Controller.selector||false) ) {
-					// We have a selector
-					$(function(){
-						// Onload
-						var $els = $(Controller.selector);
-						$els.data('ajaxy-controller',controller).addAjaxy();
-					});
-				}
-				
-				// --------------------------
-				
-				// Return true
-				return true;
-			},
-			
-			/**
 			 * Ajaxify Helpers for particular types of elements
 			 */
 			ajaxifyHelpers: {
@@ -2176,7 +2214,7 @@
 						'controller': controller,
 						'log': log,
 						'anchor': anchor,
-						'a': this
+						'el': this
 					});
 					
 					// --------------------------
@@ -2213,7 +2251,7 @@
 					// Perform the request
 					Ajaxy.go({
 						'state': state,
-						'form':	this
+						'el': this
 					});
 					
 					// --------------------------
@@ -2223,6 +2261,93 @@
 					event.preventDefault();
 					return false;
 				}
+			},
+			
+			
+			// ====================================================
+			// Helpers
+			
+			/**
+			 * Convert a HTML document into one compatiable with jQuery
+			 * Will remove doctype, and convert html,head,body,title,meta elements to divs.
+			 * @param {String} html
+			 */
+			htmlCompat: function(html){
+				var result = String(html)
+					.replace(/<\!DOCTYPE[^>]*>/i, '')
+					.replace(/<(html|head|body|title|meta)/gi,'<div id="ajaxy-$1"')
+					.replace(/<\/(html|head|body|title|meta)/gi,'</div')
+				;
+				
+				// Return result
+				return result;
+			},
+			
+			// ====================================================
+			// Events
+			
+			/**
+			 * Handler for a stateChange
+			 * @param {Object} state
+			 */
+			stateChange: function ( state ) {
+				var Ajaxy = $.Ajaxy; var History = $.History;
+			
+				// Perform the Request
+				Ajaxy.request(state);
+			},
+			
+			/**
+			 * Handle the Configured Promise
+			 * We use promise as the function will fire if the event was already fired as it is still true
+			 * @param {mixed} arguments
+			 */
+			onConfigured: function(){
+				var Ajaxy = this;
+				
+				// Handle Promise
+				return $.promise({
+					'object': Ajaxy,
+					'handlers': 'onConfiguredHandlers',
+					'flag': 'isConfigured',
+					'arguments': arguments
+				});
+			},
+			
+			/**
+			 * Handle the DocumentReady Promise
+			 * We use promise as the function will fire if the event was already fired as it is still true
+			 * @param {mixed} arguments
+			 */
+			onDocumentReady: function(handler){
+				// Prepare
+				var Ajaxy = this;
+				
+				// Handle Promise
+				return $.promise({
+					'object': Ajaxy,
+					'handlers': 'onDocumentReadyHandlers',
+					'flag': 'isDocumentReady',
+					'arguments': arguments
+				});
+			},
+			
+			/**
+			 * Handle the Ready Promise
+			 * We use promise as the function will fire if the event was already fired as it is still true
+			 * @param {mixed} arguments
+			 */
+			onReady: function(handler){
+				// Prepare
+				var Ajaxy = this;
+				
+				// Handle Promise
+				return $.promise({
+					'object': Ajaxy,
+					'handlers': 'onReadyHandlers',
+					'flag': 'isReady',
+					'arguments': arguments
+				});
 			}
 	
 		};
