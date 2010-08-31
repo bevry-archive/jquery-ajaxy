@@ -19,7 +19,7 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.6.0-dev
+ * @version 1.6.0-beta
  * @date August 31, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
@@ -35,7 +35,7 @@ Installation & Usage:
 1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-ajaxy if the demo is not included.
 
 Todo:
-- Need to add timeout for AjaxQueue. As in rare circumstances it just never pops out.
+1. Need to add timeout for AjaxQueue. As in rare circumstances it just never pops out.
 
 Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
@@ -48,7 +48,7 @@ Known Issues:
 
 Changelog:
 
-v1.6.0-dev, August 31, 2010
+v1.6.0-beta, August 31, 2010
 - Added Ajaxy form demo.
 - Added Ajaxy.onReady, Ajaxy.onDocumentReady and Ajaxy.onConfigured promises
 - Controllers should now use classname instead of selector. B/C Break.
