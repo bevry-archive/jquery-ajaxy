@@ -570,11 +570,11 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
+							var Ajaxy = $.Ajaxy, responseData = this.State.Response.data, state = this.state||'unknown';
 							// Log what is happening
-							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.response', [this,arguments], data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.response', [this,arguments]);
 							// Title
-							var title = data.title||false; // if we have a title in the response JSON
+							var title = responseData.title||false; // if we have a title in the response JSON
 							if ( !title && this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
 							if ( title ) document.title = title; // if we have a new title use it
 							// Loaded
@@ -593,10 +593,9 @@
 						 */
 						error: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
-							// Error
-							var error = data.error||data.responseText||'Unknown Error.';
-							var error_message = data.content||error;
+							var Ajaxy = $.Ajaxy, errorData = this.State.Error.data, responseData = this.State.Response.data, state = this.state||'unknown';
+							// Error Message
+							var error_message = errorData.error;
 							// Log what is happening
 							window.console.error('$.Ajaxy.Controllers._generic.error', [this, arguments], error_message);
 							// Loaded
@@ -663,14 +662,14 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state; var State = this.State;
+							var Ajaxy = $.Ajaxy, responseData = this.State.Response.data, state = this.state, State = this.State;
 							// Log what is happening
-							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', [this,arguments], data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', [this,arguments]);
 							// Adjust Menu
 							$menu.children(':has(a[href*="'+State.raw.state+'"])').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
 							var Action = this;
-							$content.html(data.content).fadeIn(400,function(){
+							$content.html(responseData.content).fadeIn(400,function(){
 								Action.documentReady($content);
 								/**
 								 * The above line calls our Action's documentReady function.

@@ -1473,13 +1473,16 @@
 					data: State.Request.data,
 					url: State.Request.url,
 					type: 'post',
-					success: function(responseData, status){
+					
+					/**
+					 * Ajaxy Request Success Handler
+					 * @param {Object} responseData (prepared by proxy)
+					 * @param {String} textStatus ["success", "notmodified"]
+					 * @param {XMLHttpRequest} XMLHttpRequest
+					 */
+					success: function(responseData, textStatus, XMLHttpRequest){
 						// Success
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.success:', [this, arguments]);
-					
-						// Prepare
-						responseData = $.extend(true,{},Ajaxy.defaults.State.Response.data,responseData);
-						responseData.Ajaxy = responseData.Ajaxy || {};
 						
 						// Check for redirect
 						if ( responseData.Ajaxy.redirected ) {
@@ -1504,7 +1507,8 @@
 							return false; // don't care for this
 						}
 						
-						// Prepare
+						// Apply Data
+						State.Request.XMLHttpRequest = XMLHttpRequest;
 						State.Response.data = responseData;
 						State.Error.data = {};
 						
@@ -1536,18 +1540,20 @@
 						// Trigger handler
 						return Ajaxy.trigger(controller, 'response', State);
 					},
-					error: function(XMLHttpRequest, textStatus, errorThrown, responseData){
+					
+					/**
+					 * Ajaxy Request Error Handler
+					 * This could come from an error with the ajax request, a malformed response, or a response which contains an error.
+					 * @param {XMLHttpRequest} XMLHttpRequest
+					 * @param {String} textStatus ["timeout", "error", "notmodified" and "parsererror"]
+				 	 * @param {String|undefined} errorThrown (only specified if textStatus==="parseerror")
+					 * @param {Object} errorData (prepared by error proxy)
+					 * @param {Object} responseData (prepared by error proxy)
+					 */
+					error: function(XMLHttpRequest, textStatus, errorThrown, errorData, responseData){
 						// Error
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.error:', [this, arguments]);
-					
-						// Prepare
-						if ( !responseData ) {
-							// Should already be handled, but in the rare case it isn't
-							responseData = {
-								responseText: XMLHttpRequest.responseText.trim()||false
-							}
-						}
-					
+						
 						// Handler queue
 						Ajaxy.ajaxQueue.shift()
 						var queueState = Ajaxy.ajaxQueue.pop();
@@ -1556,19 +1562,12 @@
 							Ajaxy.stateChange(queueState);
 							return false; // don't care for this
 						}
-					
-						// Prepare
-						var errorData = {
-							XMLHttpRequest: XMLHttpRequest,
-							textStatus: textStatus,
-							errorThrown: errorThrown
-						};
-					
-						// Prepare
+						
+						// Apply Data
 						State.Request.XMLHttpRequest = XMLHttpRequest;
 						State.Response.data = responseData;
-						State.Error.data = {};
-					
+						State.Error.data = errorData;
+						
 						// Fetch controller
 						var controller = responseData.controller || State.controller || null;
 						
@@ -1598,15 +1597,22 @@
 						return Ajaxy.trigger(controller, 'error', State);
 					},
 				
-					complete:	function ( XMLHttpRequest, textStatus ) {
+					complete: function ( XMLHttpRequest, textStatus ) {
 						// Request completed
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.complete:', [this, arguments]);
 						
-						// Set XMLHttpRequest
-						State.Request.XMLHttpRequest = XMLHttpRequest;
+						// Apply XMLHttpRequest
+						if ( XMLHttpRequest ) {
+							State.Request.XMLHttpRequest = XMLHttpRequest;
+						}
 						
-						// Ignore for some reason
-						if ( false && this.url !== XMLHttpRequest.channel.name ) {
+						// Apply textStatus
+						if ( textStatus ) {
+							State.Request.textStatus = textStatus;
+						}
+						
+						/* Ignore for some reason
+						if ( this.url !== XMLHttpRequest.channel.name ) {
 							// A redirect was performed, set a option so we know what to do
 							var newState = Ajaxy.extractState(XMLHttpRequest.channel.name);
 							Ajaxy.redirected = {
@@ -1617,6 +1623,7 @@
 							// Update the history, not ajaxy
 							History.go(newState);
 						};
+						*/
 					}
 				};
 			
@@ -1706,6 +1713,129 @@
 			},
 			
 			/**
+			 * Prepare Response Data
+			 * @param {Object} responseData
+			 * @param {Object} params {XMLHttpRequest, textStatus}
+			 */
+			prepareResponseData: function ( data, params ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare responseData
+				var responseData = {};
+				
+				// Prepare responseText
+				var responseText = params.XMLHttpRequest.responseText||false;
+				if ( responseText ) {
+					responseText = String(responseText).trim();
+				}
+				if ( !responseText ) {
+					responseText = false;
+				}
+				
+				// Prepare responseData
+				if ( typeof data === 'object' ) {
+					// We have good responseData
+					responseData = data;
+				}
+				else {
+					// Attempt Salvation through ResponseText
+					if ( typeof data === 'string' ) {
+						// Attempt conversion using data
+						responseText = data.trim();
+					}
+					if ( !responseText ) {
+						responseText = params.XMLHttpRequest.responseText||'';
+						if ( responseText ) {
+							responseText = String(responseText).trim();
+						}
+					}
+					
+					// Attempt Conversion to JSON
+					try {
+						// Attempt
+						responseData = $.parseJSON(responseText);
+					}
+					// Invalid JSON
+					catch ( event ) {
+						// We can now attempt salvation through text
+						if ( !Ajaxy.options.support_text ) {
+							window.console.error('Ajaxy.prepareResponseData: Response has been received as text, however support_text is set to false.', [this,arguments]);
+							window.console.trace();
+							return false;
+						}
+						
+						// Extract details
+						var html = Ajaxy.htmlCompat(responseText),
+							$html = $(html),
+							$head = $html.find('#ajaxy-head'),
+							$body = $html.find('#ajaxy-body'),
+							$title = $html.find('#ajaxy-title'),
+							$controller = $html.find('#ajaxy-controller'), /* special case support for controller in html pages */
+							title = ($title.length ? $title.text() : ''),
+							head = ($head.length ? $head.htmlAndSelf() : ''),
+							body = ($body.length ? $body.htmlAndSelf() : ''),
+							content = ($body.length ? $body.html() : html),
+							controller = ($controller.length ? $controller.text().trim() : null);
+						
+						// Create from Text
+						responseData = {
+							"controller": controller,
+							"html": html,
+							"title": title,
+							"head": head,
+							"body": body,
+							"content": content
+						};
+					}
+				}
+				
+				// Apply responseText
+				if ( !(responseData.responseText||false) ) {
+					responseData.responseText = responseText;
+				}
+				
+				// Apply defaults
+				responseData = $.extend(true,{},Ajaxy.defaults.State.Response.data,responseData||{});
+				responseData.Ajaxy = responseData.Ajaxy||{};
+				responseData.Ajaxy.redirected = responseData.Ajaxy.redirected||false;
+				
+				// Return responseData
+				return responseData;
+			},
+			
+			/**
+			 * Prepare Error Data
+			 * @param {Object} errorData
+			 * @param {Object} params {XMLHttpRequest, textStatus, errorThrown}
+			 */
+			prepareErrorData: function ( errorData, params ) {
+				var Ajaxy = $.Ajaxy;
+				
+				// Prepare errorData
+				if ( typeof errorData !== 'object' ) {
+					errorData = {};
+				}
+				
+				// Apply textStatus
+				if ( !(errorData.textStatus||false) ) {
+					errorData.textStatus = params.textStatus;
+				}
+				
+				// Apply errorThrown
+				if ( !(errorData.errorThrown||false) ) {
+					errorData.errorThrown = params.errorThrown;
+				}
+				
+				// Apply error
+				if ( !(errorData.error||false) ) {
+					errorData.error = params.errorThrown || ((params.XMLHttpRequest.status||'Error')+': '+(params.XMLHttpRequest.statusText||'Unknown'));
+				}
+				
+				// Return errorData
+				return errorData;
+			},
+			
+			/**
 			 * Wrapper for Ajaxy Request
 			 * @param {Object} data
 			 */
@@ -1718,17 +1848,17 @@
 				// Move handlers into callbacks
 				// Use defaults if they do not exist
 				var callbacks = {};
-				callbacks.success = options.success || function (data, status) {
+				callbacks.success = options.success || function (responseData, textStatus, XMLHttpRequest) {
 					// Success
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.callbacks.success:', [this, arguments]);
 					// Handle
 					$('.error').empty();
 				};
-				callbacks.error = options.error || function (XMLHttpRequest, textStatus, errorThrown, data) {
+				callbacks.error = options.error || function (XMLHttpRequest, textStatus, errorThrown, errorData, responseData) {
 					// Error
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.callbacks.error:', [this, arguments]);
 					// Handle
-					$('.error').html(errorThrown);
+					$('.error').html(errorData.error);
 				};
 				callbacks.complete = options.complete || function(XMLHttpRequest, textStatus){
 					// Request completed
@@ -1749,97 +1879,77 @@
 				};
 				$.extend(true,request,options);
 				
-				// Apply Handlers to Request
-				request.success = function(responseText, status){
+				/**
+				 * Ajax Success Handler
+				 * @param {Object|String} data (data returned from the server formatted according to the 'dataType' parameter)
+				 * @param {String} textStatus ["success", "notmodified"]
+				 * @param {XMLHttpRequest} XMLHttpRequest
+				 */
+				request.success = function(responseData, textStatus, XMLHttpRequest){
 					// Success
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.request.success:', [this, arguments]);
-					var Response = {},
-						responseData = {};
-					
-					// Parse
-					if ( typeof responseText !== 'object' && Ajaxy.options.support_text && responseText ) {
-						// Attempt JSON
-						try {
-							// Attempt
-							responseData = $.parseJSON(responseText);
-						}
-						// Invalid JSON
-						catch (e) {
-							// Extract details
-							var html = Ajaxy.htmlCompat(responseText),
-								$html = $(html),
-								$head = $html.find('#ajaxy-head'),
-								$body = $html.find('#ajaxy-body'),
-								$title = $html.find('#ajaxy-title'),
-								$controller = $html.find('#ajaxy-controller'), /* special case support for controller in html pages */
-								title = ($title.length ? $title.text() : ''),
-								head = ($head.length ? $head.htmlAndSelf() : ''),
-								body = ($body.length ? $body.htmlAndSelf() : ''),
-								content = ($body.length ? $body.html() : html),
-								controller = ($controller.length ? $controller.text().trim() : null);
-							
-							// Create
-							responseData = {
-								"controller": controller,
-								"responseText": responseText,
-								"html": html,
-								"title": title,
-								"head": head,
-								"body": body,
-								"content": content
-							};
-						}
-					}
-					else {
-						// Using JSON
-						responseData = responseText;
-					}
-					
-					// Apply
-					Response.data = responseData;
 					
 					// Debug
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.success:', [this, arguments]);
 					
-					// Check
-					if ( typeof responseData.controller === 'undefined' && ((typeof responseData.success !== 'undefined' && !responseData.success) || (typeof responseData.error !== 'undefined' && responseData.error)) ) {
+					// Prepare responseData
+					responseData = Ajaxy.prepareResponseData(responseData, {
+						'textStatus': textStatus,
+						'XMLHttpRequest': XMLHttpRequest
+					});
+					
+					// Check for Error
+					var error = false;
+					switch ( true ) {
+						case Boolean(typeof responseData.controller === 'undefined'):
+							error = 'No controller specified';
+							break;
+						
+						case Boolean(typeof responseData.success !== 'undefined' && !responseData.success):
+						 	error = 'Success value is set false';
+							break;
+						
+						case Boolean(typeof responseData.error !== 'undefined' && responseData.error):
+							error = 'Custom Error: '+String(responseData.error);
+							break;
+					}
+					if ( error ) {
 						// Error on simple Ajax request, not Ajaxy
-						return callbacks.error.apply(this, [null, status, responseData.error||true, responseData]);
+						return request.error.apply(this, [XMLHttpRequest, textStatus, undefined, {'error':error}, responseData]);
 					}
 					
 					// Fire
-					return callbacks.success.apply(this, [responseData, status]);
+					return callbacks.success.apply(this, [responseData, textStatus, XMLHttpRequest]);
 				};
-				request.error = function(XMLHttpRequest, textStatus, errorThrown) {
+				
+				/**
+				 * Ajax Error Handler
+				 * @param {XMLHttpRequest} XMLHttpRequest
+				 * @param {String} textStatus ["timeout", "error", "notmodified" and "parsererror"]
+				 * @param {String|undefined} errorThrown (only specified if textStatus==="parseerror", or if we came from request.success)
+				 * @param {Object} errorData (prepared by success proxy)
+				 * @param {Object} responseData (prepared by success proxy)
+				 */
+				request.error = function(XMLHttpRequest, textStatus, errorThrown, errorData, responseData) {
 					// Error
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.request.error:', [this, arguments]);
-				
-					// Prepare Response
-					var responseText = XMLHttpRequest.responseText||false;
-					if ( responseText ) responseText = responseText.trim();
-					if ( !responseText ) responseText = false;
-				
-					// Prepare Data
-					var responseData = {
-						error: errorThrown||true,
-						responseText: responseText
-					};
 					
-					// Check if Response
-					if ( responseText ) {
-						try {
-							// Try JSON
-							responseData = $.parseJSON(responseText);
-						} catch (e) {
-							// Not Valid JSON
-						} finally {
-							// Is Valid, so Move
-							return this.success.apply(this, [responseData, textStatus]);
-						}
-					}
+					// Prepare responseData
+					responseData = Ajaxy.prepareResponseData(responseData,{
+						'XMLHttpRequest': XMLHttpRequest,
+						'errorThrown': errorThrown,
+						'textStatus': textStatus
+					});
+					
+					// Prepare errorData
+					errorData = Ajaxy.prepareErrorData(errorData,{
+						'XMLHttpRequest': XMLHttpRequest,
+						'errorThrown': errorThrown,
+						'textStatus': textStatus
+					});
 					
 					// Apply
-					return callbacks.error.apply(this, [XMLHttpRequest, textStatus, errorThrown, responseData]);
+					return callbacks.error.apply(this, [XMLHttpRequest, textStatus, errorData.errorThrown, errorData, responseData]);
 				};
 			
 				// Send the Request

@@ -36,6 +36,7 @@ Installation & Usage:
 
 Todo:
 1. Need to add timeout for AjaxQueue. As in rare circumstances it just never pops out.
+2. Update demo for v1.6.1-dev changes. Such as add a page error action.
 
 Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
@@ -48,7 +49,14 @@ Known Issues:
 
 Changelog:
 
+v1.6.1-dev, September 01, 2010
+- Updated response and error proxies. This brings forth a B/C break if you were using the response action for errors. Now the error action contains responseData.
+- Error information is now a lot more precise and easier to debug.
+- Updated demo for new response and error handling.
+- This release is a minor B/C break, please refer to the demo code for the new error action.
+
 v1.6.0-beta, August 31, 2010
+- Added aliases option.
 - Added Ajaxy form demo.
 - Added Ajaxy.onReady, Ajaxy.onDocumentReady and Ajaxy.onConfigured promises
 - Controllers should now use classname instead of selector. B/C Break.
