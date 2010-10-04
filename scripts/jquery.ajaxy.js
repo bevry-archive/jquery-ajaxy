@@ -2013,8 +2013,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.6.0
-	 * @date August 31, 2010
+	 * @version 1.6.1
+	 * @date October 04, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
 	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
@@ -2555,6 +2555,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// ^ we do not use root url here as google doesn't want that
 					//   but it does want the base url here
 					//   http://www.google.com/support/googleanalytics/bin/answer.py?answer=55521
+				}
+				
+				// Inform ReInvigorate of a state change
+				if ( typeof reinvigorate !== 'undefined' && typeof reinvigorate.ajax_track !== 'undefined' ) {
+					reinvigorate.ajax_track(url);
 				}
 				
 				// Done

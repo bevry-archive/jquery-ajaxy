@@ -29,6 +29,7 @@
 }
 #content {
 	padding:1em;
+	background:white;
 }
 #current {
 	margin:0;
@@ -37,6 +38,10 @@
 	border-top: 5px solid #DDD;
 }
 
-:target,.target {
+/* Must be on seperate lines for Internet Explorer */
+:target {
+	background:yellow;
+}
+.target {
 	background:yellow;
 }

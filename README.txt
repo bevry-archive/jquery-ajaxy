@@ -19,8 +19,8 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.6.0-beta
- * @date August 31, 2010
+ * @version 1.6.1-beta
+ * @date October 04, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
  * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -36,7 +36,6 @@ Installation & Usage:
 
 Todo:
 1. Need to add timeout for AjaxQueue. As in rare circumstances it just never pops out.
-2. Update demo for v1.6.1-dev changes. Such as add a page error action.
 
 Options:
 1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
@@ -48,12 +47,14 @@ Known Issues:
 ----
 
 Changelog:
-
-v1.6.1-dev, September 01, 2010
+v1.6.1-beta, October 04, 2010
+- Added a 404 error page demo.
+- Got yellow background working for targets in IE.
 - Updated response and error proxies. This brings forth a B/C break if you were using the response action for errors. Now the error action contains responseData.
 - Error information is now a lot more precise and easier to debug.
 - Updated demo for new response and error handling.
-- This release is a minor B/C break, please refer to the demo code for the new error action.
+- This release is a minor B/C break, please refer to the demo code for the new error handling and actions.
+- Added support for ReInvigorate Ajax Tracking.
 
 v1.6.0-beta, August 31, 2010
 - Added aliases option.

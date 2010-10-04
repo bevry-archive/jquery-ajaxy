@@ -74,6 +74,7 @@
 				<li><a href="./pages/coconuts.html" class="ajaxy ajaxy-page">Learn about Coconuts</a></li>
 				<li><a href="./pages/durians.html#yummy" class="ajaxy ajaxy-page">Learn about Durians</a></li>
 				<li><a href="./pages/eggplants.php" class="ajaxy ajaxy-page">Have your say about Eggplants</a></li>
+				<li><a href="./pages/404.html" class="ajaxy ajaxy-page">A page which does not exist</a></li>
 			</ul>
 			<div id="result">
 				<div id="content" style="max-height:100px;overflow:auto;"></div>
@@ -192,7 +193,7 @@
 							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.request', &#91;this,arguments&#93;);
 							// Loading
 							$body.addClass('loading');
-							// Done
+							// Return true
 							return true;
 						},
 						
@@ -203,11 +204,11 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
+							var Ajaxy = $.Ajaxy, responseData = this.State.Response.data, state = this.state||'unknown';
 							// Log what is happening
-							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.response', &#91;this,arguments&#93;, data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.response', &#91;this,arguments&#93;);
 							// Title
-							var title = data.title||false; // if we have a title in the response JSON
+							var title = responseData.title||false; // if we have a title in the response JSON
 							if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
 							if ( title ) document.title = title; // if we have a new title use it
 							// Loaded
@@ -226,17 +227,21 @@
 						 */
 						error: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
-							// Error
-							var error = data.error||data.responseText||'Unknown Error.';
-							var error_message = data.content||error;
+							var Ajaxy = $.Ajaxy, errorData = this.State.Error.data, responseData = this.State.Response.data, state = this.state||'unknown';
+							// Error Message
+							var error_message = errorData.error;
 							// Log what is happening
-							window.console.error('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
+							if ( errorData.handled||false ) {
+								window.console.error('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message); // will throw exception
+							}
+							else {
+								window.console.warn('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message); // will output log
+							}
 							// Loaded
 							$body.removeClass('loading');
 							// Display State
 							$('#current').text('Our current state is: &#91;'+state+'&#93;');
-							// Done
+							// Return true
 							return true;
 						}
 					},
@@ -270,8 +275,8 @@
 						
 						/**
 						 * Our Page Controller's Request Action
-						 * This just like our Request Action in the Generic Controller will be fired for all Ajaxy requests.
-						 * However this will only be fired for those Ajaxy requests which are known to be for the Page controller.
+						 * This just like our Request Action in the Generic Controller,
+						 * however this will only be fired for those Ajaxy requests which are known to be for the Page controller.
 						 * For instance, we could have another Controller called "Subpage", if a request is determined to be for that controller, their request action will fire and not this one.
 						 * We use this to prepare our tab area for incoming content, so we deselect all items in the tab menu, and fade out the content.
 						 */
@@ -296,14 +301,14 @@
 						 */
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state; var State = this.State;
+							var Ajaxy = $.Ajaxy, responseData = this.State.Response.data, state = this.state, State = this.State;
 							// Log what is happening
-							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', &#91;this,arguments&#93;, data, state);
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', &#91;this,arguments&#93;);
 							// Adjust Menu
 							$menu.children(':has(a&#91;href*="'+State.raw.state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
 							var Action = this;
-							$content.html(data.content).fadeIn(400,function(){
+							$content.html(responseData.content).fadeIn(400,function(){
 								Action.documentReady($content);
 								/**
 								 * The above line calls our Action's documentReady function.
@@ -318,6 +323,32 @@
 								 *    This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look:
 								 *    http://www.balupton.com/projects/jquery-sparkle/
 								 */
+							});
+							// Return true
+							return true;
+						},
+						
+						/**
+						 * The Error Action
+						 * This just like our Error Action in the Generic Controller,
+						 * however this will only be fired for those Ajaxy errors which are known to be for the Page controller.
+						 * For instance, we could have 404 error on one of our pages which directs here, allowing us to display the 404 page in the appropriate area and not leave the user in the dark.
+						 */
+						error: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy, errorData = this.State.Error.data, responseData = this.State.Response.data, state = this.state||'unknown';
+							// Error Message
+							var error_message = errorData.error;
+							// Log what is happening
+							window.console.warn('$.Ajaxy.Controllers.page.error', &#91;this, arguments&#93;, error_message);
+							// Mark the Error as Handled so we don't raise an error in our generic controller
+							errorData.handled = true;
+							// Deselect Menu Items
+							$menu.find('.active').removeClass('active');
+							// Display our Error Page
+							var Action = this;
+							$content.html(responseData.content).fadeIn(400,function(){
+								Action.documentReady($content);
 							});
 							// Return true
 							return true;
@@ -361,17 +392,22 @@
 				'Controllers': {
 					'_generic': {
 						request: function(){
-						request: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy;
+							// Log what is happening
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.request', &#91;this,arguments&#93;);
 							// Loading
 							$body.addClass('loading');
-							// Done
+							// Return true
 							return true;
 						},
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state||'unknown';
+							var Ajaxy = $.Ajaxy, responseData = this.State.Response.data, state = this.state||'unknown';
+							// Log what is happening
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.response', &#91;this,arguments&#93;);
 							// Title
-							var title = data.title||false; // if we have a title in the response JSON
+							var title = responseData.title||false; // if we have a title in the response JSON
 							if ( !title &amp;&amp; this.state||false ) title = 'jQuery Ajaxy - '+this.state; // if not use the state as the title
 							if ( title ) document.title = title; // if we have a new title use it
 							// Loaded
@@ -383,17 +419,21 @@
 						},
 						error: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
-							// Error
-							var error = data.error||data.responseText||'Unknown Error.';
-							var error_message = data.content||error;
+							var Ajaxy = $.Ajaxy, errorData = this.State.Error.data, responseData = this.State.Response.data, state = this.state||'unknown';
+							// Error Message
+							var error_message = errorData.error;
 							// Log what is happening
-							window.console.error('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message);
+							if ( errorData.handled||false ) {
+								window.console.error('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message); // will throw exception
+							}
+							else {
+								window.console.warn('$.Ajaxy.Controllers._generic.error', &#91;this, arguments&#93;, error_message); // will output log
+							}
 							// Loaded
 							$body.removeClass('loading');
 							// Display State
 							$('#current').text('Our current state is: &#91;'+state+'&#93;');
-							// Done
+							// Return true
 							return true;
 						}
 					},
@@ -403,6 +443,8 @@
 						request: function(){
 							// Prepare
 							var Ajaxy = $.Ajaxy;
+							// Log what is happening
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.request', &#91;this,arguments&#93;);
 							// Adjust Menu
 							$menu.find('.active').removeClass('active');
 							// Hide Content
@@ -412,12 +454,33 @@
 						},
 						response: function(){
 							// Prepare
-							var Ajaxy = $.Ajaxy; var data = this.State.Response.data; var state = this.state; var State = this.State;
+							var Ajaxy = $.Ajaxy, responseData = this.State.Response.data, state = this.state, State = this.State;
+							// Log what is happening
+							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', &#91;this,arguments&#93;);
 							// Adjust Menu
 							$menu.children(':has(a&#91;href*="'+State.raw.state+'"&#93;)').addClass('active').siblings('.active').removeClass('active');
 							// Show Content
 							var Action = this;
-							$content.html(data.content).fadeIn(400,function(){
+							$content.html(responseData.content).fadeIn(400,function(){
+								Action.documentReady($content);
+							});
+							// Return true
+							return true;
+						},
+						error: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy, errorData = this.State.Error.data, responseData = this.State.Response.data, state = this.state||'unknown';
+							// Error Message
+							var error_message = errorData.error;
+							// Log what is happening
+							window.console.warn('$.Ajaxy.Controllers.page.error', &#91;this, arguments&#93;, error_message);
+							// Mark the Error as Handled so we don't raise an error in our generic controller
+							errorData.handled = true;
+							// Deselect Menu Items
+							$menu.find('.active').removeClass('active');
+							// Display our Error Page
+							var Action = this;
+							$content.html(responseData.content).fadeIn(400,function(){
 								Action.documentReady($content);
 							});
 							// Return true
@@ -559,7 +622,7 @@
 							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers._generic.request', [this,arguments]);
 							// Loading
 							$body.addClass('loading');
-							// Done
+							// Return true
 							return true;
 						},
 						
@@ -597,12 +660,17 @@
 							// Error Message
 							var error_message = errorData.error;
 							// Log what is happening
-							window.console.error('$.Ajaxy.Controllers._generic.error', [this, arguments], error_message);
+							if ( errorData.handled||false ) {
+								window.console.error('$.Ajaxy.Controllers._generic.error', [this, arguments], error_message); // will throw exception
+							}
+							else {
+								window.console.warn('$.Ajaxy.Controllers._generic.error', [this, arguments], error_message); // will output log
+							}
 							// Loaded
 							$body.removeClass('loading');
 							// Display State
 							$('#current').text('Our current state is: ['+state+']');
-							// Done
+							// Return true
 							return true;
 						}
 					},
@@ -636,8 +704,8 @@
 						
 						/**
 						 * Our Page Controller's Request Action
-						 * This just like our Request Action in the Generic Controller will be fired for all Ajaxy requests.
-						 * However this will only be fired for those Ajaxy requests which are known to be for the Page controller.
+						 * This just like our Request Action in the Generic Controller,
+						 * however this will only be fired for those Ajaxy requests which are known to be for the Page controller.
 						 * For instance, we could have another Controller called "Subpage", if a request is determined to be for that controller, their request action will fire and not this one.
 						 * We use this to prepare our tab area for incoming content, so we deselect all items in the tab menu, and fade out the content.
 						 */
@@ -684,6 +752,32 @@
 								 *    This is optional as there are no dependencies with jQuery Sparkle, but it is a nifty project which is worth a look:
 								 *    http://www.balupton.com/projects/jquery-sparkle/
 								 */
+							});
+							// Return true
+							return true;
+						},
+						
+						/**
+						 * The Error Action
+						 * This just like our Error Action in the Generic Controller,
+						 * however this will only be fired for those Ajaxy errors which are known to be for the Page controller.
+						 * For instance, we could have 404 error on one of our pages which directs here, allowing us to display the 404 page in the appropriate area and not leave the user in the dark.
+						 */
+						error: function(){
+							// Prepare
+							var Ajaxy = $.Ajaxy, errorData = this.State.Error.data, responseData = this.State.Response.data, state = this.state||'unknown';
+							// Error Message
+							var error_message = errorData.error;
+							// Log what is happening
+							window.console.warn('$.Ajaxy.Controllers.page.error', [this, arguments], error_message);
+							// Mark the Error as Handled so we don't raise an error in our generic controller
+							errorData.handled = true;
+							// Deselect Menu Items
+							$menu.find('.active').removeClass('active');
+							// Display our Error Page
+							var Action = this;
+							$content.html(responseData.content).fadeIn(400,function(){
+								Action.documentReady($content);
 							});
 							// Return true
 							return true;
