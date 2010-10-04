@@ -19,7 +19,7 @@
  * - A copy of our interpretation of the license used.
  *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
  * 
- * @version 1.6.2-beta
+ * @version 1.7.0-alpha
  * @date October 04, 2010
  * @since v0.1.0-dev, July 24, 2008
  * @category jquery-plugin
@@ -48,7 +48,7 @@ Known Issues:
 
 Changelog:
 
-v1.6.2-beta, October 04, 2010
+v1.7.0-alpha, October 04, 2010
 - Fixed support for ReInvigorate Ajax Tracking.
 - Moved Tracking into Action.documentReady/Ajaxy.stateCompleted function such that ReInvigorate can correctly determine the page
 - Calling Action.documentReady is now optional, Ajaxy.stateCompleted will be automatically fired when the response and refresh triggers have finished.

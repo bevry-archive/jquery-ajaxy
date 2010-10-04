@@ -18,7 +18,7 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.6.2
+	 * @version 1.7.0
 	 * @date October 04, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
