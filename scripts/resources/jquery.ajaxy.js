@@ -18,7 +18,7 @@
 	
 	/**
 	 * jQuery Ajaxy
-	 * @version 1.6.1
+	 * @version 1.6.2
 	 * @date October 04, 2010
 	 * @since 0.1.0-dev, July 24, 2008
      * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
@@ -206,7 +206,7 @@
 					preventDefault: function(){
 						this.propagate = false;
 					},
-					documentReady: function($el,options){
+					documentReady: function($content,options){
 						var Ajaxy = $.Ajaxy; var Action = this;
 						
 						// Options
@@ -215,7 +215,9 @@
 						}
 						
 						// Default Options
-						var defaults = {};
+						var defaults = {
+							'$content': $content
+						};
 						switch ( Action.action ) {
 							case 'refresh':
 								defaults.auto_ajaxify_documentReady = 
@@ -229,8 +231,12 @@
 						// Merge with Defaults
 						var config = $.extend(true,{},defaults,options);
 						
-						// Fire Ajaxy's stateCompleted
-						return Ajaxy.stateCompleted(Action.State,$el,config);
+						// Apply config to State
+						Action.state.documentReady = true;
+						Action.state.stateCompletedConfig = config;
+						
+						// Return true
+						return true;
 					}
 				},
 				
@@ -245,6 +251,14 @@
 					el: null,
 					isLink: false,
 					isForm: false,
+					
+					// Modes
+					documentReady: false,
+					stateCompletedConfig: {},
+					stateCompleted: function(){
+						var Ajaxy = $.Ajaxy; var State = this;
+						Ajaxy.stateCompleted(State);
+					},
 					
 					// Parts
 					anchor: '',
@@ -554,9 +568,9 @@
 			
 				// Inform Google Analytics of a state change
 				if ( typeof pageTracker !== 'undefined' ) {
-					var url = State.vanilla.locationShort;
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.track', [this,arguments], [url]);
-					pageTracker._trackPageview(url);
+					var shortUrl = State.vanilla.locationShort;
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.track.analytics', [this,arguments], [shortUrl]);
+					pageTracker._trackPageview(shortUrl);
 					// ^ we do not use root url here as google doesn't want that
 					//   but it does want the base url here
 					//   http://www.google.com/support/googleanalytics/bin/answer.py?answer=55521
@@ -564,7 +578,10 @@
 				
 				// Inform ReInvigorate of a state change
 				if ( typeof reinvigorate !== 'undefined' && typeof reinvigorate.ajax_track !== 'undefined' ) {
-					reinvigorate.ajax_track(url);
+					var fullUrl = State.vanilla.location;
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.track.reinvigorate', [this,arguments], [fullUrl]);
+					reinvigorate.ajax_track(fullUrl);
+					// ^ we use the full url here as that is what reinvigorate supports
 				}
 				
 				// Done
@@ -1122,25 +1139,44 @@
 			/**
 			 * Function which fires once a state has completed it's cycle
 			 * @param {Object} State
-			 * @param {Element|undefined} $content
 			 * @param {Object|undefined} options
 			 */
-			stateCompleted: function(State,$content,options){
+			stateCompleted: function(State,options){
 				var Ajaxy = $.Ajaxy;
 				
 				// Prepare Arguments
 				if ( typeof State !== 'object' ) {
-					State = {};
+					State = {
+						documentReady: true
+					};
 				}
-				if ( !($content instanceof jQuery) || !$content.length ) {
-					$content = $(document.body);
+				
+				// Check State
+				if ( !(State.documentReady||false) ) {
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.stateCompleted: Called but not ready yet.', [this, arguments]);
 				}
+							
+				// Prepare Options
 				if ( typeof options !== 'object' ) {
 					options = {};
 				}
 				
-				// Prepare Options
-				var config = $.extend({},Ajaxy.options,options);
+				// Prepare $content
+				var $content = options.$content||null;
+				if ( !($content instanceof jQuery) || !$content.length ) {
+					$content = $(document.body);
+				}
+				
+				// Prepare Config
+				var config = $.extend({},Ajaxy.options,State.stateCompletedConfig,options);
+				
+				// Log
+				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.stateCompleted:', [this, arguments], [$content,config]);
+				
+				// Fire the analytics
+				if ( config.analytics ) {
+					Ajaxy.track(State);
+				}
 				
 				// Auto Sparkle
 				if ( config.auto_sparkle_documentReady && $.Sparkle||false ) {
@@ -1251,7 +1287,8 @@
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.trigger: ', [this, arguments]);
 				
 				// Prepare
-				var i, n, list, call_generic = true;
+				var	i, n, list,
+					call_generic = true;
 				
 				// Check Input
 				if ( !controller ) {
@@ -1349,9 +1386,19 @@
 				}
 				
 				// Fire generic?
-				if ( call_generic && controller !== '_generic' ) {
-					// Fire generic
-					Action.forward('_generic');
+				if ( controller !== '_generic' ) {
+					if ( call_generic ) {
+						// Fire generic
+						Action.forward('_generic');
+					}
+					// Fire Ajaxy's stateCompleted
+					if ( action === 'response' || action === 'refresh' ) {
+						State.documentReady = true;
+						State.stateCompleted();
+					}
+					else {
+						State.documentReady = false;
+					}
 				}
 				
 				// --------------------------
@@ -1439,11 +1486,6 @@
 					return false;
 				}
 				// We are now the current event
-			
-				// Fire the analytics
-				if ( Ajaxy.options.analytics ) {
-					Ajaxy.track(State);
-				}
 				
 				// Update the currentState
 				Ajaxy.currentState = State;

@@ -801,19 +801,45 @@
 	<script type="text/javascript" src="./scripts/modernizr-1.5.min.js"></script> 
 	<script type="text/javascript"> 
 		//<![CDATA[
-		try {
-			var pageTracker = _gat._getTracker("UA-4446117-1");
-			pageTracker._initData();
-			if ( Modernizr ) {
-				pageTracker._setCustomVar(1, "html5.boxshadow", Modernizr.boxshadow ? "yes" : "no" , 2 );
-				pageTracker._setCustomVar(2, "html5.multiplebgs", Modernizr.multiplebgs ? "yes" : "no", 2 );
-				pageTracker._setCustomVar(3, "html5.fontface", Modernizr.fontface ? "yes" : "no", 2 );
-				pageTracker._setCustomVar(4, "html5.csstransitions", Modernizr.csstransitions ? "yes" : "no", 2 );
-				pageTracker._setCustomVar(5, "html5.borderradius", Modernizr.borderradius ? "yes" : "no", 2 );
-			}
-			pageTracker._trackPageview();
-		} catch(err) {}
+		if ( String(document.location).indexOf('balupton.com') !== -1 ) {
+			try {
+				var pageTracker = _gat._getTracker("UA-4446117-1");
+				pageTracker._initData();
+				if ( Modernizr ) {
+					pageTracker._setCustomVar(1, "html5.boxshadow", Modernizr.boxshadow ? "yes" : "no" , 2 );
+					pageTracker._setCustomVar(2, "html5.multiplebgs", Modernizr.multiplebgs ? "yes" : "no", 2 );
+					pageTracker._setCustomVar(3, "html5.fontface", Modernizr.fontface ? "yes" : "no", 2 );
+					pageTracker._setCustomVar(4, "html5.csstransitions", Modernizr.csstransitions ? "yes" : "no", 2 );
+					pageTracker._setCustomVar(5, "html5.borderradius", Modernizr.borderradius ? "yes" : "no", 2 );
+				}
+				pageTracker._trackPageview();
+			} catch(err) {}
+		}
 		//]]>
+	</script>
+
+	<!-- Re-Invigorate --> 
+	<script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
+	<script type="text/javascript">
+	/*<![CDATA[*/
+	try {
+		if ( true || String(document.location).indexOf('balupton.com') !== -1 ) {
+			reinvigorate.code = "702o7-66905bt9t0";
+			reinvigorate.url_filter = function(url) {
+				if(url == reinvigorate.session.url && reinvigorate.url_override != null) {
+					reinvigorate.session.url = url = reinvigorate.url_override;
+				}
+				return url.replace(/^https?:\/\/(www\.)?/,"http://");
+			}
+			reinvigorate.ajax_track = function(url) {
+				reinvigorate.url_override = url;
+				reinvigorate.track(reinvigorate.code);
+			}
+			reinvigorate.url_override = null;
+			reinvigorate.track(reinvigorate.code);
+		}
+	} catch(err) {}
+	/*]]>*/
 	</script>
 	
 </body>
