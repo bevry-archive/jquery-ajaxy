@@ -184,6 +184,9 @@
 					// Options
 					propagate: true,
 					
+					// Flags
+					forwarded: false,
+					
 					// System
 					action: null,
 					state: null,
@@ -206,34 +209,20 @@
 					preventDefault: function(){
 						this.propagate = false;
 					},
-					documentReady: function($content,options){
+					documentReady: function(options){
 						var Ajaxy = $.Ajaxy; var Action = this;
 						
-						// Options
-						if ( typeof options !== 'object' ) {
-							options = {};
-						}
+						// Get State
+						var State = Ajaxy.getState(Action.State);
 						
-						// Default Options
-						var defaults = {
-							'$content': $content
-						};
-						switch ( Action.action ) {
-							case 'refresh':
-								defaults.auto_ajaxify_documentReady = 
-								defaults.auto_sparkle_documentReady = false;
-								break;
-							
-							default:
-								break;
-						}
+						// Specify the document is now ready
+						State.documentReady = true;
 						
-						// Merge with Defaults
-						var config = $.extend(true,{},defaults,options);
+						// Specify the Current Action for our State
+						State.setAction(Action);
 						
-						// Apply config to State
-						Action.state.documentReady = true;
-						Action.state.stateCompletedConfig = config;
+						// Fire the State Completed Callback
+						State.stateCompleted(options);
 						
 						// Return true
 						return true;
@@ -251,14 +240,6 @@
 					el: null,
 					isLink: false,
 					isForm: false,
-					
-					// Modes
-					documentReady: false,
-					stateCompletedConfig: {},
-					stateCompleted: function(){
-						var Ajaxy = $.Ajaxy; var State = this;
-						Ajaxy.stateCompleted(State);
-					},
 					
 					// Parts
 					anchor: '',
@@ -301,22 +282,124 @@
 						data: {}
 					},
 					
-					/* The Response Object which is returned in our Ajax Request */
+					/** The Response Object which is returned in our Ajax Request */
 					Response: {
 						callback: null,
 						data: {}
 					},
 					
-					/* The Response Object which is returned from an Error in our Ajax Request */
+					/** The Response Object which is returned from an Error in our Ajax Request */
 					Error: {
 						callback: null,
 						data: {}
 					},
 					
-					/* Any user data specific to the state should go in here. This is not used by Ajaxy. */
+					/** Any user data specific to the state should go in here. This is not used by Ajaxy. */
 					User: {
 						data: {}
+					},
+					
+					/** Current Action */
+					Action: {},
+					action: '',
+					
+					// Flags
+					documentReady: false,
+					triggerCompleted: false,
+					
+					/**
+					 * Specify the Action Used
+					 * @param {Object} Action
+					 */
+					setAction: function(Action){
+						var State = this;
+						State.Action = Action;
+						State.action = Action.action;
+						return true;
+					},
+					
+					/**
+					 * Function which fires once a state has completed it's cycle
+					 * @param {Object|undefined} options
+					 */
+					stateCompleted: function(options){
+						var Ajaxy = $.Ajaxy, State = this;
+						
+						// --------------------------
+						
+						// Check State
+						if ( !(State.documentReady||false) ) {
+							if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.stateCompleted: Called but not ready yet (documentReady).', [this, arguments]);
+							return false;
+						}
+						if ( !(State.triggerCompleted||false) ) {
+							if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.stateCompleted: Called but not ready yet (triggerCompleted).', [this, arguments]);
+							return false;
+						}
+						
+						// --------------------------
+						
+						// Prepare Config
+						var config = $.extend(true,{},Ajaxy.options,options||{});
+						
+						// Apply Action Specific Config
+						switch ( State.action ) {
+							case 'refresh':
+								config.auto_ajaxify_documentReady = 
+								config.auto_sparkle_documentReady = false;
+								break;
+							
+							default:
+								break;
+						}
+						
+						// Prepare $content
+						var $content = $(config.content||null);
+						if ( !($content instanceof jQuery) || !$content.length ) {
+							$content = $(document.body);
+						}
+						
+						// Log
+						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.stateCompleted:', [this, arguments], [$content,config]);
+				
+						// --------------------------
+						
+						// Fire the analytics
+						if ( config.analytics ) {
+							Ajaxy.track(State);
+						}
+				
+						// Auto Sparkle
+						if ( config.auto_sparkle_documentReady && $.Sparkle||false ) {
+							if ( config.add_sparkle_extension ) {
+								config.auto_ajaxify_documentReady = false; // as the sparkle extension will handle this
+							}
+							$content.sparkle();
+						}
+				
+						// Auto Ajaxify
+						if ( config.auto_ajaxify_documentReady ) {
+							$content.ajaxify();
+						}
+				
+						// Check for Anchor
+						var anchor = State.anchor||false;
+						if ( anchor ) {
+							// Reset the anchor
+							State.anchor = false;
+							// Fire the anchor
+							var $anchor = $('#'+anchor).giveTarget();
+							$anchor.ScrollTo(config.scrollto_options);
+						}
+						else if ( config.scrollto_content && !$content.is('body') ) {
+							// ScrollTo the content
+							$content.ScrollTo(config.scrollto_options);
+						}
+				
+						// Return true
+						return true;
 					}
+					
 				}
 			},
 			
@@ -1136,79 +1219,6 @@
 				return result;
 			},
 			
-			/**
-			 * Function which fires once a state has completed it's cycle
-			 * @param {Object} State
-			 * @param {Object|undefined} options
-			 */
-			stateCompleted: function(State,options){
-				var Ajaxy = $.Ajaxy;
-				
-				// Prepare Arguments
-				if ( typeof State !== 'object' ) {
-					State = {
-						documentReady: true
-					};
-				}
-				
-				// Check State
-				if ( !(State.documentReady||false) ) {
-					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.stateCompleted: Called but not ready yet.', [this, arguments]);
-				}
-							
-				// Prepare Options
-				if ( typeof options !== 'object' ) {
-					options = {};
-				}
-				
-				// Prepare $content
-				var $content = options.$content||null;
-				if ( !($content instanceof jQuery) || !$content.length ) {
-					$content = $(document.body);
-				}
-				
-				// Prepare Config
-				var config = $.extend({},Ajaxy.options,State.stateCompletedConfig,options);
-				
-				// Log
-				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.stateCompleted:', [this, arguments], [$content,config]);
-				
-				// Fire the analytics
-				if ( config.analytics ) {
-					Ajaxy.track(State);
-				}
-				
-				// Auto Sparkle
-				if ( config.auto_sparkle_documentReady && $.Sparkle||false ) {
-					if ( config.add_sparkle_extension ) {
-						config.auto_ajaxify_documentReady = false; // as the sparkle extension will handle this
-					}
-					$content.sparkle();
-				}
-				
-				// Auto Ajaxify
-				if ( config.auto_ajaxify_documentReady ) {
-					$content.ajaxify();
-				}
-				
-				// Check for Anchor
-				var anchor = State.anchor||false;
-				if ( anchor ) {
-					// Reset the anchor
-					State.anchor = false;
-					// Fire the anchor
-					var $anchor = $('#'+anchor).giveTarget();
-					$anchor.ScrollTo(config.scrollto_options);
-				}
-				else if ( config.scrollto_content && !$content.is('body') ) {
-					// ScrollTo the content
-					$content.ScrollTo(config.scrollto_options);
-				}
-				
-				// Return true
-				return true;
-			},
-			
 			
 			// ====================================================
 			// Actions
@@ -1281,8 +1291,9 @@
 			 * @param {String} controller
 			 * @param {String} action
 			 * @param {Object} State
+			 * @param {Boolean|undefined} forwarded
 			 */
-			trigger: function ( controller, action, state ) {
+			trigger: function ( controller, action, state, forwarded ) {
 				var Ajaxy = $.Ajaxy;
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.trigger: ', [this, arguments]);
 				
@@ -1348,17 +1359,24 @@
 				// --------------------------
 				// Prepare Action
 				
+				// Prepare Forwarded
+				forwarded = Boolean(forwarded||false);
+				
 				// Generate Action
 				var Action = $.extend(true,{},Ajaxy.defaults.Action,{
 					'action':action,
 					'controller':controller,
 					'Controller':Controller,
 					'state':state,
-					'State':State
+					'State':State,
+					'forwarded':forwarded
 				});
 				
+				// Specify the Current Action for our State
+				State.setAction(Action);
+				
 				// Setup up the Trigger + Forward Actions
-				Action.forward = Action.trigger = function(_controller, _action, _state){
+				Action.trigger = function(_controller, _action, _state){
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.Action.trigger:', [this, arguments]);
 					
 					// Prepare
@@ -1367,7 +1385,21 @@
 					_state = _state||state;
 					
 					// Trigger
-					Ajaxy.trigger(_controller, _action, _state);
+					Ajaxy.trigger(_controller, _action, _state, false);
+					
+					// Return true
+					return true;
+				};
+				Action.forward = function(_controller, _action, _state){
+					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.Action.forward:', [this, arguments]);
+					
+					// Prepare
+					_controller = _controller||controller;
+					_action = _action||action;
+					_state = _state||state;
+					
+					// Forward
+					Ajaxy.trigger(_controller, _action, _state, true);
 					
 					// Return true
 					return true;
@@ -1375,6 +1407,12 @@
 				
 				// --------------------------
 				// Fire
+				
+				// Check for Original Request
+				if ( !Action.forwarded ) {
+					// State that the trigger is not completed in our state
+					State.triggerCompleted = false;
+				}
 				
 				// Fire the ControllerAction Handler
 				var result = ControllerAction.apply(Action, []);
@@ -1391,13 +1429,17 @@
 						// Fire generic
 						Action.forward('_generic');
 					}
+				}
+				
+				// Check for Original Request
+				if ( !Action.forwarded ) {
 					// Fire Ajaxy's stateCompleted
 					if ( action === 'response' || action === 'refresh' ) {
-						State.documentReady = true;
+						// State that the trigger is now completed in our state
+						State.triggerCompleted = true;
+						
+						// Fire the State Completed Callback
 						State.stateCompleted();
-					}
-					else {
-						State.documentReady = false;
 					}
 				}
 				
@@ -1469,7 +1511,6 @@
 					Ajaxy.storeState(State); // really this shouldn't be needed, but somewhere our expectations of references are wrong
 					
 					// Trigger handler
-					//Ajaxy.stateCompleted(Ajaxy.currentState);
 					Ajaxy.trigger(State.controller, 'refresh', Ajaxy.currentState);
 					
 					// Log this minor state change
