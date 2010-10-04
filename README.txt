@@ -47,6 +47,7 @@ Known Issues:
 ----
 
 Changelog:
+
 v1.6.1-beta, October 04, 2010
 - Added a 404 error page demo.
 - Got yellow background working for targets in IE.
