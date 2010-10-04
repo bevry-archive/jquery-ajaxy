@@ -51,7 +51,6 @@ Changelog:
 v1.7.0-alpha, October 04, 2010
 - Fixed support for ReInvigorate Ajax Tracking.
 - Moved Tracking into Action.documentReady/Ajaxy.stateCompleted function such that ReInvigorate can correctly determine the page
-- Calling Action.documentReady is now optional, Ajaxy.stateCompleted will be automatically fired when the response and refresh triggers have finished.
 
 v1.6.1-beta, October 04, 2010
 - Added a 404 error page demo.
