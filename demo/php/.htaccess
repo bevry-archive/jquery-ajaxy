@@ -1,0 +1,5 @@
+Options +FollowSymlinks -Indexes
+RewriteEngine On
+
+# Clean URLs
+RewriteRule (.*)pages/(.*)(\..+)?$ $1?page=$2 [QSA,PT,L]

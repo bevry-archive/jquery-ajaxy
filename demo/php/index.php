@@ -1,4 +1,27 @@
-<!DOCTYPE HTML>
+<?php
+	# Prepare
+	error_reporting(E_ALL | E_STRICT);
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	
+	# Check Page
+	$page = isset($_GET['page']) ? $_GET['page'] : null;
+	switch ( $page ) {
+		case 'apricots':
+		case 'bananas':
+		case 'coconuts':
+		case 'durians':
+		case 'eggplants':
+			break;
+		
+		default:
+			header('HTTP/1.1 404 Not Found');
+			echo '404 Not Found';
+			die;
+			break;
+	}
+						
+?><!DOCTYPE HTML>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -7,14 +30,14 @@
     </title>
 	
 	<!-- Include jQuery (Ajaxy Requirement) -->
-	<script type="text/javascript" src="../scripts/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery-1.4.2.min.js"></script>
 	<!-- Include jQuery Ajaxy (Production) -->
-	<!-- <script type="text/javascript" src="../scripts/jquery.ajaxy.min.js"></script> -->
+	<!-- <script type="text/javascript" src="../../scripts/jquery.ajaxy.min.js"></script> -->
 	<!-- Include jQuery Ajaxy (Development) -->
-	<script type="text/javascript" src="../scripts/jquery.ajaxy.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery.ajaxy.js"></script>
 	
 	<!-- Include The Demo's Requirements -->
-	<link type="text/css" rel="stylesheet" media="screen" href="./styles/style.css" />
+	<link type="text/css" rel="stylesheet" media="screen" href="../styles/style.css" />
 </head>
 <body>
 	<!-- Include jQuery Syntax Highlighter -->
@@ -69,16 +92,40 @@
 		
 		<div id="demo">
 			<ul id="menu">
-				<li><a href="./pages/apricots.html" class="ajaxy ajaxy-page">Learn about Apricots</a></li>
-				<li><a href="./pages/bananas.html" class="ajaxy ajaxy-page">Lean about Bananas</a></li>
-				<li><a href="./pages/coconuts.html" class="ajaxy ajaxy-page">Learn about Coconuts</a></li>
-				<li><a href="./pages/durians.html#yummy" class="ajaxy ajaxy-page">Learn about Durians</a></li>
-				<li><a href="./pages/eggplants.php" class="ajaxy ajaxy-page">Have your say about Eggplants</a></li>
-				<li><a href="./pages/404.html" class="ajaxy ajaxy-page">A page which does not exist</a></li>
+				<li><a href="?page=apricots" class="ajaxy ajaxy-page">Learn about Apricots</a></li>
+				<li><a href="?page=bananas" class="ajaxy ajaxy-page">Lean about Bananas</a></li>
+				<li><a href="?page=coconuts" class="ajaxy ajaxy-page">Learn about Coconuts</a></li>
+				<li><a href="?page=durians#yummy" class="ajaxy ajaxy-page">Learn about Durians</a></li>
+				<li><a href="?page=eggplants" class="ajaxy ajaxy-page">Have your say about Eggplants</a></li>
+				<li><a href="?page=404" class="ajaxy ajaxy-page">A page which does not exist</a></li>
 			</ul>
 			<div id="result">
-				<div id="content" style="max-height:100px;overflow:auto;"></div>
-				<div id="current"></div>
+				<?php
+					$page = isset($_GET['page']) ? $_GET['page'] : null;
+					$pages_dir = dirname(__FILE__).'/pages';
+					switch ( $page ) {
+						case 'apricots':
+						case 'bananas':
+						case 'coconuts':
+						case 'durians':
+						case 'eggplants':
+							?><div id="content" style="max-height:100px;overflow:auto;"><?php
+								require "$pages_dir/$page.php";
+							?></div><div id="current"><?php
+								echo "$page";
+							?></div><?php
+							break;
+						
+						default:
+							?><div id="content" style="max-height:100px;overflow:auto;">
+								Your Default/Start Page.
+							</div><div id="current">
+								Your Default/Start Page.
+							</div><?php
+							break;
+					}
+				?>
+				</div>
 			</div>
 		</div>
 		
@@ -106,7 +153,25 @@
 			&lt;/ul&gt;
 			&lt;div id="result"&gt;
 				&lt;div id="content" style="max-height:100px;overflow:auto;"&gt;&lt;/div&gt;
-				&lt;div id="current"&gt;&lt;/div&gt;
+				&lt;div id="current"&gt;
+					&lt;?php
+						$page = isset($_GET[&#x27;page&#x27;]) ? $_GET[&#x27;page&#x27;] : null;
+						$dir = dirname(__FILE__);
+						switch ( $page ) {
+							case &#x27;apricots&#x27;:
+							case &#x27;bananas&#x27;:
+							case &#x27;coconuts&#x27;:
+							case &#x27;durians&#x27;:
+							case &#x27;eggplants&#x27;:
+								require &quot;$dir/$page.php&quot;;
+								break;
+						
+							default:
+								echo &#x27;Welcome / Your Default Page.&#x27;;
+								break;
+						}
+					?&gt;
+				&lt;/div&gt;
 			&lt;/div&gt;
 		</pre>
 		
@@ -708,7 +773,7 @@
 						 * However, as this request has not come from a link, we cannot use the Controller's selector to associate the request with a particular controller.
 						 * Instead we use this to match against the proposed state, and if it does then we know that this is the controller that should be used.
 						 */
-						matches: /^\/pages\/?/,
+						matches: /^\/pages\/?|page=[a-z]+/,
 						
 						/**
 						 * Our Page Controller's Request Action
@@ -743,9 +808,11 @@
 							if ( Ajaxy.options.debug ) window.console.debug('$.Ajaxy.Controllers.page.response', [this,arguments]);
 							// Adjust Menu
 							$menu.children(':has(a[href*="'+State.raw.state+'"])').addClass('active').siblings('.active').removeClass('active');
+							// Grab Content
+							var $responseContent = $(responseData.content).find('#content');
 							// Show Content
 							var Action = this;
-							$content.html(responseData.content).fadeIn(400,function(){
+							$content.html($responseContent).fadeIn(400,function(){
 								Action.documentReady({
 									'content': $content
 								});
@@ -810,7 +877,7 @@
 		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 		//]]>
 	</script> 
-	<script type="text/javascript" src="./scripts/modernizr-1.5.min.js"></script> 
+	<script type="text/javascript" src="../scripts/modernizr-1.5.min.js"></script> 
 	<script type="text/javascript"> 
 		//<![CDATA[
 		if ( String(document.location).indexOf('balupton.com') !== -1 ) {
@@ -833,25 +900,25 @@
 	<!-- Re-Invigorate --> 
 	<script type="text/javascript" src="http://include.reinvigorate.net/re_.js"></script>
 	<script type="text/javascript">
-	/*<![CDATA[*/
-	try {
-		if ( true || String(document.location).indexOf('balupton.com') !== -1 ) {
-			reinvigorate.code = "702o7-66905bt9t0";
-			reinvigorate.url_filter = function(url) {
-				if(url == reinvigorate.session.url && reinvigorate.url_override != null) {
-					reinvigorate.session.url = url = reinvigorate.url_override;
+		/*<![CDATA[*/
+		if ( String(document.location).indexOf('balupton.com') !== -1 ) {
+			try {
+				reinvigorate.code = "702o7-66905bt9t0";
+				reinvigorate.url_filter = function(url) {
+					if(url == reinvigorate.session.url && reinvigorate.url_override != null) {
+						reinvigorate.session.url = url = reinvigorate.url_override;
+					}
+					return url.replace(/^https?:\/\/(www\.)?/,"http://");
 				}
-				return url.replace(/^https?:\/\/(www\.)?/,"http://");
-			}
-			reinvigorate.ajax_track = function(url) {
-				reinvigorate.url_override = url;
+				reinvigorate.ajax_track = function(url) {
+					reinvigorate.url_override = url;
+					reinvigorate.track(reinvigorate.code);
+				}
+				reinvigorate.url_override = null;
 				reinvigorate.track(reinvigorate.code);
-			}
-			reinvigorate.url_override = null;
-			reinvigorate.track(reinvigorate.code);
+			} catch(err) {}
 		}
-	} catch(err) {}
-	/*]]>*/
+		/*]]>*/
 	</script>
 	
 </body>

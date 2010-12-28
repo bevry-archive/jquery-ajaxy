@@ -3850,10 +3850,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Extract details
 						var html = Ajaxy.htmlCompat(responseText),
 							$html = $(html),
-							$head = $html.find('#ajaxy-head'),
-							$body = $html.find('#ajaxy-body'),
-							$title = $html.find('#ajaxy-title'),
-							$controller = $html.find('#ajaxy-controller'), /* special case support for controller in html pages */
+							$head = $html.find('#ajaxy-head:last'),
+							$body = $html.find('#ajaxy-body:last'),
+							$title = $html.find('#ajaxy-title:last'),
+							$controller = $html.find('#ajaxy-controller:last'), /* special case support for controller in html pages */
 							title = ($title.length ? $title.text() : ''),
 							head = ($head.length ? $head.htmlAndSelf() : ''),
 							body = ($body.length ? $body.htmlAndSelf() : ''),

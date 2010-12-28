@@ -2,6 +2,10 @@
 @import url("./yui-reset-3.1.1-min.css");
 @import url("./generic.css");
 
+#ajaxy-title, #ajaxy-controller, #ajaxy-head {
+	display:none;
+}
+
 #demo, #demo div {
 	margin:0;
 }
