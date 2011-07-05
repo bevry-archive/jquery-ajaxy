@@ -148,7 +148,11 @@
 				/**
 				 * The Controllers to use
 				 */
-				Controllers: {}
+				Controllers: {},
+				/**
+				 * The method that will be used to send our AJAX requests
+				 */
+				method: 'post'
 			},
 			
 			
@@ -1472,7 +1476,6 @@
 				var Request = {
 					data: State.Request.data,
 					url: State.Request.url,
-					type: 'post',
 					success: function(responseData, status){
 						// Success
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.success:', [this, arguments]);
@@ -1744,7 +1747,7 @@
 				
 				// Prepare Ajax Request
 				var request = {
-					type:		'post',
+					type:		Ajaxy.options.method,
 					dataType:	(Ajaxy.options.support_text ? 'text' : 'json')
 				};
 				$.extend(true,request,options);
