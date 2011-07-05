@@ -21,6 +21,7 @@
 				<input type="submit" name="submit" />
 			</form>
 		<? endif; ?>
+		If this form does not submit properly, it is because the server this is hosted on does not support AJAX POST requests.
 	</div>
 </body>
 </html>
