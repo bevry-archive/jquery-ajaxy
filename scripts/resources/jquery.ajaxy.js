@@ -1,7 +1,7 @@
 /**
  * @depends jquery, core.console, core.string, jquery.extra
  * @name jquery.ajaxy
- * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
+ * @package jquery-ajaxy {@link http://balupton.com/projects/jquery-ajaxy}
  */
 
 /**
@@ -21,10 +21,10 @@
 	 * @version 1.6.0
 	 * @date August 31, 2010
 	 * @since 0.1.0-dev, July 24, 2008
-     * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-ajaxy {@link http://balupton.com/projects/jquery-ajaxy}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	if ( !($.Ajaxy||false) ) {
 		/**

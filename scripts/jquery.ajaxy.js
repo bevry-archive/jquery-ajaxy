@@ -1317,7 +1317,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 /**
  * @depends jquery
  * @name jquery.scrollto
- * @package jquery-scrollto {@link http://www.balupton/projects/jquery-scrollto}
+ * @package jquery-scrollto {@link http://balupton.com/projects/jquery-scrollto}
  */
 
 /**
@@ -1330,10 +1330,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	 * @version 1.0.1
 	 * @date August 31, 2010
 	 * @since 0.1.0, August 27, 2010
-     * @package jquery-scrollto {@link http://www.balupton/projects/jquery-scrollto}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-scrollto {@link http://balupton.com/projects/jquery-scrollto}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	if ( !($.ScrollTo||false) ) {
 		$.ScrollTo = {
@@ -1503,40 +1503,40 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 /**
  * @depends jquery, core.console
  * @name jquery.history
- * @package jquery-history {@link http://www.balupton/projects/jquery-history}
+ * @package jquery-history {@link http://balupton.com/projects/jquery-history}
  */
 
 // Start of our jQuery Plugin
 (function($)
 {	// Create our Plugin function, with $ as the argument (we pass the jQuery object over later)
 	// More info: http://docs.jquery.com/Plugins/Authoring#Custom_Alias
-	
+
 	/**
 	 * jQuery History
 	 * @version 1.5.0
 	 * @date August 31, 2010
 	 * @since 0.1.0-dev, July 24, 2008
-     * @package jquery-history {@link http://www.balupton/projects/jquery-history}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-history {@link http://balupton.com/projects/jquery-history}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	// Check our class exists
 	if ( !($.History||false) ) {
 		// Declare our class
 		$.History = {
 			// Our Plugin definition
-		
+
 			// -----------------
 			// Options
-		
+
 			options: {
 				debug: false
 			},
-		
+
 			// -----------------
 			// Variables
-		
+
 			state:		'',
 			$window:	null,
 			$iframe:	null,
@@ -1544,10 +1544,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				generic:	[],
 				specific:	{}
 			},
-		
+
 			// --------------------------------------------------
 			// Functions
-			
+
 			/**
 			 * Extract the Hash from a URL
 			 * @param {String} hash
@@ -1558,17 +1558,17 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					.replace(/^[^#]*#/, '')	/* strip anything before the first anchor */
 					.replace(/^#+|#+$/, '')
 					;
-				
+
 				// Return hash
 				return hash;
 			},
-			
+
 			/**
 			 * Get the current state of the application
 			 */
 	        getState: function ( ) {
 				var History = $.History;
-			
+
 				// Get the current state
 				return History.state;
 	        },
@@ -1578,40 +1578,40 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			setState: function ( state ) {
 				var History = $.History;
-				
+
 				// Format the state
 				state = History.extractHash(state)
-			
+
 				// Apply the state
 				History.state = state;
-			
+
 				// Return the state
 				return History.state;
 			},
-		
+
 			/**
 			 * Get the current hash of the browser
 			 */
 			getHash: function ( ) {
 				var History = $.History;
-			
+
 				// Get the hash
 				var hash = History.extractHash(window.location.hash || location.hash);
-			
+
 				// Return the hash
 				return hash;
 			},
-		
+
 			/**
 			 * Set the current hash of the browser and iframe if present
 			 * @param {String} hash
 			 */
 			setHash: function ( hash ) {
 				var History = $.History;
-			
+
 				// Prepare hash
 				hash = History.extractHash(hash);
-			
+
 				// Write hash
 				if ( typeof window.location.hash !== 'undefined' ) {
 					if ( window.location.hash !== hash ) {
@@ -1620,25 +1620,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				} else if ( location.hash !== hash ) {
 					location.hash = hash;
 				}
-			
+
 				// Done
 				return hash;
 			},
-		
+
 			/**
 			 * Go to the specific state - does not force a history entry like setHash
 			 * @param {String} to
 			 */
 			go: function ( to ) {
 				var History = $.History;
-			
+
 				// Format
 				to = History.extractHash(to);
-			
+
 				// Get current
 				var	hash = History.getHash(),
 					state = History.getState();
-			
+
 				// Has the hash changed
 				if ( to !== hash ) {
 					// Yes, update the hash
@@ -1650,32 +1650,32 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Yes, Update the state
 						History.setState(to);
 					}
-				
+
 					// Trigger our change
 					History.trigger();
 				}
-			
+
 				// Done
 				return true;
 			},
-		
+
 			/**
 			 * Handle when the hash has changed
 			 * @param {Event} e
 			 */
 			hashchange: function ( e ) {
 				var History = $.History;
-			
+
 				// Get Hash
 				var hash = History.getHash();
-			
+
 				// Handle the new hash
 				History.go(hash);
-			
+
 				// All done
 				return true;
 			},
-		
+
 			/**
 			 * Bind a handler to a hash
 			 * @param {Object} state
@@ -1683,7 +1683,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			bind: function ( state, handler ) {
 				var History = $.History;
-			
+
 				// Handle
 				if ( handler ) {
 					// We have a state specific handler
@@ -1700,25 +1700,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					handler = state;
 					History.handlers.generic.push(handler);
 				}
-			
+
 				// Done
 				return true;
 			},
-		
+
 			/**
 			 * Trigger a handler for a state
 			 * @param {String} state
 			 */
 			trigger: function ( state ) {
 				var History = $.History;
-			
+
 				// Prepare
 				if ( typeof state === 'undefined' ) {
 					// Use current
 					state = History.getState();
 				}
 				var i, n, handler, list;
-			
+
 				// Fire specific
 				if ( typeof History.handlers.specific[state] !== 'undefined' ) {
 					// We have specific handlers
@@ -1729,7 +1729,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						handler(state);
 					}
 				}
-			
+
 				// Fire generics
 				list = History.handlers.generic;
 				for ( i = 0, n = list.length; i < n; ++i ) {
@@ -1737,67 +1737,67 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					handler = list[i];
 					handler(state);
 				}
-			
+
 				// Done
 				return true;
 			},
-		
+
 			// --------------------------------------------------
 			// Constructors
-		
+
 			/**
 			 * Construct our application
 			 */
 			construct: function ( ) {
 				var History = $.History;
-			
+
 				// Modify the document
 				$(document).ready(function() {
 					// Prepare the document
 					History.domReady();
 				});
-			
+
 				// Done
 				return true;
 			},
-		
+
 			/**
 			 * Configure our application
 			 * @param {Object} options
 			 */
 			configure: function ( options ) {
 				var History = $.History;
-			
+
 				// Set options
 				History.options = $.extend(History.options, options);
-			
+
 				// Done
 				return true;
 			},
-		
+
 			domReadied: false,
 			domReady: function ( ) {
 				var History = $.History;
-			
+
 				// Runonce
 				if ( History.domRedied ) {
 					return;
 				}
 				History.domRedied = true;
-			
+
 				// Define window
 				History.$window = $(window);
-			
+
 				// Apply the hashchange function
 				History.$window.bind('hashchange', this.hashchange);
-			
+
 				// Force hashchange support for all browsers
 				setTimeout(History.hashchangeLoader, 200);
-			
+
 				// All done
 				return true;
 			},
-			
+
 			/**
 			 * Determines whether or not our browser has native support for the required onhashchange event.
 			 * Unfortunately we have to test against a known range of browsers, as doing a automatic test would require testing the onhashchange functionality
@@ -1814,7 +1814,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					browserVersionPartsTwo = parseInt(browserVersionParts[1],10),
 					browserVersionPartsThree = parseInt(browserVersionParts[2],10),
 					nativeSupport = false;
-				
+
 				// Determine if we are running under a browser which has nativeSupport for the onhashchange event
 				// >= MSIE 8
 				if ( (browser.msie||false) && browserVersionInt >= 8 ) {
@@ -1859,54 +1859,54 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						}
 					}
 				}
-				
+
 				// Return nativeSupport
 				return nativeSupport;
 			},
-			
+
 			/**
 			 * Enable hashchange for all browsers
 			 * For browsers which do not have native support, the support must be emulated.
 			 */
 			hashchangeLoader: function () {
 				var History = $.History;
-				
+
 				// Fetch nativeSupport
 				var nativeSupport = History.nativeSupport();
-				
+
 				// Check whether or not we need to implement a unfortunate but required workaround for browsers without nativeSupport
-				if ( !nativeSupport ) {	
+				if ( !nativeSupport ) {
 					// We are not IE8, or another browser which supports onhashchange natively
-			
+
 					// State our checker function, it is used to constantly check the location to detect a change
 					var checker;
-				
+
 					// Handle depending on the browser
 					if ( $.browser.msie ) {
 						// We are still IE
 						// IE6, IE7, etc
-				
+
 						// Append and $iframe to the document, as $iframes are required for back and forward
 						// Create a hidden $iframe for hash change tracking
 						History.$iframe = $('<iframe id="jquery-history-iframe" style="display: none;"></$iframe>').prependTo(document.body)[0];
-					
+
 						// Create initial history entry
 						History.$iframe.contentWindow.document.open();
 						History.$iframe.contentWindow.document.close();
-					
+
 						// Define the checker function (for bookmarks)
 						var iframeHit = false;
 						checker = function ( ) {
-						
+
 							// Fetch
 							var hash = History.getHash();
 							var state = History.getState();
 							var iframeHash = History.extractHash(History.$iframe.contentWindow.document.location.hash);
-						
+
 							// Check if the browser hash is different
 							if ( state !== hash ) {
 								// Browser hash is different
-							
+
 								// Check if we need to update the iframe
 								if ( !iframeHit ) {
 									// Write a iframe/history entry in the browsers back and forward
@@ -1914,16 +1914,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 									History.$iframe.contentWindow.document.open();
 									History.$iframe.contentWindow.document.close();
 									// alert('update iframe entry.');
-								
+
 									// Update the iframe hash
 									// alert('update iframe hash');
 									History.$iframe.contentWindow.document.location.hash = hash;
 									// alert('update iframe hash.');
 								}
-							
+
 								// Reset
 								iframeHit = false;
-							
+
 								// Fire
 								// alert('hashchange');
 								History.$window.trigger('hashchange');
@@ -1931,25 +1931,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							}
 							else {
 								// Browser hash is not different
-							
+
 								// Check if the iframe hash is different from the iframe state
 								if ( state !== iframeHash ) {
 									// Specify we were hit from the iframe
 									iframeHit = true;
-								
+
 									// Update the browser hash
 									// alert('set hash from iframe');
 									History.setHash(iframeHash);
 									// alert('set hash from iframe.');
 								}
 							}
-						
+
 						};
 					}
 					else {
 						// We are not IE
 						// Firefox, Opera, Etc
-				
+
 						// Define the checker function (for bookmarks, back, forward)
 						checker = function ( ) {
 							var hash = History.getHash();
@@ -1961,42 +1961,42 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							}
 						};
 					}
-				
+
 					// Apply the checker function
 					setInterval(checker, 200);
 				}
 				else {
 					// We are IE8, or another browser which supports onhashchange natively
-				
+
 					// Fire the initial
 					var hash = History.getHash();
 					if ( hash ) {
 						History.$window.trigger('hashchange');
 					}
 				}
-			
+
 				// Done
 				return true;
 			}
-	
+
 		}; // We have finished extending/defining our Plugin
-	
+
 		// --------------------------------------------------
 		// Finish up
-	
+
 		// Instantiate
 		$.History.construct();
 	}
 	else {
 		window.console.warn('$.History has already been defined...');
 	}
-	
+
 	// Finished definition
 })(jQuery); // We are done with our plugin, so lets call it with jQuery as the argument
 /**
  * @depends jquery, core.console, core.string, jquery.extra
  * @name jquery.ajaxy
- * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
+ * @package jquery-ajaxy {@link http://balupton.com/projects/jquery-ajaxy}
  */
 
 /**
@@ -2016,10 +2016,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	 * @version 1.6.0
 	 * @date August 31, 2010
 	 * @since 0.1.0-dev, July 24, 2008
-     * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-ajaxy {@link http://balupton.com/projects/jquery-ajaxy}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	if ( !($.Ajaxy||false) ) {
 		/**
