@@ -1,23 +1,23 @@
 /**
  * @depends jquery
  * @name jquery.events
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
  */
 
 /**
  * jQuery Aliaser
  */
 (function($){
-	
+
 	/**
 	 * Bind a event, with or without data
 	 * Benefit over $.bind, is that $.binder(event, callback, false|{}|''|false) works.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.binder = $.fn.binder || function(event, data, callback){
 		// Help us bind events properly
@@ -32,15 +32,15 @@
 		// Chain
 		return $this;
 	};
-	
+
 	/**
 	 * Bind a event only once
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.once = $.fn.once || function(event, data, callback){
 		// Only apply a event handler once
@@ -57,15 +57,15 @@
 		// Chain
 		return $this;
 	};
-	
+
 	/**
 	 * Event for pressing the enter key
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.enter = $.fn.enter || function(data,callback){
 		return $(this).binder('enter',data,callback);
@@ -92,15 +92,15 @@
 			return;
 		}
 	};
-	
+
 	/**
 	 * Event for pressing the escape key
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.cancel = $.fn.cancel || function(data,callback){
 		return $(this).binder('cancel',data,callback);
@@ -128,15 +128,15 @@
 			return;
 		}
 	};
-	
+
 	/**
 	 * Event for the last click for a series of one or more clicks
 	 * @version 1.0.0
 	 * @date July 16, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.lastclick = $.fn.lastclick || function(data,callback){
 		return $(this).binder('lastclick',data,callback);
@@ -190,15 +190,15 @@
 			check.apply(this,[event]);
 		}
 	};
-	
+
 	/**
 	 * Event for the first click for a series of one or more clicks
 	 * @version 1.0.0
 	 * @date July 16, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.firstclick = $.fn.firstclick || function(data,callback){
 		return $(this).binder('firstclick',data,callback);
@@ -253,16 +253,16 @@
 			check.apply(this,[event]);
 		}
 	};
-	
+
 	/**
 	 * Event for performing a singleclick
 	 * @version 1.1.0
 	 * @date July 16, 2010
 	 * @since 1.0.0, June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.singleclick = $.fn.singleclick || function(data,callback){
 		return $(this).binder('singleclick',data,callback);
@@ -320,6 +320,6 @@
 			check.apply(this,[event]);
 		}
 	};
-	
+
 
 })(jQuery);

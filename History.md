@@ -1,52 +1,4 @@
-----
-/**
- * This file is part of jQuery Ajaxy
- * Copyright (C) 2008-2010 Benjamin Arthur Lupton
- * http://www.balupton.com/projects/jquery-ajaxy
- *
- * jQuery Ajaxy is free software; You can redistribute it and/or modify it under the terms of
- * the GNU Affero General Public License version 3 as published by the Free Software Foundation.
- * You don't have to do anything special to accept the license and you don’t have to notify
- * anyone which that you have made that decision.
- * 
- * jQuery Ajaxy is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See your chosen license for more details.
- * 
- * You should have received along with jQuery Ajaxy:
- * - A copy of the license used.
- *   If not, see <http://www.gnu.org/licenses/agpl-3.0.html>.
- * - A copy of our interpretation of the license used.
- *   If not, see <http://github.com/balupton/jquery-ajaxy/blob/master/COPYING.txt>.
- * 
- * @version 1.6.0-beta
- * @date August 31, 2010
- * @since v0.1.0-dev, July 24, 2008
- * @category jquery-plugin
- * @package jquery-ajaxy {@link http://www.balupton/projects/jquery-ajaxy}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2008-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
- * @example Visit {@link http://www.balupton.com/projects/jquery-ajaxy} for more information.
- */
-----
-
-Installation & Usage:
-1. Refer to the (demo/index.html) or http://www.balupton.com/projects/jquery-ajaxy if the demo is not included.
-
-Todo:
-1. Need to add timeout for AjaxQueue. As in rare circumstances it just never pops out.
-
-Options:
-1. Refer to (scripts/resources/jquery.ajaxy.js) at about line 40 you will see the options with their information. 
-
-Known Issues:
-- Under Google Chrome, when in postpone or disable mode anchors may not scroll to the correct position when using back and forward buttons. [minor]
-- Ajaxy form submit does not care for multiple submit buttons and only uses the last one. Issue due to jQuery's submit function. [minor]
-
-----
-
-Changelog:
+## History
 
 v1.6.0-beta, August 31, 2010
 - Added Ajaxy form demo.
@@ -122,7 +74,7 @@ v1.5.2-beta, August 07, 2010
 v1.5.1-beta, August 05, 2010
 - Fixed a redirection issue
 - Support for anchors is now complete. We can now detect all types of anchors and adjust the page and state accordingly.
-- Able to detect the severity of the page change, and if it is not considerable (such as only an anchor change) then do not both performing the request. 
+- Able to detect the severity of the page change, and if it is not considerable (such as only an anchor change) then do not both performing the request.
 - $.fn.SrollTo can now take the options argument. We also have a $.Ajaxy.options.scrollto_options for this.
 - Added the options [track_all_anchors] and [track_all_internal_links] to keep your Ajaxy website in sync; these are set to false by default.
 - A few more options added, should refer to the documentation about these.
@@ -191,15 +143,3 @@ v1.0.0-final, June 19, 2009
 
 v0.1.0-dev, July 24, 2008
 - Initial Release
-
-----
-
-Special Thanks:
-- jQuery {@link http://jquery.com/}
-- jQuery UI History - Klaus Hartl {@link http://www.stilbuero.de/jquery/ui_history/}
-- Really Simple History - Brian Dillard and Brad Neuberg {@link http://code.google.com/p/reallysimplehistory/}
-- jQuery History Plugin - Taku Sano (Mikage Sawatari) {@link http://www.mikage.to/jquery/jquery_history.html}
-- jQuery History Remote Plugin - Klaus Hartl {@link http://stilbuero.de/jquery/history/}
-- Content With Style: Fixing the back button and enabling bookmarking for ajax apps - Mike Stenhouse {@link http://www.contentwithstyle.co.uk/Articles/38/fixing-the-back-button-and-enabling-bookmarking-for-ajax-apps}
-- Bookmarks and Back Buttons {@link http://ajax.howtosetup.info/options-and-efficiencies/bookmarks-and-back-buttons/}
-- Ajax: How to handle bookmarks and back buttons - Brad Neuberg {@link http://dev.aol.com/ajax-handling-bookmarks-and-back-button}

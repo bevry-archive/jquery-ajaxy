@@ -1,7 +1,7 @@
 /**
  * @depends nothing
  * @name core.console
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
  */
 
 /**
@@ -10,10 +10,10 @@
  * @version 1.0.3
  * @date August 31, 2010
  * @since 0.1.0-dev, December 01, 2009
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 
 // Check to see if console exists, if not define it
@@ -33,7 +33,7 @@ if ( typeof window.console.emulated === 'undefined' ) {
 		}
 		window.console.hasLog = false;
 	}
-	
+
 	// Emulate Debug
 	if ( typeof window.console.debug === 'function' ) {
 		window.console.hasDebug = true;
@@ -47,7 +47,7 @@ if ( typeof window.console.emulated === 'undefined' ) {
 		}
 		window.console.hasDebug = false;
 	}
-	
+
 	// Emulate Warn
 	if ( typeof window.console.warn === 'function' ) {
 		window.console.hasWarn = true;
@@ -61,7 +61,7 @@ if ( typeof window.console.emulated === 'undefined' ) {
 		}
 		window.console.hasWarn = false;
 	}
-	
+
 	// Emulate Error
 	if ( typeof window.console.error === 'function' ) {
 		window.console.hasError = true;
@@ -70,7 +70,7 @@ if ( typeof window.console.emulated === 'undefined' ) {
 		if ( typeof window.console.error === 'undefined' ) {
 			window.console.error = function(){
 				var msg = "An error has occured.";
-				
+
 				// Log
 				if ( window.console.hasLog ) {
 					var arr = ['console.error:']; for(var i = 0; i < arguments.length; i++) { arr.push(arguments[i]); };
@@ -78,7 +78,7 @@ if ( typeof window.console.emulated === 'undefined' ) {
 					// Adjust Message
 					msg = 'An error has occured. More information is available in your browser\'s javascript console.'
 				}
-				
+
 				// Prepare Arguments
 				for ( var i = 0; i < arguments.length; ++i ) {
 					if ( typeof arguments[i] !== 'string' ) {
@@ -86,7 +86,7 @@ if ( typeof window.console.emulated === 'undefined' ) {
 					}
 					msg += "\n"+arguments[i];
 				}
-				
+
 				// Throw Error
 				if ( typeof Error !== 'undefined' ) {
 					throw new Error(msg);
@@ -98,7 +98,7 @@ if ( typeof window.console.emulated === 'undefined' ) {
 		}
 		window.console.hasError = false;
 	}
-	
+
 	// Emulate Trace
 	if ( typeof window.console.trace === 'function' ) {
 		window.console.hasTrace = true;
@@ -111,24 +111,24 @@ if ( typeof window.console.emulated === 'undefined' ) {
 		}
 		window.console.hasTrace = false;
 	}
-	
+
 	// Done
 	window.console.emulated = true;
 }
 /**
  * @depends nothing
  * @name core.string
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
  */
 
 /**
  * Return a new string with any spaces trimmed the left and right of the string
  * @version 1.0.0
  * @date June 30, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.trim = String.prototype.trim || function() {
 	// Trim off any whitespace from the front and back
@@ -140,10 +140,10 @@ String.prototype.trim = String.prototype.trim || function() {
  * @version 1.1.1
  * @date July 22, 2010
  * @since 1.0.0, June 30, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.strip = String.prototype.strip || function(value,regex){
 	// Strip a value from left and right, with optional regex support (defaults to false)
@@ -163,10 +163,10 @@ String.prototype.strip = String.prototype.strip || function(value,regex){
  * Return a new string with the value stripped from the left of the string
  * @version 1.1.1
  * @date July 22, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.stripLeft = String.prototype.stripLeft || function(value,regex){
 	// Strip a value from the left, with optional regex support (defaults to false)
@@ -186,10 +186,10 @@ String.prototype.stripLeft = String.prototype.stripLeft || function(value,regex)
  * Return a new string with the value stripped from the right of the string
  * @version 1.1.1
  * @date July 22, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.stripRight = String.prototype.stripRight || function(value,regex){
 	// Strip a value from the right, with optional regex support (defaults to false)
@@ -209,10 +209,10 @@ String.prototype.stripRight = String.prototype.stripRight || function(value,rege
  * Return a int of the string
  * @version 1.0.0
  * @date June 30, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.toInt = String.prototype.toInt || function(){
 	// Convert to a Integer
@@ -223,10 +223,10 @@ String.prototype.toInt = String.prototype.toInt || function(){
  * Return a new string of the old string wrapped with the start and end values
  * @version 1.0.0
  * @date June 30, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.wrap = String.prototype.wrap || function(start,end){
 	// Wrap the string
@@ -237,10 +237,10 @@ String.prototype.wrap = String.prototype.wrap || function(start,end){
  * Return a new string of a selection of the old string wrapped with the start and end values
  * @version 1.0.0
  * @date June 30, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.wrapSelection = String.prototype.wrapSelection || function(start,end,a,z){
 	// Wrap the selection
@@ -254,10 +254,10 @@ String.prototype.wrapSelection = String.prototype.wrapSelection || function(star
  * @version 1.1.0
  * @date July 16, 2010
  * @since 1.0.0, June 30, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.toSlug = String.prototype.toSlug || function(){
 	// Convert a string to a slug
@@ -273,10 +273,10 @@ String.prototype.toSlug = String.prototype.toSlug || function(){
  * @version 1.1.0
  * @date July 16, 2010
  * @since 1.0.0, June 30, 2010
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
- * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
- * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
- * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+ * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+ * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+ * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
  */
 String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || function ( )
 {	// Turns a params string or url into an array of params
@@ -304,14 +304,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		param = param.split('=');
 		if ( param === null ) { continue; }
 		// ^ We now have "var=blah" into ["var","blah"]
-		
+
 		// Get
 		var key = param[0] || null;
 		if ( key === null ) { continue; }
 		if ( typeof param[1] === 'undefined' ) { continue; }
 		var value = param[1];
 		// ^ We now have the parts
-		
+
 		// Fix
 		key = decodeURIComponent(key);
 		value = decodeURIComponent(value);
@@ -321,7 +321,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		} catch ( e ) {
 		    // value is a normal string
 		}
-		
+
 		// Set
 		// window.console.log({'key':key,'value':value}, split);
 		var keys = key.split('.');
@@ -358,23 +358,23 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 /**
  * @depends jquery
  * @name jquery.events
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
  */
 
 /**
  * jQuery Aliaser
  */
 (function($){
-	
+
 	/**
 	 * Bind a event, with or without data
 	 * Benefit over $.bind, is that $.binder(event, callback, false|{}|''|false) works.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.binder = $.fn.binder || function(event, data, callback){
 		// Help us bind events properly
@@ -389,15 +389,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		// Chain
 		return $this;
 	};
-	
+
 	/**
 	 * Bind a event only once
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.once = $.fn.once || function(event, data, callback){
 		// Only apply a event handler once
@@ -414,15 +414,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		// Chain
 		return $this;
 	};
-	
+
 	/**
 	 * Event for pressing the enter key
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.enter = $.fn.enter || function(data,callback){
 		return $(this).binder('enter',data,callback);
@@ -449,15 +449,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			return;
 		}
 	};
-	
+
 	/**
 	 * Event for pressing the escape key
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.cancel = $.fn.cancel || function(data,callback){
 		return $(this).binder('cancel',data,callback);
@@ -485,15 +485,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			return;
 		}
 	};
-	
+
 	/**
 	 * Event for the last click for a series of one or more clicks
 	 * @version 1.0.0
 	 * @date July 16, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.lastclick = $.fn.lastclick || function(data,callback){
 		return $(this).binder('lastclick',data,callback);
@@ -547,15 +547,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			check.apply(this,[event]);
 		}
 	};
-	
+
 	/**
 	 * Event for the first click for a series of one or more clicks
 	 * @version 1.0.0
 	 * @date July 16, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.firstclick = $.fn.firstclick || function(data,callback){
 		return $(this).binder('firstclick',data,callback);
@@ -610,16 +610,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			check.apply(this,[event]);
 		}
 	};
-	
+
 	/**
 	 * Event for performing a singleclick
 	 * @version 1.1.0
 	 * @date July 16, 2010
 	 * @since 1.0.0, June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.singleclick = $.fn.singleclick || function(data,callback){
 		return $(this).binder('singleclick',data,callback);
@@ -677,40 +677,40 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			check.apply(this,[event]);
 		}
 	};
-	
+
 
 })(jQuery);
 /**
  * @depends jquery
  * @name jquery.extra
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
  */
 
 /**
  * jQuery Aliaser
  */
 (function($){
-	
+
 	/**
 	 * Opacity Fix for Text without Backgrounds
 	 * Fixes the text corrosion during opacity effects by forcing a background-color value on the element.
 	 * The background-color value is the the same value as the first parent div which has a background-color.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.opacityFix = $.fn.opacityFix || function(){
 		var $this = $(this);
-		
+
 		// Check if this fix applies
 		var color = $this.css('background-color');
 		if ( color && color !== 'rgba(0, 0, 0, 0)' ) {
 			return this;
 		}
-		
+
 		// Apply the background colour of the first parent which has a background colour
 		var $parent = $this;
 		while ( $parent.inDOM() ) {
@@ -721,62 +721,62 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				break;
 			}
 		}
-		
+
 		// Chain
 		return this;
 	};
-	
+
 	/**
 	 * Get all elements above ourself which match the selector, and include ourself in the search
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.parentsAndSelf = $.fn.parentsAndSelf || function(selector){
 		var $this = $(this);
 		return $this.parents(selector).andSelf().filter(selector);
 	};
-	
+
 	/**
 	 * Get all elements within ourself which match the selector, and include ourself in the search
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.findAndSelf = $.fn.findAndSelf || function(selector){
 		var $this = $(this);
 		return $this.find(selector).andSelf().filter(selector);
 	};
-	
+
 	/**
 	 * Find the first input, and include ourself in the search
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.firstInput = $.fn.firstInput || function(){
 		var $this = $(this);
 		return $this.findAndSelf(':input').filter(':first');
 	};
-	
+
 	/**
 	 * Select a option within options, checkboxes, radios and selects.
 	 * Rather than setting the actual value of a element which $el.val does.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.choose = $.fn.choose||function(value){
 		var $this = $(this);
@@ -804,15 +804,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		}
 		return this;
 	};
-	
+
 	/**
 	 * Deselect a option within options, checkboxes, radios and selects.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.unchoose = $.fn.unchoose||function(){
 		var $this = $(this);
@@ -834,15 +834,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		}
 		return this;
 	};
-	
+
 	/**
 	 * Checks if the element would be passed with the form if the form was submitted.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.wouldSubmit = $.fn.wouldSubmit || function(){
 		var $input = $(this).findAndSelf(':input');
@@ -852,15 +852,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		}
 		return result;
 	};
-	
+
 	/**
 	 * Grab all the values of a form in JSON format if the form would be submitted.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.values = $.fn.values || function(){
 		var $inputs = $(this).findAndSelf(':input');
@@ -887,15 +887,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		});
 		return values;
 	};
-	
+
 	/**
 	 * Submit the form which the element is associated with.
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.submitForm = $.fn.submitForm || function(){
 		// Submit the parent form or our form
@@ -905,44 +905,44 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		// Chain
 		return $this;
 	};
-	
+
 	/**
 	 * Checks if the element is attached within the DOM
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.inDOM = $.fn.inDOM || function(){
 		var $ancestor = $(this).parent().parent();
 		return $ancestor.size() && ($ancestor.height()||$ancestor.width());
 	};
-	
+
 	/**
 	 * Wrap the element's value with the passed start and end text
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.valWrap = $.fn.valWrap || function(start,end){
 		// Wrap a value
 		var $field = $(this);
 		return $field.val($field.val().wrap(start,end));
 	};
-	
+
 	/**
 	 * Wrap a selection of the element's value with the passed start and end text
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.valWrapSelection = $.fn.valWrapSelection || function(start,end,a,z){
 		// Wrap the selected text
@@ -972,15 +972,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		}
 		return $field;
 	};
-	
+
 	/**
 	 * Find (with regards to the element) the first visible input element, and give focus to it
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.giveFocus = $.fn.giveFocus || function(){
 		// Give focus to the current element
@@ -989,15 +989,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		$this.findAndSelf(selector).focus();
 		return this;
 	};
-	
+
 	/**
 	 * Gives target to the element, and removes target from everything else
 	 * @version 1.0.0
 	 * @date August 23, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.giveTarget = $.fn.giveTarget || function(){
 		// Give focus to the current element
@@ -1006,45 +1006,45 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		$this.addClass('target');
 		return this;
 	};
-	
+
 	/**
 	 * Perform the highlight effect
 	 * @version 1.0.0
 	 * @date June 30, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.highlight = $.fn.highlight || function(duration){
 		// Perform the Highlight Effect
 		return $(this).effect('highlight', {}, duration||3000);
 	};
-	
+
 	/**
 	 * Get a elements html including it's own tag
 	 * @version 1.0.1
 	 * @date August 07, 2010
 	 * @since 1.0.0, August 07, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.htmlAndSelf = $.fn.htmlAndSelf || function(){
 		// Get a elements html including it's own tag
 		return $(this).attr('outerHTML');
 	};
-	
+
 	/**
 	 * Prevent the default action when a click is performed
 	 * @version 1.0.1
 	 * @date August 31, 2010
 	 * @since 1.0.0, August 19, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.preventDefaultOnClick = $.fn.preventDefaultOnClick || function(){
 		return $(this).click(function(event){
@@ -1052,16 +1052,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			return false;
 		});
 	};
-	
+
 	/**
 	 * Attempts to change the element type to {$type}
 	 * @version 1.0.1
 	 * @date August 07, 2010
 	 * @since 1.0.0, August 07, 2010
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.fn.attemptTypeChangeTo = $.fn.attemptTypeChangeTo || function(type){
 		// Prepare
@@ -1069,7 +1069,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			result = false,
 			el = $input.get(0),
 			oldType = el.type;
-			
+
 		// Handle
 		if ( type === oldType ) {
 			// Setting to the same
@@ -1086,23 +1086,23 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				}
 			}
 		}
-		
+
 		// Return result
 		return result;
 	};
-	
+
 })(jQuery);
 /**
  * @depends jquery
  * @name jquery.utilities
- * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
+ * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
  */
 
 /**
  * jQuery Aliaser
  */
 (function($){
-	
+
 	/**
 	 * Creates a new object, which uses baseObject's structure, and userObject's values when applicable
 	 * @params {Object} baseObject
@@ -1112,25 +1112,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	 * @version 1.0.0
 	 * @date August 01, 2010
 	 * @since 1.0.0
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.prepareObject = $.prepareObject || function(baseObject,userObject) {
 		var newObject = {};
 		var skipValue = '$.prepareObject.skipValue';
-		
+
 		// Extend newObject
 		$.extend(newObject,baseObject||{});
-		
+
 		// Intercept with the userObject
 		$.intercept(true,newObject,userObject);
-		
+
 		// Handle additional params
 		var objects = arguments;
 		objects[0] = objects[1] = skipValue;
-		
+
 		// Cycle through additional objects
 		$.each(objects,function(i,object){
 			// Check if we want to skip
@@ -1138,21 +1138,21 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			// Intercept with the object
 			$.intercept(true,newObject,object);
 		});
-		
+
 		// Return the newObject
 		return newObject;
 	};
-	
+
 	/**
 	 * Intercept two objects
 	 * @params [deep], &object1, object2, ...
 	 * @version 1.0.0
 	 * @date August 01, 2010
 	 * @since 1.0.0
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.intercept = $.intercept || function() {
 		// Prepare
@@ -1161,7 +1161,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			deep = false,
 			copy = false;
 		var skipValue = '$.intercept.skipValue';
-		
+
 		// Check Deep
 		if ( typeof objects[0] === 'boolean' ) {
 			deep = objects[0];
@@ -1188,13 +1188,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			object = objects[0];
 			objects[0] = skipValue;
 		}
-		
+
 		// Grab Keys
 		var keys = {};
 		$.each(object,function(key){
 			keys[key] = true;
 		});
-		
+
 		// Intercept Objects
 		if ( deep ) {
 			// Cycle through objects
@@ -1236,11 +1236,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				});
 			})
 		}
-		
+
 		// Return object
 		return object;
 	};
-	
+
 	/**
 	 * Handle a Promise
 	 * @param {Object} options.object
@@ -1251,15 +1251,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 	 * @version 1.0.0
 	 * @date August 31, 2010
 	 * @since 1.0.0
-     * @package jquery-sparkle {@link http://www.balupton/projects/jquery-sparkle}
-	 * @author Benjamin "balupton" Lupton {@link http://www.balupton.com}
-	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://www.balupton.com}
-	 * @license GNU Affero General Public License version 3 {@link http://www.gnu.org/licenses/agpl-3.0.html}
+     * @package jquery-sparkle {@link http://balupton.com/projects/jquery-sparkle}
+	 * @author Benjamin "balupton" Lupton {@link http://balupton.com}
+	 * @copyright (c) 2009-2010 Benjamin Arthur Lupton {@link http://balupton.com}
+	 * @license MIT License {@link http://creativecommons.org/licenses/MIT/}
 	 */
 	$.promise = $.promise || function(options){
 		// Extract
 		var	object = options.object||this;
-		
+
 		// Check
 		if ( typeof object[options.handlers] === 'undefined' ) {
 			object[options.handlers] = [];
@@ -1267,19 +1267,19 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		if ( typeof object[options.flag] === 'undefined' ) {
 			object[options.flag] = false;
 		}
-		
+
 		// Extract
 		var	handlers = object[options.handlers],
 			flag = object[options.flag],
 			handler = options.arguments[0];
-		
+
 		// Handle
 		switch ( typeof handler ) {
 			case 'boolean':
 				// We want to set the flag as true or false, then continue on
 				flag = object[options.flag] = handler;
 				// no break, as we want to continue on
-				
+
 			case 'undefined':
 				// We want to fire the handlers, so check if the flag is true
 				if ( flag && handlers.length ) {
@@ -1291,7 +1291,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					object[options.handlers] = [];
 				}
 				break;
-			
+
 			case 'function':
 				// We want to add or fire a handler, so check the flag
 				if ( flag ) {
@@ -1303,16 +1303,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					object[options.handlers].push(handler);
 				}
 				break;
-			
+
 			default:
 				window.console.error('Unknown arguments for $.promise', [this, arguments]);
 				break;
 		}
-	
+
 		// Return flag
 		return flag;
 	}
-	
+
 })(jQuery);
 /**
  * @depends jquery
@@ -1324,7 +1324,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
  * jQuery Aliaser
  */
 (function($){
-	
+
 	/**
 	 * jQuery ScrollTo (balupton edition)
 	 * @version 1.0.1
@@ -1346,20 +1346,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				callback: undefined,
 				durationMode: 'each'
 			},
-			
+
 			/**
 			 * Configure ScrollTo
 			 */
 			configure: function(options){
 				var ScrollTo = $.ScrollTo;
-				
+
 				// Apply Options to Config
 				$.extend(ScrollTo.config, options||{});
-				
+
 				// Chain
 				return this;
 			},
-		
+
 			/**
 			 * Perform the Scroll Animation for the Collections
 			 * We use $inline here, so we can determine the actual offset start for each overflow:scroll item
@@ -1367,12 +1367,12 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			scroll: function(collections, config){
 				var ScrollTo = $.ScrollTo;
-			
+
 				// Determine the Scroll
 	    		var	collection = collections.pop(),
 					$container = collection.$container,
 					$target = collection.$target;
-			
+
 				// Prepare the Inline Element of the Container
 				var $inline = $('<span/>').css({
 					'position': 'absolute',
@@ -1380,20 +1380,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					'left': '0px'
 				});
 				var position = $container.css('position');
-			
+
 				// Insert the Inline Element of the Container
 				$container.css('position','relative');
 				$inline.appendTo($container);
-			
+
 				// Determine the Offsets
 				var	startOffset = $inline.offset().top,
 					targetOffset = $target.offset().top,
 					offsetDifference = targetOffset - startOffset;
-			
+
 				// Reset the Inline Element of the Container
 				$inline.remove();
 				$container.css('position',position);
-				
+
 				// Prepare the callback
 				var callback = function(event){
 					// Check
@@ -1410,38 +1410,38 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// Return true
 					return true;
 				};
-			
+
 				// Perform the Scroll
 				$container.animate({
 					'scrollTop': offsetDifference+'px'
 				}, config.duration, config.easing, callback);
-			
+
 				// Return true
 				return true;
 			},
-		
+
 			/**
 			 * ScrollTo the Element using the Options
 			 */
 			fn: function(options){
 				var ScrollTo = $.ScrollTo;
-				
+
 				// Prepare
 				var	$target = $(this);
 				if ( $target.length === 0 ) {
 					// Chain
 					return this;
 				}
-				
+
 				// Fetch
 				var	$container = $target.parent(),
 					collections = [];
-	
+
 				// Handle Options
 				config = $.extend({},ScrollTo.config,options);
 
 				// Cycle through the containers
-				while ( $container.length === 1 && !$container.is('body') ) {
+				while ( $container.length === 1 && !$container.is('body') && !($container.get(0) === document) ) {
 					// Check Container
 					var container = $container.get(0);
 					if ( $container.css('overflow-y') !== 'visible' && container.scrollHeight !== container.clientHeight ) {
@@ -1456,49 +1456,49 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// Update the Container
 					$container = $container.parent();
 				}
-			
+
 				// Add the final collection
 				collections.push({
 					'$container': $($.browser.msie ? 'html' : 'body'),
 					'$target': $target
 				});
-	
+
 				// Adjust the Config
 				if ( config.durationMode === 'all' ) {
 					config.duration /= collections.length;
 				}
-				
+
 				// Handle
 				ScrollTo.scroll(collections,config);
-			
+
 				// Chain
 				return this;
 			},
-		
+
 			/**
 			 * Construct
 			 */
 			construct: function(options){
 				var ScrollTo = $.ScrollTo;
-			
+
 				// Apply our jQuery Function
 				$.fn.ScrollTo = ScrollTo.fn;
-			
+
 				// Apply our Options to the Default Config
 				ScrollTo.config = $.extend(ScrollTo.config,options);
-			
+
 				// Chain
 				return this;
 			}
 		};
-	
+
 		// Construct It
 		$.ScrollTo.construct();
 	}
 	else {
 		window.console.warn("$.ScrollTo has already been defined...");
 	}
-	
+
 })(jQuery);
 /**
  * @depends jquery, core.console
@@ -2005,12 +2005,12 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 (function($){
 	// Create our Plugin function, with $ as the argument (we pass the jQuery object over later)
 	// More info: http://docs.jquery.com/Plugins/Authoring#Custom_Alias
-	
+
 	/**
 	 * Prepare Body
 	 */
 	$(document.body).addClass('js');
-	
+
 	/**
 	 * jQuery Ajaxy
 	 * @version 1.6.0
@@ -2026,12 +2026,12 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 		 * Ajaxy
 		 */
 		$.Ajaxy = {
-			
-			
+
+
 			// ====================================================
 			// Options
-			
-			
+
+
 			/**
 			 * User configuration
 			 */
@@ -2057,7 +2057,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				 * If set to true, then we will use the default regular expression to match against.
 				 */
 				request_match: false,
-				
+
 				/**
 				 * The CSS class that can be attached to a Ajaxy link to indicate we should not log this page in history.
 				 */
@@ -2149,12 +2149,12 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				 */
 				method: 'post'
 			},
-			
-			
+
+
 			// ====================================================
 			// Defaults
-			
-			
+
+
 			/**
 			 * Default Structures
 			 */
@@ -2168,28 +2168,28 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					classname: null,
 					selector: null,
 					matches: null,
-					
+
 					// System
 					controller: null,
-					
+
 					// Actions
 					response: null,
 					request: null,
 					error: null,
 					refresh: null
 				},
-				
+
 				Action: {
 					// Options
 					propagate: true,
-					
+
 					// System
 					action: null,
 					state: null,
 					State: null,
 					controller: null,
 					Controller: null,
-					
+
 					// Ajaxy Helper Functions
 					forward: function(){
 						window.console.error('Ajaxy.Action.forward: Forward never defined.', [this, arguments]);
@@ -2207,32 +2207,32 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					},
 					documentReady: function($el,options){
 						var Ajaxy = $.Ajaxy; var Action = this;
-						
+
 						// Options
 						if ( typeof options !== 'object' ) {
 							options = {};
 						}
-						
+
 						// Default Options
 						var defaults = {};
 						switch ( Action.action ) {
 							case 'refresh':
-								defaults.auto_ajaxify_documentReady = 
+								defaults.auto_ajaxify_documentReady =
 								defaults.auto_sparkle_documentReady = false;
 								break;
-							
+
 							default:
 								break;
 						}
-						
+
 						// Merge with Defaults
 						var config = $.extend(true,{},defaults,options);
-						
+
 						// Fire Ajaxy's stateCompleted
 						return Ajaxy.stateCompleted(Action.State,$el,config);
 					}
 				},
-				
+
 				/**
 				 * Default State Structure
 				 * All Controllers inherit and are bound to this
@@ -2244,7 +2244,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					el: null,
 					isLink: false,
 					isForm: false,
-					
+
 					// Parts
 					anchor: '',
 					querystring: '',
@@ -2276,105 +2276,105 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						location: '',
 						locationShort: ''
 					},
-					
+
 					// System
 					controller: null,
-					
+
 					/** The Request Object that is used in the $.Ajax */
 					Request: {
 						url: null,
 						data: {}
 					},
-					
+
 					/* The Response Object which is returned in our Ajax Request */
 					Response: {
 						callback: null,
 						data: {}
 					},
-					
+
 					/* The Response Object which is returned from an Error in our Ajax Request */
 					Error: {
 						callback: null,
 						data: {}
 					},
-					
+
 					/* Any user data specific to the state should go in here. This is not used by Ajaxy. */
 					User: {
 						data: {}
 					}
 				}
 			},
-			
-			
+
+
 			// ====================================================
 			// Variables
-			
-			
+
+
 			/**
 			 * Have we been constructed
 			 */
 			isConstructed: false,
-			
+
 			/**
 			 * Aliases Hashtable
 			 */
 			aliases: {},
-			
+
 			/**
 			 * Whether or not we are in postpone mode
 			 */
 			postpone: false,
-			
+
 			/**
 			 * Collection of Controllers
 			 */
 			Controllers: {},
-		
+
 			/**
 			 * Collection of states
 			 */
 			States: {},
-			
+
 			/**
 			 * Collection of Ignored States
 			 */
 			ignoredStates: {},
-			
+
 			/**
 			 * Our Current State
 			 */
 			currentState: {},
-			
+
 			/**
 			 * Queue for our events
 			 * @param {Object} state
 			 */
 			ajaxQueue: [],
-		
+
 			/**
 			 * Our assigned data
 			 * @param {Object} data
 			 */
 			data: {},
-			
+
 			/**
 			 * Contains any redirect data in case we were
 			 * @param {Object} redirected
 			 */
 			redirected: false,
-			
-			
+
+
 			// ====================================================
 			// Data
-			
-			
+
+
 			/**
 			 * Get a piece of data
 			 * @param {Object} name
 			 */
 			get: function ( name ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Fetch data
 				if ( typeof Ajaxy.data[name] !== 'undefined' ) {
 					return Ajaxy.data[name];
@@ -2382,7 +2382,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					return undefined;
 				}
 			},
-		
+
 			/**
 			 * Set a piece (or pieces) of data
 			 * Ajaxy.set(data), Ajaxy.set(name, value)
@@ -2391,7 +2391,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			set: function ( data, value ) {
 				var Ajaxy = $.Ajaxy;
-			
+
 				// Set route data
 				if ( typeof value === 'undefined' ) {
 					if ( typeof data === 'object' ) {
@@ -2401,12 +2401,12 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					Ajaxy.data[data] = value;
 				}
 			},
-			
-			
+
+
 			// ====================================================
 			// URLS
-			
-			
+
+
 			/**
 			 * Ensure we return a valid String value
 			 * @param {*} str
@@ -2414,20 +2414,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			ensureString: function(str){
 				var result = '';
-				
+
 				switch ( typeof str ) {
 					case 'number':
 					case 'string':
 						result = String(str);
 						break;
-					
+
 					default:
 						result = '';
 				}
-				
+
 				return result;
 			},
-			
+
 			/**
 			 * Extract a Relative URL from a URL
 			 * @param {String} url
@@ -2437,20 +2437,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				if ( typeof fixSlash === 'undefined' ) {
 					fixSlash = true;
 				}
-				
+
 				// Prepare
 				url = Ajaxy.ensureString(url);
-				
+
 				// Strip urls
 				var relative_url = url.stripLeft(Ajaxy.options.root_url).stripLeft(Ajaxy.options.base_url);
-				
+
 				// Check
-				if ( fixSlash && relative_url === '/' ) relative_url = ''; 
-				
+				if ( fixSlash && relative_url === '/' ) relative_url = '';
+
 				// Return relative_url
 				return relative_url;
 			},
-			
+
 			/**
 			 * Extract the State from a URL
 			 * Alias for extractRelativeUrl
@@ -2458,14 +2458,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			extractState: function (url) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Strip urls
 				var state = Ajaxy.extractRelativeUrl(url,false);
-				
+
 				// Return state
 				return state;
 			},
-			
+
 			/**
 			 * Extract the Hash from a State
 			 * @param {String} state
@@ -2473,20 +2473,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			extractHash: function (state) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Strip urls
 				var state = Ajaxy.extractState(state);
-				
+
 				// Extract the anchor
 				var hash = state.match(/^([^#?]*)/)||'';
 				if ( hash && hash.length||false === 2 ) {
 					hash = hash[1]||'';
 				}
-				
+
 				// Return hash
 				return hash;
 			},
-			
+
 			/**
 			 * Extract a Anchor from a State
 			 * @param {String} state
@@ -2494,22 +2494,22 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			extractAnchor: function (state) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Strip urls
 				var	state = Ajaxy.extractState(state),
 					anchor_param_name = Ajaxy.options.anchor_param_name;
-				
+
 				// Extract the anchor
 				var anchor = state.replace(/[^#]+#/g,'#').match(/#+([^#\?]*)/)||'';
 				if ( anchor && anchor.length||false === 2 ) {
 					anchor = anchor[1]||'';
 				}
-				
+
 				// Check
 				if ( anchor === state ) {
 					anchor = '';
 				}
-				
+
 				// Check
 				if ( !anchor ) {
 					// Extract anchor from QueryString
@@ -2518,11 +2518,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						anchor = anchor[1]||'';
 					}
 				}
-				
+
 				// Return anchor
 				return anchor;
 			},
-			
+
 			/**
 			 * Extract a Querystring from a State
 			 * @param {String} state
@@ -2530,27 +2530,27 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			extractQuerystring: function (state) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Strip urls
 				var state = Ajaxy.extractState(state);
-				
+
 				// Extract the querystring
 				var querystring = state.match(/\?(.*)$/)||'';
 				if ( querystring && querystring.length||false === 2 ) {
 					querystring = querystring[1]||'';
 				}
-				
+
 				// Return querystring
 				return querystring;
 			},
-			
+
 			/**
 			 * Track a state change in Google Analytics
 			 * @param {Object} State
 			 */
 			track: function ( State ) {
 				var Ajaxy = $.Ajaxy;
-			
+
 				// Inform Google Analytics of a state change
 				if ( typeof pageTracker !== 'undefined' ) {
 					var url = State.vanilla.locationShort;
@@ -2560,11 +2560,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					//   but it does want the base url here
 					//   http://www.google.com/support/googleanalytics/bin/answer.py?answer=55521
 				}
-				
+
 				// Done
 				return true;
 			},
-			
+
 			/**
 			 * Determines the result of a matches against a state
 			 * @param {Regex|Array|String} matches
@@ -2573,7 +2573,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			matches: function ( matches, state ) {
 				var Ajaxy = $.Ajaxy;
 				var isAMatch = false;
-				
+
 				// Handle matches
 				switch ( typeof matches ) {
 					// Objects
@@ -2590,18 +2590,18 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							if ( isAMatch ) return false; // break out of $.each
 						});
 						break;
-					
+
 					// Exact
 					case 'number':
 					case 'string':
 						isAMatch = (String(matches) === state);
 						break;
 				}
-				
+
 				// Return isAMatch
 				return isAMatch;
 			},
-			
+
 			/**
 			 * Match the state against the controllers
 			 * @param {String} state
@@ -2609,7 +2609,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			match: function ( state ) {
 				var Ajaxy = $.Ajaxy;
 				var matchedController = false;
-				
+
 				// Cycle through
 				$.each(Ajaxy.Controllers, function(controller,Controller){
 					// Check for matches
@@ -2620,16 +2620,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						return false; // break out of $.each
 					}
 				});
-				
+
 				// Return matchedController
 				return matchedController;
 			},
-			
-			
+
+
 			// ====================================================
 			// Controllers
-			
-			
+
+
 			/**
 			 * Get the controller's Controller Object
 			 * @param {String|Object} controller
@@ -2637,11 +2637,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			getController: function ( controller, create ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Prepare
 				var Controller = undefined,
 					controllerType = typeof (controller||undefined);
-				
+
 				// Fetch
 				if ( (controllerType === 'number' || controllerType === 'string') && typeof Ajaxy.Controllers[controller] !== 'undefined' ) {
 					Controller = Ajaxy.Controllers[controller];
@@ -2660,11 +2660,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					window.console.error('Ajaxy.getController: Controller does not exist', [this, arguments]);
 					window.console.trace();
 				}
-			
+
 				// Return Controller
 				return Controller;
 			},
-			
+
 			/**
 			 * Get the Controller Action
 			 * @param {String|Object} controller
@@ -2672,11 +2672,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			getControllerAction: function ( controller, action, create ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Prepare
 				var ControllerAction = undefined,
 					Controller = Ajaxy.getController(controller,false);
-				
+
 				// Fetch
 				if ( typeof Controller === 'undefined' ) {
 					if ( create === false ) {
@@ -2700,11 +2700,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						window.console.trace();
 					}
 				}
-				
+
 				// Return ControllerAction
 				return ControllerAction;
 			},
-			
+
 			/**
 			 * Ajaxy.bind
 			 * @alias Ajaxy.addControllers
@@ -2713,7 +2713,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				var Ajaxy = $.Ajaxy;
 				return Ajaxy.addControllers.apply(this, arguments);
 			},
-			
+
 			/**
 			 * Ajaxy.addController
 			 * @param {String|Object} controller
@@ -2721,10 +2721,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			addController: function ( controller, Controller ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// --------------------------
 				// Prepare the Controller
-				
+
 				// Add a controller
 				if ( typeof Controller === 'undefined' && typeof controller === 'object' ) {
 					// Ajaxy.addController({});
@@ -2747,7 +2747,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					window.console.error('Ajaxy.addController: Unknown Controller Format', [this, arguments]);
 					window.console.trace();
 				}
-				
+
 				// Check Bound Status
 				if ( typeof Ajaxy.Controllers[Controller.controller] !== 'undefined' ) {
 					// Already Bound
@@ -2755,42 +2755,42 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					window.console.trace();
 					return false;
 				}
-				
+
 				// --------------------------
 				// Ensure then Store the Controller
-				
+
 				// Ensure the Controller
 				Controller = $.prepareObject(
 					Ajaxy.defaults.Controller,
 					Controller
 				);
-				
+
 				// Adjust Controller
 				if ( !Controller.selector && Controller.classname ) {
 					Controller.selector = '.'+Controller.classname;
 				}
-				
+
 				// Store the Controller
 				Ajaxy.Controllers[Controller.controller] = Controller;
-				
+
 				// Ajaxify the Controller
 				if ( Ajaxy.options.auto_ajaxify ) {
 					Ajaxy.ajaxifyController(Controller);
 				}
-				
+
 				// --------------------------
-				
+
 				// Return the Controller
 				return Controller;
 			},
-			
+
 			/**
 			 * Ajaxy.addControllers
 			 * @param {Object|Array} Controllers
 			 */
 			addControllers: function ( Controllers ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Create the Controller
 				if ( typeof Controllers === 'object' && typeof Controllers.controller === 'string' ) {
 					// We were meant to be an addController call
@@ -2802,16 +2802,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						Ajaxy.addController(controller,Controller);
 					});
 				}
-				
+
 				// Return true
 				return true;
 			},
-			
-			
+
+
 			// ====================================================
 			// States
-			
-			
+
+
 			/**
 			 * Get the state's State Object
 			 * @param {String|Object} state
@@ -2819,13 +2819,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			getState: function ( state, create, error ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Prepare
 				state = Ajaxy.extractState((state||{}).state||state);
 				var State = undefined,
 					type = typeof (state||undefined),
 					typeStringable = (type === 'number' || type === 'string');
-				
+
 				// Fetch
 				if ( typeStringable && typeof Ajaxy.States[state] !== 'undefined' ) {
 					State = Ajaxy.States[state];
@@ -2841,16 +2841,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					window.console.error('Ajaxy.getState: State does not exist', [this, arguments]);
 					window.console.trace();
 				}
-				
+
 				// Rebuild State
 				if ( State ) {
 					Ajaxy.rebuildState(State);
 				}
-				
+
 				// Return State
 				return State;
 			},
-			
+
 			/**
 			 * Create a new State Object
 			 * @param {String|Object} state
@@ -2858,22 +2858,22 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			createState: function ( state ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Prepare
 				state = Ajaxy.extractState((state||{}).state||state);
-				
+
 				// Create State
 				State = $.extend(true,{},Ajaxy.defaults.State,{
 					state: state
 				});
-				
+
 				// Rebuild State
 				Ajaxy.rebuildState(State);
-				
+
 				// Return State
 				return State;
 			},
-			
+
 			/**
 			 * Build an Ajaxy State
 			 * @param {String|Object} UserState
@@ -2881,9 +2881,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			buildState: function ( UserState ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.buildState:', [this, arguments]);
-				
+
 				// --------------------------
-				
+
 				// Ensure format
 				if ( typeof UserState === 'string' ) {
 					// We have just a state
@@ -2891,24 +2891,24 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						url: UserState
 					};
 				}
-				
+
 				// Prepare State
 				var State = Ajaxy.getState(false,true);
 				$.extend(true,State,UserState);
-				
+
 				// --------------------------
 				// Ensure parts
-				
+
 				// Check for !state and url
 				if ( !(State.state||false) && (State.url||false) ) {
 					State.state	= Ajaxy.extractState(State.url);
 				}
-				
+
 				// Fix state
 				if ( !State.state ) {
 					State.state = '/';
 				}
-				
+
 				// Handle Element
 				if ( State.el ) {
 					var $el = $(State.el);
@@ -2925,18 +2925,18 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					}
 					delete $el;
 				}
-				
+
 				// Rebuild the state
 				Ajaxy.rebuildState(State);
-				
+
 				// --------------------------
 				// Anchor Fixes
-				
+
 				// Fix anchor
 				if ( State.anchor === State.state || State.anchor === State.hash ) {
 					State.anchor = '';
 				}
-				
+
 				// Check for !hash and !querystring and anchor
 				if ( !(State.hash||false) && !State.raw.querystring && (State.anchor||'') ) {
 					// We are just an anchor change
@@ -2944,19 +2944,19 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// As otherwise the anchor will become the hash, and this is a problem.
 					State.hash = Ajaxy.currentState.hash||'';
 					State.querystring = State.raw.querystring;
-					
+
 					// Rebuild the state
 					Ajaxy.rebuildState(State);
 				}
-				
+
 				// --------------------------
 				// Additional Checks
-				
+
 				// Check state
 				if ( !State.state || (!State.hash && !State.raw.querystring) ) {
 					window.console.warn('Ajaxy.go: No state or (hash and querystring).', [this, arguments], [State]);
 				}
-				
+
 				// Ensure mode
 				if ( !State.mode ) {
 					if ( State.isLink && Ajaxy.postpone ) {
@@ -2976,14 +2976,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					else {
 						State.mode = 'default';
 					}
-				}	
-				
+				}
+
 				// --------------------------
-				
+
 				// Return State
 				return State;
 			},
-			
+
 			/**
 			 * Rebuild a State
 			 * @param {&State} State
@@ -2991,7 +2991,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			rebuildState: function(State,mode){
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Extract
 				var state = Ajaxy.extractState(State.state),
 					hash = Ajaxy.ensureString(State.hash) || Ajaxy.extractHash(state),
@@ -3000,7 +3000,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					base_url = Ajaxy.options.base_url,
 					root_url = Ajaxy.options.root_url,
 					anchor_param_name = Ajaxy.options.anchor_param_name;
-				
+
 				// Anchor
 				if ( anchor ) {
 					// Place anchor into querystring
@@ -3009,7 +3009,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					querystring = unescape($.param(params));
 					delete params;
 				}
-				
+
 				// Standard: +Ajaxy +Anchor
 				// http://site.com/page/#state?anchor=top&a=true
 				State.anchor = anchor;
@@ -3018,7 +3018,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				State.state = hash+(querystring ? '?'+querystring : '');
 				State.locationShort = base_url+'#'+State.state;
 				State.location = root_url+State.locationShort;
-				
+
 				// Raw: +Ajaxy -Anchor
 				// http://site.com/page/#state?a=true
 				State.raw.anchor = '';
@@ -3027,7 +3027,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				State.raw.state = State.hash+(State.raw.querystring ? '?'+State.raw.querystring : '');
 				State.raw.locationShort = base_url+(State.raw.state ? '#'+State.raw.state : '');
 				State.raw.location = root_url+State.raw.locationShort;
-				
+
 				// Vanilla: -Ajaxy +Anchor
 				// http://site.com/page/?a=true#top
 				State.vanilla.anchor = State.anchor;
@@ -3036,7 +3036,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				State.vanilla.state = State.vanilla.anchor;
 				State.vanilla.locationShort = base_url+State.raw.hash+(State.vanilla.querystring ? '?'+State.vanilla.querystring : '')+(State.vanilla.anchor ? '#'+State.vanilla.anchor : '');
 				State.vanilla.location = root_url+State.vanilla.locationShort;
-				
+
 				// Clean: -Ajaxy -Anchor
 				// http://site.com/page/?a=true
 				State.clean.anchor = '';
@@ -3045,25 +3045,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				State.clean.state = '';
 				State.clean.locationShort = base_url+State.hash+(State.clean.querystring ? '?'+State.clean.querystring : '');
 				State.clean.location = root_url+State.clean.locationShort;
-				
+
 				// Return State
 				return State;
 			},
-			
+
 			/**
 			 * Store a State Object
 			 * @param {Object} state
 			 */
 			storeState: function ( State ) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Prepare
 				var result = true,
 					stateType = typeof (State||undefined);
-				
+
 				// Rebuild State
 				Ajaxy.rebuildState(State);
-				
+
 				// Fetch
 				if ( stateType === 'object' && typeof State.state === 'string' ) {
 					result = Ajaxy.States[State.state] = State;
@@ -3073,11 +3073,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					window.console.trace();
 					result = false;
 				}
-			
+
 				// Return result
 				return result;
 			},
-			
+
 			/**
 			 * Compare two States with each other
 			 * @param {State} newState
@@ -3086,10 +3086,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			statesEquivalent: function(newState, oldState) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Prepare
 				var result = false;
-				
+
 				// Check for Forms
 				if ( newState.isForm || oldState.isForm ) {
 					// If we are a form, we are always new
@@ -3108,11 +3108,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						}
 					});
 				}
-				
+
 				// Return result
 				return result;
 			},
-			
+
 			/**
 			 * Function which fires once a state has completed it's cycle
 			 * @param {Object} State
@@ -3121,7 +3121,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			stateCompleted: function(State,$content,options){
 				var Ajaxy = $.Ajaxy;
-				
+
 				// Prepare Arguments
 				if ( typeof State !== 'object' ) {
 					State = {};
@@ -3132,10 +3132,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				if ( typeof options !== 'object' ) {
 					options = {};
 				}
-				
+
 				// Prepare Options
 				var config = $.extend({},Ajaxy.options,options);
-				
+
 				// Auto Sparkle
 				if ( config.auto_sparkle_documentReady && $.Sparkle||false ) {
 					if ( config.add_sparkle_extension ) {
@@ -3143,12 +3143,12 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					}
 					$content.sparkle();
 				}
-				
+
 				// Auto Ajaxify
 				if ( config.auto_ajaxify_documentReady ) {
 					$content.ajaxify();
 				}
-				
+
 				// Check for Anchor
 				var anchor = State.anchor||false;
 				if ( anchor ) {
@@ -3162,16 +3162,16 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// ScrollTo the content
 					$content.ScrollTo(config.scrollto_options);
 				}
-				
+
 				// Return true
 				return true;
 			},
-			
-			
+
+
 			// ====================================================
 			// Actions
-			
-			
+
+
 			/**
 			 * Refresh
 			 */
@@ -3180,8 +3180,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				// Go
 				return Ajaxy.go(History.getHash());
 			},
-		
-			
+
+
 			/**
 			 * Perform an Ajaxy Request
 			 * @param {String|Object} UserState
@@ -3189,17 +3189,17 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			go: function ( UserState ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.go:', [this, arguments]);
-			
+
 				// --------------------------
-				
+
 				// Build State
 				var State = Ajaxy.buildState(UserState);
-				
+
 				// Store it
 				Ajaxy.storeState(State);
-			
+
 				// --------------------------
-				
+
 				// Trigger state
 				switch ( State.mode ) {
 					case 'silent':
@@ -3207,19 +3207,19 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Trigger manually
 						Ajaxy.stateChange(State.state)
 						break;
-						
+
 					case 'ignore':
 						// Ignore the State
 						Ajaxy.ignoredStates[State.vanilla.state] = State;
 						// Redirect the browser
 						document.location = State.vanilla.location;
 						break;
-						
+
 					case 'postpone':
 						// Redirect the browser
 						document.location = State.location;
 						break;
-						
+
 					case 'default':
 					default:
 						// Log the history
@@ -3227,13 +3227,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						History.go(State.state);
 						break;
 				}
-				
+
 				// --------------------------
-				
+
 				// Return true
 				return true;
 			},
-			
+
 			/**
 			 * Trigger the action for the particular controller
 			 * @param {String} controller
@@ -3243,32 +3243,32 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			trigger: function ( controller, action, state ) {
 				var Ajaxy = $.Ajaxy;
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.trigger: ', [this, arguments]);
-				
+
 				// Prepare
 				var i, n, list, call_generic = true;
-				
+
 				// Check Input
 				if ( !controller ) {
 					window.console.warn('Ajaxy.trigger: No controller was passed, reset to _generic.', [this, arguments]);
 					controller = '_generic';
 				}
-				
+
 				// --------------------------
 				// Fetch
-				
+
 				// Fetch Controller
 				var Controller = Ajaxy.getController(controller);
-				
+
 				// Fetch Controller Action
 				var ControllerAction = Ajaxy.getControllerAction(controller,action,false);
-				
+
 				// Fetch the State
 				var State = Ajaxy.getState(state,true),
 					state = State.state||undefined;
-				
+
 				// --------------------------
 				// Checks
-				
+
 				// Check Controller
 				if ( typeof Controller === 'undefined' ) {
 					// No Controller
@@ -3279,7 +3279,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					}
 					return false;
 				}
-				
+
 				// Check Controller Action
 				if ( typeof ControllerAction === 'undefined' ) {
 					// Check Action Type
@@ -3301,10 +3301,10 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						return false;
 					}
 				}
-				
+
 				// --------------------------
 				// Prepare Action
-				
+
 				// Generate Action
 				var Action = $.extend(true,{},Ajaxy.defaults.Action,{
 					'action':action,
@@ -3313,47 +3313,47 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					'state':state,
 					'State':State
 				});
-				
+
 				// Setup up the Trigger + Forward Actions
 				Action.forward = Action.trigger = function(_controller, _action, _state){
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.Action.trigger:', [this, arguments]);
-					
+
 					// Prepare
 					_controller = _controller||controller;
 					_action = _action||action;
 					_state = _state||state;
-					
+
 					// Trigger
 					Ajaxy.trigger(_controller, _action, _state);
-					
+
 					// Return true
 					return true;
 				};
-				
+
 				// --------------------------
 				// Fire
-				
+
 				// Fire the ControllerAction Handler
 				var result = ControllerAction.apply(Action, []);
-				
+
 				// Should we continue to Propagate through
 				if ( Action.propagate === false ) {
 					// Break
 					call_generic = false;
 				}
-				
+
 				// Fire generic?
 				if ( call_generic && controller !== '_generic' ) {
 					// Fire generic
 					Action.forward('_generic');
 				}
-				
+
 				// --------------------------
-				
+
 				// Return true
 				return true;
 			},
-			
+
 			/**
 			 * Send an Ajaxy Request
 			 * @param {Object} state
@@ -3361,69 +3361,69 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			request: function (state) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request:', [this, arguments]);
-				
+
 				// Prepare variables
 				var skip_ajax = false;
-				
-				
+
+
 				// --------------------------
 				// Initialise State
-				
+
 				// Are we an ignored state?
 				var ignoredByMatch = (Ajaxy.options.request_match instanceof RegExp) && !Ajaxy.options.request_match.test(state),
 					ignoredByState = (typeof Ajaxy.ignoredStates[state] !== 'undefined');
 				if ( ignoredByMatch || ignoredByState ) {
 					// We are an ignored state
-					
+
 					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: We are an ignored state', [this, arguments], [state]);
 					return true;
 				}
 				delete ignoredByMatch;
 				delete ignoredByState;
-				
+
 				// Determine State
 				var State = Ajaxy.getState(state,true);
-				
+
 				// Check if we were a redirect
 				if ( Ajaxy.redirected !== false ) {
 					// We were, ignore as we have already been fired
 					Ajaxy.redirected = false;
 					return;
 				}
-				
+
 				// Remove Target
 				$('.target').removeClass('target');
-				
+
 				// --------------------------
 				// Current State
-				
+
 				// Are we a repeat request
 				if ( Ajaxy.statesEquivalent(State, Ajaxy.currentState) ) {
 					// We are the same hash and querystring
 					// currentState contains request and response etc, however new state contains anchor information, need to figure out a middle ground
-					
+
 					// Move the Response and Request into the new State
 					State.controller = Ajaxy.currentState.controller;
 					State.Request = Ajaxy.currentState.Request;
 					State.Response = Ajaxy.currentState.Response;
 					State.Error = Ajaxy.currentState.Error;
-					
+
 					// Update the Current State
 					Ajaxy.currentState = State;
-					
+
 					// Store/Update the State
 					Ajaxy.storeState(State); // really this shouldn't be needed, but somewhere our expectations of references are wrong
-					
+
 					// Trigger handler
 					//Ajaxy.stateCompleted(Ajaxy.currentState);
 					Ajaxy.trigger(State.controller, 'refresh', Ajaxy.currentState);
-					
+
 					// Log this minor state change
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request: There has been no considerable change', [this, arguments], [Ajaxy.currentState,State,state]);
 					return true;
 				}
-				
+
 				// Add to AJAX queue
 				Ajaxy.ajaxQueue.push(state);
 				if ( Ajaxy.ajaxQueue.length !== 1 ) {
@@ -3433,40 +3433,40 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					return false;
 				}
 				// We are now the current event
-			
+
 				// Fire the analytics
 				if ( Ajaxy.options.analytics ) {
 					Ajaxy.track(State);
 				}
-				
+
 				// Update the currentState
 				Ajaxy.currentState = State;
-				
-				
+
+
 				// --------------------------
 				// Update the State
-				
+
 				// Determine controller
 				var controller = State.controller || Ajaxy.match(state) || undefined;
-				
+
 				// Prepare the State
 				State.controller = controller;
 				State.Request.url = (State.Request.url || State.clean.location);
-				
+
 				// Store the State (in case it hasn't been stored yet - eg. we came through somewhere else other than go)
 				Ajaxy.storeState(State);
-				
-				
+
+
 				// --------------------------
 				// Trigger State
-				
+
 				// Trigger Request
 				Ajaxy.trigger(controller, 'request');
-				
-				
+
+
 				// --------------------------
 				// Handle Request
-				
+
 				// Define handlers
 				var Request = {
 					data: State.Request.data,
@@ -3474,11 +3474,11 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					success: function(responseData, status){
 						// Success
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.success:', [this, arguments]);
-					
+
 						// Prepare
 						responseData = $.extend(true,{},Ajaxy.defaults.State.Response.data,responseData);
 						responseData.Ajaxy = responseData.Ajaxy || {};
-						
+
 						// Check for redirect
 						if ( responseData.Ajaxy.redirected ) {
 							// A redirect was performed, set a option so we know what to do
@@ -3492,7 +3492,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							History.go(newState);
 							// We do the redirect check up the top, so no worries here, this one flows through like normal
 						};
-						
+
 						// Success function
 						Ajaxy.ajaxQueue.shift();
 						var queueState = Ajaxy.ajaxQueue.pop();
@@ -3501,14 +3501,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							Ajaxy.stateChange(queueState);
 							return false; // don't care for this
 						}
-						
+
 						// Prepare
 						State.Response.data = responseData;
 						State.Error.data = {};
-						
+
 						// Fetch controller
 						var controller = responseData.controller || State.controller || null;
-						
+
 						// Check controller
 						if ( controller === null ) {
 							// Default
@@ -3520,7 +3520,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 								[responseData.controller, State.controller]
 							);
 						}
-						
+
 						// Fire User Specified Callback (specified with Ajaxy.go)
 						// Halts if callback returns true, or if controller is set to 'callback'
 						if ( State.Response.callback ) {
@@ -3530,14 +3530,14 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							}
 							// We fired the callback and we want to continue on
 						}
-						
+
 						// Trigger handler
 						return Ajaxy.trigger(controller, 'response', State);
 					},
 					error: function(XMLHttpRequest, textStatus, errorThrown, responseData){
 						// Error
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.error:', [this, arguments]);
-					
+
 						// Prepare
 						if ( !responseData ) {
 							// Should already be handled, but in the rare case it isn't
@@ -3545,7 +3545,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 								responseText: XMLHttpRequest.responseText.trim()||false
 							}
 						}
-					
+
 						// Handler queue
 						Ajaxy.ajaxQueue.shift()
 						var queueState = Ajaxy.ajaxQueue.pop();
@@ -3554,22 +3554,22 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							Ajaxy.stateChange(queueState);
 							return false; // don't care for this
 						}
-					
+
 						// Prepare
 						var errorData = {
 							XMLHttpRequest: XMLHttpRequest,
 							textStatus: textStatus,
 							errorThrown: errorThrown
 						};
-					
+
 						// Prepare
 						State.Request.XMLHttpRequest = XMLHttpRequest;
 						State.Response.data = responseData;
 						State.Error.data = {};
-					
+
 						// Fetch controller
 						var controller = responseData.controller || State.controller || null;
-						
+
 						// Check controller
 						if ( controller === null ) {
 							// Default
@@ -3581,7 +3581,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 								[responseData.controller, State.controller]
 							);
 						}
-						
+
 						// Fire User Specified Callback (specified with Ajaxy.go)
 						// Halts if callback returns true, or if controller is set to 'callback'
 						if ( State.Error.callback ) {
@@ -3591,20 +3591,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							}
 							// We fired the callback and we want to continue on
 						}
-						
+
 						// Trigger handler
 						return Ajaxy.trigger(controller, 'error', State);
 					},
-				
+
 					complete:	function ( XMLHttpRequest, textStatus ) {
 						// Request completed
 						if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.request.complete:', [this, arguments]);
-						
+
 						// Set XMLHttpRequest
 						State.Request.XMLHttpRequest = XMLHttpRequest;
-						
+
 						// Ignore for some reason
-						if ( false && this.url !== XMLHttpRequest.channel.name ) {
+						/*if ( this.url !== XMLHttpRequest.channel.name ) {
 							// A redirect was performed, set a option so we know what to do
 							var newState = Ajaxy.extractState(XMLHttpRequest.channel.name);
 							Ajaxy.redirected = {
@@ -3614,37 +3614,37 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							};
 							// Update the history, not ajaxy
 							History.go(newState);
-						};
+						};*/
 					}
 				};
-			
+
 				// --------------------------
-				
+
 				// Handle form if need be
 				if ( State.isForm ) {
 					var $form = $(State.el);
-					
+
 					// Determine form type
 					var enctype = $form.attr('enctype');
 					if ( enctype === 'multipart/form-data' ) {
 						// We are a complicated form
 						// Submit via target
-					
+
 						// Generate iframe
 						var iframe_id = 'ajaxy_form_iframe_' + Math.floor(Math.random() * 99999);
 						var $iframe = $('<iframe style="display:none" src="about:blank" id="'+iframe_id+'" name="'+iframe_id+'" >').appendTo('body').hide();
 						var $ajax = $('<input type="hidden" name="ajax" value="true"/>').appendTo($form);
 						var $hidden = $('<input type="hidden" name="Ajaxy[form]" value="true"/>').appendTo($form);
-					
+
 						// Event
 						$iframe.bind('load', function(){
 							var iframe = this.document || this.currentDocument || this.contentWindow.document;
-						
+
 							// Check location
 							if ( iframe.location.href === 'about:blank' ) {
 								return true;
 							}
-						
+
 							// Fire handler
 							var text = $iframe.contents().find('.response').val();
 							var json = false;
@@ -3658,24 +3658,24 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							} else {
 								request.error(json);
 							}
-						
+
 							// Clean up
 							$form.removeAttr('target');
 							$iframe.remove();
 							$ajax.remove();
 							$hidden.remove();
 						});
-					
+
 						// Adjust the form
 						$form.attr('target', iframe_id);
-					
+
 						// Submit the form
 						$form.submit();
 
 						// Update
 						var values = $form.values();
 						Request.data = $.extend(true, Request.data, values||{});
-						
+
 						// Inform to skip ajax
 						skip_ajax = true;
 					}
@@ -3685,24 +3685,24 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						Request.data = $.extend(true, Request.data, values||{});
 					}
 				}
-				
+
 				// --------------------------
-				
+
 				// Prepare Result
 				var result = true;
-				
+
 				// Update
 				State.Request = Request;
-				
+
 				// Perform AJAX request
 				if ( !skip_ajax ) {
 					result = Ajaxy.ajax(Request);
 				}
-				
+
 				// Return result
 				return result;
 			},
-			
+
 			/**
 			 * Wrapper for Ajaxy Request
 			 * @param {Object} data
@@ -3710,9 +3710,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			ajax: function(options){
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax:', [this, arguments]);
-				
+
 				// --------------------------
-				
+
 				// Move handlers into callbacks
 				// Use defaults if they do not exist
 				var callbacks = {};
@@ -3732,28 +3732,28 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					// Request completed
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.callbacks.complete:', [this, arguments]);
 				};
-				
+
 				// Delete from options
 				delete options.success;
 				delete options.error;
 				delete options.complete;
-			
+
 				// --------------------------
-				
+
 				// Prepare Ajax Request
 				var request = {
 					type:		Ajaxy.options.method,
 					dataType:	(Ajaxy.options.support_text ? 'text' : 'json')
 				};
 				$.extend(true,request,options);
-				
+
 				// Apply Handlers to Request
 				request.success = function(responseText, status){
 					// Success
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.request.success:', [this, arguments]);
 					var Response = {},
 						responseData = {};
-					
+
 					// Parse
 					if ( typeof responseText !== 'object' && Ajaxy.options.support_text && responseText ) {
 						// Attempt JSON
@@ -3775,7 +3775,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 								body = ($body.length ? $body.htmlAndSelf() : ''),
 								content = ($body.length ? $body.html() : html),
 								controller = ($controller.length ? $controller.text().trim() : null);
-							
+
 							// Create
 							responseData = {
 								"controller": controller,
@@ -3792,37 +3792,37 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						// Using JSON
 						responseData = responseText;
 					}
-					
+
 					// Apply
 					Response.data = responseData;
-					
+
 					// Debug
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.success:', [this, arguments]);
-					
+
 					// Check
 					if ( typeof responseData.controller === 'undefined' && ((typeof responseData.success !== 'undefined' && !responseData.success) || (typeof responseData.error !== 'undefined' && responseData.error)) ) {
 						// Error on simple Ajax request, not Ajaxy
 						return callbacks.error.apply(this, [null, status, responseData.error||true, responseData]);
 					}
-					
+
 					// Fire
 					return callbacks.success.apply(this, [responseData, status]);
 				};
 				request.error = function(XMLHttpRequest, textStatus, errorThrown) {
 					// Error
 					if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.ajax.request.error:', [this, arguments]);
-				
+
 					// Prepare Response
 					var responseText = XMLHttpRequest.responseText||false;
 					if ( responseText ) responseText = responseText.trim();
 					if ( !responseText ) responseText = false;
-				
+
 					// Prepare Data
 					var responseData = {
 						error: errorThrown||true,
 						responseText: responseText
 					};
-					
+
 					// Check if Response
 					if ( responseText ) {
 						try {
@@ -3835,20 +3835,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							return this.success.apply(this, [responseData, textStatus]);
 						}
 					}
-					
+
 					// Apply
 					return callbacks.error.apply(this, [XMLHttpRequest, textStatus, errorThrown, responseData]);
 				};
-			
+
 				// Send the Request
 				return $.ajax(request);
 			},
-			
-			
+
+
 			// ====================================================
 			// Constructors
-			
-			
+
+
 			/**
 			 * Configure Ajaxy
 			 * @param {Object} options
@@ -3856,15 +3856,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			configure: function ( options ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
 				options = options||{};
-				
+
 				// --------------------------
-				
+
 				// Check
 				if ( typeof options !== 'object' ) {
 					window.console.error('Ajaxy.configure: Invalid Options Passed', [this,arguments]);
 					return;
 				}
-				
+
 				// Prepare
 				var Controllers;
 				if ( typeof options.Controllers === 'object' ) {
@@ -3879,17 +3879,17 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					Controllers = options;
 					options = {};
 				}
-				
+
 				// Set options
 				Ajaxy.options = $.extend(true, Ajaxy.options, options.options||options);
-				
+
 				// --------------------------
-				
+
 				// URLs
 				Ajaxy.options.root_url = (Ajaxy.options.root_url || document.location.protocol.toString()+'//'+document.location.hostname.toString()).replace(/\/+$/, '')+'/';
 				Ajaxy.options.base_url = (Ajaxy.options.base_url || '');
 				Ajaxy.options.relative_url = Ajaxy.extractState(Ajaxy.options.relative_url ||  document.location.pathname.toString());
-				
+
 				// Relative as Base
 				if ( Ajaxy.options.relative_as_base ) {
 					if ( Ajaxy.options.base_url.length === 0 ) {
@@ -3897,20 +3897,20 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						Ajaxy.options.relative_url = '';
 					}
 				}
-				
+
 				// Adjust finals urls
 				Ajaxy.options.root_url = Ajaxy.options.root_url.replace(/\/+$/, '');
 				Ajaxy.options.base_url = Ajaxy.options.base_url.replace(/\/+$/, '');
 				Ajaxy.options.relative_url = Ajaxy.extractRelativeUrl(Ajaxy.options.relative_url);
-				
+
 				// Check
-				if ( Ajaxy.options.root_url === '/' ) Ajaxy.options.root_url = ''; 
-				if ( Ajaxy.options.base_url === '/' ) Ajaxy.options.base_url = ''; 
-				if ( Ajaxy.options.relative_url === '/' ) Ajaxy.options.relative_url = ''; 
-				
+				if ( Ajaxy.options.root_url === '/' ) Ajaxy.options.root_url = '';
+				if ( Ajaxy.options.base_url === '/' ) Ajaxy.options.base_url = '';
+				if ( Ajaxy.options.relative_url === '/' ) Ajaxy.options.relative_url = '';
+
 				// --------------------------
 				// Other Options
-				
+
 				// URL Match
 				if ( Ajaxy.options.request_match === true ) {
 					var regParts = [];
@@ -3924,13 +3924,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					Ajaxy.options.request_match = RegExp(regParts.join('|'),'i');
 					delete regParts;
 				}
-				
+
 				// --------------------------
 				// Redirect
-				
+
 				// Debug
 				if ( Ajaxy.options.debug ) window.console.debug('Ajaxy.configure:', [this, arguments]);
-				
+
 				// Redirectable
 				if ( Ajaxy.options.relative_url && Ajaxy.options.relative_url !== null ) {
 					if ( Ajaxy.options.redirect === true ) {
@@ -3954,9 +3954,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						});
 					}
 				}
-				
+
 				// --------------------------
-				
+
 				// Aliases
 				Ajaxy.aliases = [];
 				$.each(Ajaxy.options.aliases,function(i,aliasesGroup){
@@ -3964,43 +3964,43 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						Ajaxy.aliases[alias] = aliasesGroup;
 					});
 				});
-				
+
 				// Bind the Controllers
 				Ajaxy.addControllers(Controllers);
-				
+
 				// Fire the Configured Promise
 				Ajaxy.onConfigured(true);
-				
+
 				// --------------------------
-				
+
 				// Return true
 				return true;
 			},
-			
+
 			/**
 			 * Construct Ajaxy
 			 * @param {Object} options
 			 */
 			construct: function ( ) {
 				var Ajaxy = $.Ajaxy, History = $.History, Sparkle = $.Sparkle;
-				
+
 				// --------------------------
-				
+
 				// Check if we've been constructed
 				if ( Ajaxy.isConstructed ) {
 					return;
 				} else {
 					Ajaxy.isConstructed = true;
 				}
-				
+
 				// --------------------------
-				
+
 				// Bind Ajaxy History Handler
 				History.bind(function(state){
 					// History Handler
 					return Ajaxy.stateChange(state);
 				});
-			
+
 				// Bind Sparkle Extension
 				if ( $.Sparkle||false && Ajaxy.options.add_sparkle_extension ) {
 					// Add Ajaxify to Sparkle
@@ -4009,22 +4009,22 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						$(this).ajaxify();
 					});
 				}
-				
+
 				// Bind fn functions
 				$.fn.ajaxy = Ajaxy.fn.ajaxify;
 				$.each(Ajaxy.fn,function(key,fn){
 					$.fn[key] = fn;
 				});
-				
+
 				// --------------------------
 				// Setup Promises
-				
+
 				// Bind DomReady Handler
 				$(function(){
 					// Fire DocumentReady Promise
 					Ajaxy.onDocumentReady(true);
 				});
-				
+
 				// Bind Ready Handler
 				Ajaxy.onReady(function(){
 					// Auto ajaxify?
@@ -4033,7 +4033,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					}
 					// ^ this is here as well as ajaxifyController/bind as ajaxifyController will only do that controller's selector, instead of all ajaxy links
 				});
-				
+
 				// Bind Configured Handler
 				Ajaxy.onConfigured(function(){
 					// Bind DocumentReady Handler
@@ -4042,29 +4042,29 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						Ajaxy.onReady(true);
 					});
 				});
-				
+
 				// --------------------------
-				
+
 				// All done
 				return true;
 			},
-		
-			
+
+
 			// ====================================================
 			// Ajaxify
-			
+
 			/**
 			 * Ajaxify a particullar controller
 			 * @param {String} controller
 			 */
 			ajaxifyController: function(controller) {
 				var Ajaxy = $.Ajaxy;
-				
+
 				// --------------------------
-				
+
 				// Fetch Controller
 				var Controller = Ajaxy.getController(controller);
-				
+
 				// Do selector
 				if ( Controller && (Controller.selector||false) ) {
 					// We have a selector
@@ -4074,13 +4074,13 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						$els.data('ajaxy-controller',controller).addAjaxy();
 					});
 				}
-				
+
 				// --------------------------
-				
+
 				// Return true
 				return true;
 			},
-			
+
 			/**
 			 * jQuery Prototype Extensions
 			 */
@@ -4091,15 +4091,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				 */
 				ajaxify: function(){
 					var Ajaxy = $.Ajaxy;
-					
+
 					// Prepare
 					var $el = $(this);
-					
+
 					// Ajaxify the controllers
 					$.each(Ajaxy.Controllers, function(controller,Controller){
 						Ajaxy.ajaxifyController(controller);
 					});
-			
+
 					// Ajaxify Internal Links
 					if ( Ajaxy.options.track_all_internal_links ) {
 						var $internalLinks = $el.findAndSelf('a[href^=/],a[href^=./]');
@@ -4111,19 +4111,19 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						$internalLinks = $internalLinks.filter(':not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
 						delete $internalLinks;
 					}
-					
+
 					// Ajaxify Anchors
 					if ( Ajaxy.options.track_all_anchors ) {
 						$el.findAndSelf('a[href^=#]:not(.ajaxy,.no-ajaxy)').addClass('ajaxy');
 					}
-					
+
 					// Add Ajaxy Handlers
 					$el.addAjaxy();
-					
+
 					// Chain
 					return $el;
 				},
-				
+
 				/**
 				 * Add the Ajaxy handlers
 				 * Eg. $('#id').addAjaxy();
@@ -4131,15 +4131,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				 */
 				addAjaxy: function(controller){
 					var Ajaxy = $.Ajaxy;
-					
+
 					// Prepare
 					var $el = $(this);
-					
+
 					// Adjust
 					if ( $el.is('form,a') ) {
 						$el.addClass('ajaxy');
 					}
-					
+
 					// Add Controller Classname
 					if ( controller ) {
 						var Controller = Ajaxy.getController(controller);
@@ -4147,17 +4147,17 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 							$el.addClass(Controller.classname);
 						}
 					}
-					
+
 					// Add the onclick handler for ajax compatiable links
 					$el.findAndSelf('a.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('click',Ajaxy.ajaxifyHelpers.a);
-				
+
 					// Add the onclick handler for ajax compatiable forms
 					$el.findAndSelf('form.ajaxy:not(.ajaxy-has)').addClass('ajaxy-has').once('submit',Ajaxy.ajaxifyHelpers.form);
-				
+
 					// Chain
 					return $el;
 				},
-				
+
 				/**
 				 * Remove the Ajaxy handlers
 				 * Eg. $('#id').removeAjaxy();
@@ -4165,39 +4165,39 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				 */
 				removeAjaxy: function(options){
 					var Ajaxy = $.Ajaxy;
-					
+
 					// Prepare
 					var	$el = $(this),
 						config = $.extend({
 							permanently: true
 						},options);
-					
+
 					// Remove
 					var $a = $el.findAndSelf('a.ajaxy').removeClass('ajaxy ajaxy-has').unbind('click',Ajaxy.ajaxifyHelpers.a);
 					var $form = $el.findAndSelf('form.ajaxy').removeClass('ajaxy ajaxy-has').unbind('submit',Ajaxy.ajaxifyHelpers.form);
-					
+
 					// Permanently
 					if ( config.permanently ) {
 						$a.add($form).addClass('no-ajaxy');
 					}
-					
+
 					// Chain
 					return $el;
 				}
 			},
-			
+
 			/**
 			 * Ajaxify Helpers for particular types of elements
 			 */
 			ajaxifyHelpers: {
 				a: function(event){
 					var Ajaxy = $.Ajaxy;
-					
+
 					// --------------------------
-					
+
 					// Fetch
 					var $a = $(this);
-					
+
 					// Prepare
 					var href = Ajaxy.extractRelativeUrl($a.attr('href')).replace(/^\/?\.\//,'/');
 					var state = Ajaxy.extractState(href);
@@ -4205,7 +4205,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					if ( '/'+anchor === state || anchor === state ) anchor = '';
 					var log = !$a.hasClass(Ajaxy.options.no_log_class);
 					var controller = $a.data('ajaxy-controller')||null;
-					
+
 					// Perform the request
 					Ajaxy.go({
 						'state': state,
@@ -4214,9 +4214,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 						'anchor': anchor,
 						'el': this
 					});
-					
+
 					// --------------------------
-					
+
 					// Prevent
 					event.stopPropagation();
 					event.preventDefault();
@@ -4224,47 +4224,47 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 				},
 				form: function(event){
 					var Ajaxy = $.Ajaxy;
-					
+
 					// --------------------------
-					
+
 					// Fetch
 					var $form = $(this);
-					
+
 					// Check
 					var disabled = $form.attr('disabled'); disabled = disabled || disabled === 'false';
 					if ( disabled ) {
 						return false;
 					}
-					
+
 					// See if we are in the middle of a request
 					if ( $form.attr('target') ) {
 						// We are, so proceed with the request
 						return true;
 					}
-					
+
 					// Generate the state
 					var href = Ajaxy.extractRelativeUrl($form.attr('action')).replace(/^\/?\.\//,'/');
 					var state = Ajaxy.extractState(href);
-					
+
 					// Perform the request
 					Ajaxy.go({
 						'state': state,
 						'el': this
 					});
-					
+
 					// --------------------------
-					
+
 					// Prevent
 					event.stopPropagation();
 					event.preventDefault();
 					return false;
 				}
 			},
-			
-			
+
+
 			// ====================================================
 			// Helpers
-			
+
 			/**
 			 * Convert a HTML document into one compatiable with jQuery
 			 * Will remove doctype, and convert html,head,body,title,meta elements to divs.
@@ -4276,25 +4276,25 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					.replace(/<(html|head|body|title|meta)/gi,'<div id="ajaxy-$1"')
 					.replace(/<\/(html|head|body|title|meta)/gi,'</div')
 				;
-				
+
 				// Return result
 				return result;
 			},
-			
+
 			// ====================================================
 			// Events
-			
+
 			/**
 			 * Handler for a stateChange
 			 * @param {Object} state
 			 */
 			stateChange: function ( state ) {
 				var Ajaxy = $.Ajaxy; var History = $.History;
-			
+
 				// Perform the Request
 				Ajaxy.request(state);
 			},
-			
+
 			/**
 			 * Handle the Configured Promise
 			 * We use promise as the function will fire if the event was already fired as it is still true
@@ -4302,7 +4302,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			 */
 			onConfigured: function(){
 				var Ajaxy = this;
-				
+
 				// Handle Promise
 				return $.promise({
 					'object': Ajaxy,
@@ -4311,7 +4311,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					'arguments': arguments
 				});
 			},
-			
+
 			/**
 			 * Handle the DocumentReady Promise
 			 * We use promise as the function will fire if the event was already fired as it is still true
@@ -4320,7 +4320,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			onDocumentReady: function(handler){
 				// Prepare
 				var Ajaxy = this;
-				
+
 				// Handle Promise
 				return $.promise({
 					'object': Ajaxy,
@@ -4329,7 +4329,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					'arguments': arguments
 				});
 			},
-			
+
 			/**
 			 * Handle the Ready Promise
 			 * We use promise as the function will fire if the event was already fired as it is still true
@@ -4338,7 +4338,7 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			onReady: function(handler){
 				// Prepare
 				var Ajaxy = this;
-				
+
 				// Handle Promise
 				return $.promise({
 					'object': Ajaxy,
@@ -4347,15 +4347,15 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 					'arguments': arguments
 				});
 			}
-	
+
 		};
-	
+
 		// Construct
 		$.Ajaxy.construct();
 	}
 	else {
 		window.console.warn('$.Ajaxy has already been defined...');
 	}
-	
+
 // Finished definition
 })(jQuery); // We are done with our plugin, so lets call it with jQuery as the argument
