@@ -4273,8 +4273,8 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
 			htmlCompat: function(html){
 				var result = String(html)
 					.replace(/<\!DOCTYPE[^>]*>/i, '')
-					.replace(/<(html|head|body|title|meta)/gi,'<div id="ajaxy-$1"')
-					.replace(/<\/(html|head|body|title|meta)/gi,'</div')
+					.replace(/<(html|head|body|title|meta)\b/gi,'<div id="ajaxy-$1"')
+					.replace(/<\/(html|head|body|title|meta)\b/gi,'</div')
 				;
 
 				// Return result
