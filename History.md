@@ -1,5 +1,9 @@
 ## History
 
+v1.6.1, December 28, 2012
+- Fixed `<header>` elements being stripped
+	- Thanks to [exocom](https://github.com/exocom) for [pull request #7](https://github.com/balupton/jquery-ajaxy/pull/7)
+
 v1.6.0-beta, August 31, 2010
 - Added Ajaxy form demo.
 - Added Ajaxy.onReady, Ajaxy.onDocumentReady and Ajaxy.onConfigured promises
